@@ -1,15 +1,15 @@
 import Config
 
 # Configure your database
-config :sync_me, SyncMe.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "sync_me_dev",
-  port: 5433,
-  stacktrace: true,
-  show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+#config :sync_me, SyncMe.Repo,
+#  username: "postgres",
+#  password: "postgres",
+#  hostname: "localhost",
+#  database: "sync_me_dev",
+#  port: 5433,
+#  stacktrace: true,
+#  show_sensitive_data_on_connection_error: true,
+#  pool_size: 10
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
