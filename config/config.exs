@@ -7,9 +7,9 @@
 # General application configuration
 import Config
 
-#config :sync_me,
-#  ecto_repos: [SyncMe.Repo],
-#  generators: [timestamp_type: :utc_datetime, binary_id: true]
+config :sync_me,
+  ecto_repos: [SyncMe.Repo],
+  generators: [timestamp_type: :utc_datetime, binary_id: true]
 
 # Configures the endpoint
 config :sync_me, SyncMeWeb.Endpoint,
