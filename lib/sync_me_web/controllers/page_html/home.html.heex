@@ -1,0 +1,160 @@
+<Layouts.flash_group flash={@flash} />
+
+
+
+
+<div class="px-4 py-10 sm:px-6 sm:py-28 lg:px-8 xl:px-28 xl:py-32 container mx-auto max-w-4xl">
+  <div class="lg:mx-0">
+
+    <!-- SyncMe.link – Logo (Orange theme) -->
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" role="img" aria-labelledby="title desc">
+  <title id="title">SyncMe.link Logo</title>
+  <desc id="desc">An S-shaped pair of interlocking links in orange next to the text SyncMe.link</desc>
+
+  <!-- ====== Defs: colors and effects ====== -->
+  <defs>
+    <!-- Primary orange gradient -->
+    <linearGradient id="grad-orange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A18"/>
+      <stop offset="100%" stop-color="#FFB347"/>
+    </linearGradient>
+
+    <!-- Subtle shadow for the mark -->
+    <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.18"/>
+    </filter>
+
+    <!-- Reusable rounded link shape (a rounded rect path) -->
+    <symbol id="link-shape" viewBox="0 0 120 70">
+      <rect x="5" y="5" width="110" height="60" rx="30" ry="30" fill="none" stroke="url(#grad-orange)" stroke-width="12" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+
+  <!-- ====== Logo mark (S made of two links) ====== -->
+  <g id="mark" filter="url(#soft-shadow)" transform="translate(10,10)">
+    <!-- Top-right link -->
+    <g transform="rotate(-25 60 50)">
+      <use href="#link-shape"/>
+    </g>
+
+    <!-- Bottom-left link (mirrored and overlapped) -->
+    <g transform="translate(0,0) rotate(155 60 50)">
+      <use href="#link-shape"/>
+    </g>
+
+    <!-- Sync spark (small star) -->
+    <g transform="translate(96,18)">
+      <circle r="3.5" fill="#FF7A18"/>
+      <path d="M0 -9 L1.8 -1.8 9 0 1.8 1.8 0 9 -1.8 1.8 -9 0 -1.8 -1.8 Z" fill="#FFB347"/>
+    </g>
+  </g>
+
+  <!-- ====== Wordmark ====== -->
+  <g id="wordmark" transform="translate(160,78)">
+    <!-- Use system fonts so no webfont required -->
+    <text x="0" y="0"
+          font-family="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+          font-size="60" font-weight="700" letter-spacing="0.5"          
+          >
+      SyncMe
+      <tspan font-weight="600" fill="url(#grad-orange)">.link</tspan>
+    </text>
+  </g>
+
+  <!-- ====== Dark mode support (optional) ====== -->
+  
+</svg>
+
+    
+    <div class="mt-10 flex justify-between items-center">
+    
+      <h1 class="flex items-center text-sm font-semibold leading-6">
+        SyncMe.Link
+        
+      </h1>
+      <Layouts.theme_toggle />
+    </div>
+
+    <p class="text-[2rem]  mt-4 font-semibold leading-10 tracking-light text-balance">
+      Your Time is Valuable. Finally, a Link That Proves It.
+    </p>
+    <p class="mt-4 text-sm leading-7 text-base-content/70 font-intra">
+      Stop the endless DMs asking to "pick your brain". <span class="font-bold">Have 1:1 calls with your followers.</span>
+      
+    </p>
+    <p class="mt-4 text-sm leading-7 text-base-content/70 font-intra">
+    SyncMe provides one simple <span class="font-bold text-md">link for your bio</span> that lets your followers book and pay for your time. <br/>We handle the scheduling, payments, and video calls,<br/> so you can focus on what you do best: <span class="font-bold">sharing your expertise.</span>
+    </p>
+
+    
+
+    <div class="flex">
+      <div class="w-full sm:w-auto">
+        <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">
+          <a
+            href="https://hexdocs.pm/phoenix/overview.html"
+            class="group relative rounded-box px-6 py-4 text-sm font-semibold leading-6 sm:py-6"
+          >
+            <span class="absolute inset-0 rounded-box bg-base-200 transition group-hover:bg-base-300 sm:group-hover:scale-105">
+            </span>
+            <span class="relative flex items-center gap-4 sm:flex-col">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
+              </svg>
+              Claim your syncme.link
+            </span>
+          </a>
+          <a
+            href="https://github.com/phoenixframework/phoenix"
+            class="group relative rounded-box px-6 py-4 text-sm font-semibold leading-6 sm:py-6"
+          >
+            <span class="absolute inset-0 rounded-box bg-base-200 transition group-hover:bg-base-300 sm:group-hover:scale-105">
+            </span>
+            <span class="relative flex items-center gap-4 sm:flex-col">
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="h-6 w-6">
+                <path
+                  fill="currentColor"
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M12 0C5.37 0 0 5.506 0 12.303c0 5.445 3.435 10.043 8.205 11.674.6.107.825-.262.825-.585 0-.292-.015-1.261-.015-2.291C6 21.67 5.22 20.346 4.98 19.654c-.135-.354-.72-1.446-1.23-1.738-.42-.23-1.02-.8-.015-.815.945-.015 1.62.892 1.845 1.261 1.08 1.86 2.805 1.338 3.495 1.015.105-.8.42-1.338.765-1.645-2.67-.308-5.46-1.37-5.46-6.075 0-1.338.465-2.446 1.23-3.307-.12-.308-.54-1.569.12-3.26 0 0 1.005-.323 3.3 1.26.96-.276 1.98-.415 3-.415s2.04.139 3 .416c2.295-1.6 3.3-1.261 3.3-1.261.66 1.691.24 2.952.12 3.26.765.861 1.23 1.953 1.23 3.307 0 4.721-2.805 5.767-5.475 6.075.435.384.81 1.122.81 2.276 0 1.645-.015 2.968-.015 3.383 0 .323.225.707.825.585a12.047 12.047 0 0 0 5.919-4.489A12.536 12.536 0 0 0 24 12.304C24 5.505 18.63 0 12 0Z"
+                />
+              </svg>
+              Source Code
+            </span>
+          </a>
+          <a
+            href={"https://github.com/phoenixframework/phoenix/blob/v#{Application.spec(:phoenix, :vsn)}/CHANGELOG.md"}
+            class="group relative rounded-box px-6 py-4 text-sm font-semibold leading-6 sm:py-6"
+          >
+            <span class="absolute inset-0 rounded-box bg-base-200 transition group-hover:bg-base-300 sm:group-hover:scale-105">
+            </span>
+            <span class="relative flex items-center gap-4 sm:flex-col">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="h-6 w-6">
+                <path
+                  d="M12 1v6M12 17v6"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="4"
+                  fill="currentColor"
+                  fill-opacity=".15"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Changelog
+            </span>
+          </a>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
