@@ -7,9 +7,22 @@
 # General application configuration
 import Config
 
-#config :sync_me,
-#  ecto_repos: [SyncMe.Repo],
-#  generators: [timestamp_type: :utc_datetime, binary_id: true]
+config :sync_me, :scopes,
+  user: [
+    default: true,
+    module: SyncMe.Accounts.Scope,
+    assign_key: :current_scope,
+    access_path: [:user, :id],
+    schema_key: :user_id,
+    schema_type: :binary_id,
+    schema_table: :users,
+    test_data_fixture: SyncMe.AccountsFixtures,
+    test_setup_helper: :register_and_log_in_user
+  ]
+
+config :sync_me,
+  ecto_repos: [SyncMe.Repo],
+  generators: [timestamp_type: :utc_datetime, binary_id: true]
 
 # Configures the endpoint
 config :sync_me, SyncMeWeb.Endpoint,
@@ -63,3 +76,14 @@ config :phoenix, :json_library, Jason
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
+
+
+#Google Auth config
+config :ueberauth, Ueberauth,
+  providers: [
+    google: {Ueberauth.Strategy.Google, []}
+  ]
+
+config :ueberauth, Ueberauth.Strategy.Google.OAuth,
+  client_id: System.get_env("GOOGLE_CLIENT_ID"),
+  client_secret: System.get_env("GOOGLE_CLIENT_SECRET")

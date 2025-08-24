@@ -9,7 +9,7 @@ defmodule SyncMe.Application do
   def start(_type, _args) do
     children = [
       SyncMeWeb.Telemetry,
-      #SyncMe.Repo,
+      SyncMe.Repo,
       {DNSCluster, query: Application.get_env(:sync_me, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: SyncMe.PubSub},
       # Start a worker by calling: SyncMe.Worker.start_link(arg)
