@@ -23,6 +23,7 @@ defmodule SyncMeWeb.UserHome do
       </div>
 
     </div>
+    {@current_scope.user.email}
     """
   end
 
