@@ -9,7 +9,7 @@ defmodule SyncMe.Accounts.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"SyncMe", "contact@example.com"})
+      |> from({"SyncMe", "admin@syncme.link"})
       |> subject(subject)
       |> text_body(body)
 
