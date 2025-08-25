@@ -15,6 +15,7 @@ kill_signal = 'SIGTERM'
 [env]
   PHX_HOST = 'sync-me-bold-breeze-7417.fly.dev'
   PORT = '8080'
+  MIX_ENV = "prod"
 
 [http_service]
   internal_port = 8080
