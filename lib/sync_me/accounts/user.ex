@@ -6,11 +6,13 @@ defmodule SyncMe.Accounts.User do
   @foreign_key_type :binary_id
   schema "users" do
     field :email, :string
+    field :first_name, :string
+    field :last_name, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
-
+    field :is_oauth_user, :boolean
     timestamps(type: :utc_datetime)
   end
 
