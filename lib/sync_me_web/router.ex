@@ -21,6 +21,8 @@ defmodule SyncMeWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/privacy", PrivacyAndTOSController, :privacy
+    get "/terms_of_service", PrivacyAndTOSController, :tos
   end
 
   # Other scopes may use custom stacks.

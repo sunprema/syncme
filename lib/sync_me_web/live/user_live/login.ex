@@ -3,6 +3,8 @@ defmodule SyncMeWeb.UserLive.Login do
 
   alias SyncMe.Accounts
 
+
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -10,22 +12,12 @@ defmodule SyncMeWeb.UserLive.Login do
       <div class="mx-auto max-w-sm space-y-4">
         <div class="text-center">
           <.header>
-            <p>Log in</p>
-            <:subtitle>
-              <%= if @current_scope do %>
-                You need to reauthenticate to perform sensitive actions on your account.
-              <% else %>
-                Don't have an account? <.link
-                  navigate={~p"/users/register"}
-                  class="font-semibold text-brand hover:underline"
-                  phx-no-format
-                >Sign up</.link> for an account now.
-              <% end %>
-            </:subtitle>
+            <p class="tracking-normal text-md font-semibold">Log in to your SyncMe.Link account</p>
+
           </.header>
         </div>
 
-        <div :if={local_mail_adapter?()} class="alert alert-info">
+        <div :if={local_mail_adapter?()} class="alert">
           <.icon name="hero-information-circle" class="size-6 shrink-0" />
           <div>
             <p>You are running the local mail adapter.</p>
@@ -51,43 +43,23 @@ defmodule SyncMeWeb.UserLive.Login do
             required
             phx-mounted={JS.focus()}
           />
-          <.button class="btn btn-primary w-full">
-            Log in with email <span aria-hidden="true">→</span>
-          </.button>
+          <button class="btn btn-neutral w-full font-normal">
+            Log in with email
+          </button>
         </.form>
 
-        <div class="divider">or</div>
+        <div class="divider divider-neutral/50 text-xs my-8" >OR</div>
+          <button class="btn btn-neutral btn-outline w-full font-normal">
+            Continue with Google
+          </button>
+        </div>
 
-        <.form
-          :let={f}
-          for={@form}
-          id="login_form_password"
-          action={~p"/users/log-in"}
-          phx-submit="submit_password"
-          phx-trigger-action={@trigger_submit}
-        >
-          <.input
-            readonly={!!@current_scope}
-            field={f[:email]}
-            type="email"
-            label="Email"
-            autocomplete="username"
-            required
-          />
-          <.input
-            field={@form[:password]}
-            type="password"
-            label="Password"
-            autocomplete="current-password"
-          />
-          <.button class="btn btn-primary w-full" name={@form[:remember_me].name} value="true">
-            Log in and stay logged in <span aria-hidden="true">→</span>
-          </.button>
-          <.button class="btn btn-primary btn-soft w-full mt-2">
-            Log in only this time
-          </.button>
-        </.form>
-      </div>
+        <footer class="footer sm:footer-horizontal absolute bottom-4 left-0 footer-center  text-base-content p-4">
+          <aside>
+          <p class="text-xs">By continuing, you agree to SyncMe.Link's <a><span class="font-semibold">Terms of Service</span></a> and <a><span class="font-semibold">Privacy Policy</span></a></p>
+          </aside>
+        </footer>
+
     </Layouts.app>
     """
   end
@@ -100,7 +72,7 @@ defmodule SyncMeWeb.UserLive.Login do
 
     form = to_form(%{"email" => email}, as: "user")
 
-    {:ok, assign(socket, form: form, trigger_submit: false)}
+    {:ok, assign(socket, form: form, trigger_submit: false), }
   end
 
   @impl true
