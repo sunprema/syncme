@@ -17,6 +17,13 @@ defmodule SyncMeWeb.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/auth", SyncMeWeb do
+    pipe_through :browser
+    get "/:provider", AuthController, :request
+    get "/:provider/callback", AuthController, :callback
+    delete "/logout", AuthController, :delete
+  end
+
   scope "/", SyncMeWeb do
     pipe_through :browser
 
@@ -77,4 +84,7 @@ defmodule SyncMeWeb.Router do
     post "/users/log-in", UserSessionController, :create
     delete "/users/log-out", UserSessionController, :delete
   end
+
+
+
 end

@@ -294,4 +294,11 @@ defmodule SyncMe.Accounts do
       end
     end)
   end
+
+  def register_oauth_user(attrs) do
+    %User{}
+    |> User.oauth_registration_changeset(attrs)
+    |> Repo.insert()
+  end
+
 end

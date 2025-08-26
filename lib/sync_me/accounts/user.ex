@@ -80,6 +80,14 @@ defmodule SyncMe.Accounts.User do
     |> validate_password(opts)
   end
 
+  def oauth_registration_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :first_name, :last_name])
+    |> validate_required([:first_name, :last_name, :email])
+    |> validate_email(opts)
+    |> put_change(:is_oauth_user, true)
+  end
+
   defp validate_password(changeset, opts) do
     changeset
     |> validate_required([:password])

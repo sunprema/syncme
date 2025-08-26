@@ -49,9 +49,7 @@ defmodule SyncMeWeb.UserLive.Login do
         </.form>
 
         <div class="divider divider-neutral/50 text-xs my-8" >OR</div>
-          <button class="btn btn-neutral btn-outline w-full font-normal">
-            Continue with Google
-          </button>
+          <.link href={~p"/auth/google"} class="btn btn-outline w-full font-normal">Continue with Google</.link>
         </div>
 
         <footer class="footer sm:footer-horizontal absolute bottom-4 left-0 footer-center  text-base-content p-4">
