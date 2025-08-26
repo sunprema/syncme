@@ -11,7 +11,7 @@ defmodule SyncMeWeb.Layouts do
 
   embed_templates "layouts/*"
 
-  def app(assigns) do
+  def app_original(assigns) do
     ~H"""
     <header class="navbar px-4 sm:px-6 lg:px-8">
       <div class="flex-1">
@@ -39,6 +39,19 @@ defmodule SyncMeWeb.Layouts do
         </ul>
       </div>
     </header>
+
+    <main class="px-4 py-20 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-2xl space-y-4">
+        {render_slot(@inner_block)}
+      </div>
+    </main>
+
+    <.flash_group flash={@flash} />
+    """
+  end
+
+  def app(assigns) do
+    ~H"""
 
     <main class="px-4 py-20 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-2xl space-y-4">
