@@ -108,11 +108,16 @@ if config_env() == :prod do
   config :sync_me, SyncMe.Mailer,
          adapter: Swoosh.Adapters.Sendgrid,
          api_key: System.get_env("SENDGRID_API_KEY")
-  #
-  # For this example you need include a HTTP client required by Swoosh API client.
-  # Swoosh supports Hackney, Req and Finch out of the box:
-  #
-  #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
-  #
-  # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+
+
+  #Google Auth config
+  config :ueberauth, Ueberauth,
+    providers: [
+      google: {Ueberauth.Strategy.Google, [default_scope: "email profile"]}
+    ]
+
+  config :ueberauth, Ueberauth.Strategy.Google.OAuth,
+    client_id: System.get_env("GOOGLE_CLIENT_ID"),
+    client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
+
 end
