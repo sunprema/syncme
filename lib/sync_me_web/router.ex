@@ -30,6 +30,7 @@ defmodule SyncMeWeb.Router do
     get "/", PageController, :home
     get "/privacy", PrivacyAndTOSController, :privacy
     get "/terms_of_service", PrivacyAndTOSController, :tos
+    get "/:syncme_link", GuestUserHomeController, :home
   end
 
   # Other scopes may use custom stacks.
