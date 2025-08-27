@@ -7,7 +7,11 @@ defmodule SyncMe.Partners.Partner do
   schema "partners" do
     field :bio, :string
     field :syncme_link, :string
-    field :user_id, :binary_id
+
+    belongs_to :user, SyncMe.Accounts.User
+    has_many :event_types, SyncMe.Events.EventType
+    has_many :availability_rules, SyncMe.Availability.AvailabilityRule
+    has_many :availability_overrides, SyncMe.Availability.AvailabilityOverride
 
     timestamps(type: :utc_datetime)
   end
