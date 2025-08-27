@@ -7,7 +7,7 @@ defmodule SyncMeWeb.UserLive.Confirmation do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <div class="mx-auto max-w-sm">
+      <div class="mx-auto max-w-sm space-y-2">
         <div class="text-center">
           <.header>Welcome {@user.email}</.header>
         </div>
@@ -22,17 +22,17 @@ defmodule SyncMeWeb.UserLive.Confirmation do
           phx-trigger-action={@trigger_submit}
         >
           <input type="hidden" name={@form[:token].name} value={@form[:token].value} />
-          <.button
+          <button
             name={@form[:remember_me].name}
             value="true"
             phx-disable-with="Confirming..."
-            class="btn btn-primary w-full"
+            class="btn btn-neutral w-full"
           >
             Confirm and stay logged in
-          </.button>
-          <.button phx-disable-with="Confirming..." class="btn btn-primary btn-soft w-full mt-2">
+          </button>
+          <button phx-disable-with="Confirming..." class="btn btn-secondary btn-outline btn-soft w-full mt-4">
             Confirm and log in only this time
-          </.button>
+          </button>
         </.form>
 
         <.form
@@ -50,17 +50,17 @@ defmodule SyncMeWeb.UserLive.Confirmation do
               Log in
             </.button>
           <% else %>
-            <.button
+            <button
               name={@form[:remember_me].name}
               value="true"
               phx-disable-with="Logging in..."
               class="btn btn-primary w-full"
             >
               Keep me logged in on this device
-            </.button>
-            <.button phx-disable-with="Logging in..." class="btn btn-primary btn-soft w-full mt-2">
+            </button>
+            <button phx-disable-with="Logging in..." class="btn btn-primary btn-soft w-full mt-4">
               Log me in only this time
-            </.button>
+            </button>
           <% end %>
         </.form>
 
