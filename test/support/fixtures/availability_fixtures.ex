@@ -18,4 +18,20 @@ defmodule SyncMe.AvailabilityFixtures do
     {:ok, availability_rule} = SyncMe.Availability.create_availability_rule(scope, attrs)
     availability_rule
   end
+
+  @doc """
+  Generate a availability_override.
+  """
+  def availability_override_fixture(scope, attrs \\ %{}) do
+    attrs =
+      Enum.into(attrs, %{
+        date: ~D[2025-08-26],
+        end_time: ~T[14:00:00],
+        is_available: true,
+        start_time: ~T[14:00:00]
+      })
+
+    {:ok, availability_override} = SyncMe.Availability.create_availability_override(scope, attrs)
+    availability_override
+  end
 end
