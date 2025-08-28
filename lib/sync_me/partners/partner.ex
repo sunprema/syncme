@@ -12,6 +12,7 @@ defmodule SyncMe.Partners.Partner do
     has_many :event_types, SyncMe.Events.EventType
     has_many :availability_rules, SyncMe.Availability.AvailabilityRule
     has_many :availability_overrides, SyncMe.Availability.AvailabilityOverride
+    has_many :bookings, SyncMe.Bookings.Booking
 
     timestamps(type: :utc_datetime)
   end

@@ -10,28 +10,6 @@ defmodule SyncMe.Bookings do
   alias SyncMe.Bookings.Booking
   alias SyncMe.Accounts.Scope
 
-  @doc """
-  Subscribes to scoped notifications about any booking changes.
-
-  The broadcasted messages match the pattern:
-
-    * {:created, %Booking{}}
-    * {:updated, %Booking{}}
-    * {:deleted, %Booking{}}
-
-  """
-  def subscribe_bookings(%Scope{} = scope) do
-    key = scope.user.id
-
-    Phoenix.PubSub.subscribe(SyncMe.PubSub, "user:#{key}:bookings")
-  end
-
-  defp broadcast(%Scope{} = scope, message) do
-    key = scope.user.id
-
-    Phoenix.PubSub.broadcast(SyncMe.PubSub, "user:#{key}:bookings", message)
-  end
-
   def list_bookings(%Scope{user: user}, filters \\ %{}) when not is_nil(user) do
     partner = Repo.get_by(Partner, user_id: user.id)
 
@@ -52,95 +30,43 @@ defmodule SyncMe.Bookings do
     Repo.all(query_with_filters)
   end
 
-  @doc """
-  Gets a single booking.
+  def get_booking!(%Scope{user: user}, id) when not is_nil(user) do
+    # Booking can be obtained by Guest user or Partner
+    partner = Repo.get_by(Partner, user_id: user.id)
 
-  Raises `Ecto.NoResultsError` if the Booking does not exist.
+    base_query =
+      cond do
+        !is_nil(partner) ->
+          from b in Booking,
+            where: b.partner_id == ^partner.id and b.id == ^id,
+            preload: [:guest_user, :event_type]
 
-  ## Examples
+        true ->
+          from b in Booking,
+            where: b.guest_user_id == ^user.id and b.id == ^id,
+            preload: [partner: [user: :partner], event_type: []]
+      end
 
-      iex> get_booking!(scope, 123)
-      %Booking{}
-
-      iex> get_booking!(scope, 456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_booking!(%Scope{} = scope, id) do
-    Repo.get_by!(Booking, id: id, user_id: scope.user.id)
+    Repo.one!(base_query)
   end
 
-  @doc """
-  Creates a booking.
-
-  ## Examples
-
-      iex> create_booking(scope, %{field: value})
-      {:ok, %Booking{}}
-
-      iex> create_booking(scope, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
   def create_booking(%Scope{} = scope, attrs) do
     with {:ok, booking = %Booking{}} <-
            %Booking{}
            |> Booking.changeset(attrs, scope)
            |> Repo.insert() do
-      broadcast(scope, {:created, booking})
       {:ok, booking}
     end
   end
-
-  """
-  def update_booking(%Scope{} = scope, %Booking{} = booking, attrs) do
-    true = booking.user_id == scope.user.id
-
-    with {:ok, booking = %Booking{}} <-
-           booking
-           |> Booking.changeset(attrs, scope)
-           |> Repo.update() do
-      broadcast(scope, {:updated, booking})
-      {:ok, booking}
-    end
-  end
-
-  @doc \"""
-  Deletes a booking.
-
-  ## Examples
-
-      iex> delete_booking(scope, booking)
-      {:ok, %Booking{}}
-
-      iex> delete_booking(scope, booking)
-      {:error, %Ecto.Changeset{}}
-
-  """
 
   def delete_booking(%Scope{} = scope, %Booking{} = booking) do
-    true = booking.user_id == scope.user.id
-
-    with {:ok, booking = %Booking{}} <-
-           Repo.delete(booking) do
-      broadcast(scope, {:deleted, booking})
-      {:ok, booking}
+    # only the partner or guest can cancel a booking.
+    # TODO: Think about only future bookings can be cancelled.
+    with :ok <- verify_booking_ownership(scope, booking) do
+      Repo.delete(booking)
+    else
+      {:error, reason} -> {:error, reason}
     end
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking booking changes.
-
-  ## Examples
-
-      iex> change_booking(scope, booking)
-      %Ecto.Changeset{data: %Booking{}}
-
-  """
-  def change_booking(%Scope{} = scope, %Booking{} = booking, attrs \\ %{}) do
-    true = booking.user_id == scope.user.id
-
-    Booking.changeset(booking, attrs, scope)
   end
 
   # --- Private Helper for Filtering ---
@@ -158,5 +84,24 @@ defmodule SyncMe.Bookings do
   # If no recognized filters are passed, return the original query.
   defp apply_booking_filters(query, _filters) do
     query
+  end
+
+  defp verify_booking_ownership(%Scope{user: user}, %Booking{} = booking) when not is_nil(user) do
+    partner = Repo.get_by(Partner, user_id: user.id)
+
+    cond do
+      partner && partner.id == booking.partner_id ->
+        :ok
+
+      user.id == booking.guest_user_id ->
+        :ok
+
+      true ->
+        {:error, :not_found_or_unauthorized}
+    end
+  end
+
+  defp verify_booking_ownership(%Scope{user: nil}, _rule) do
+    {:error, :user_not_authenticated}
   end
 end
