@@ -67,8 +67,6 @@ defmodule SyncMeWeb.Router do
       live "/user/home", UserHome, :index
     end
 
-
-
     post "/users/update-password", UserSessionController, :update_password
   end
 
@@ -85,7 +83,4 @@ defmodule SyncMeWeb.Router do
     post "/users/log-in", UserSessionController, :create
     delete "/users/log-out", UserSessionController, :delete
   end
-
-
-
 end

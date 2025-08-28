@@ -139,7 +139,11 @@ defmodule SyncMe.Availability do
       %Ecto.Changeset{data: %AvailabilityRule{}}
 
   """
-  def change_availability_rule(%Scope{} = scope, %AvailabilityRule{} = availability_rule, attrs \\ %{}) do
+  def change_availability_rule(
+        %Scope{} = scope,
+        %AvailabilityRule{} = availability_rule,
+        attrs \\ %{}
+      ) do
     true = availability_rule.user_id == scope.user.id
 
     AvailabilityRule.changeset(availability_rule, attrs, scope)
@@ -229,7 +233,11 @@ defmodule SyncMe.Availability do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_availability_override(%Scope{} = scope, %AvailabilityOverride{} = availability_override, attrs) do
+  def update_availability_override(
+        %Scope{} = scope,
+        %AvailabilityOverride{} = availability_override,
+        attrs
+      ) do
     true = availability_override.user_id == scope.user.id
 
     with {:ok, availability_override = %AvailabilityOverride{}} <-
@@ -253,7 +261,10 @@ defmodule SyncMe.Availability do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_availability_override(%Scope{} = scope, %AvailabilityOverride{} = availability_override) do
+  def delete_availability_override(
+        %Scope{} = scope,
+        %AvailabilityOverride{} = availability_override
+      ) do
     true = availability_override.user_id == scope.user.id
 
     with {:ok, availability_override = %AvailabilityOverride{}} <-
@@ -272,7 +283,11 @@ defmodule SyncMe.Availability do
       %Ecto.Changeset{data: %AvailabilityOverride{}}
 
   """
-  def change_availability_override(%Scope{} = scope, %AvailabilityOverride{} = availability_override, attrs \\ %{}) do
+  def change_availability_override(
+        %Scope{} = scope,
+        %AvailabilityOverride{} = availability_override,
+        attrs \\ %{}
+      ) do
     true = availability_override.user_id == scope.user.id
 
     AvailabilityOverride.changeset(availability_override, attrs, scope)

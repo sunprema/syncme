@@ -7,7 +7,6 @@ defmodule SyncMeWeb.AuthController do
 
   plug Ueberauth
 
-
   def request(conn, _params) do
     Phoenix.Controller.redirect(conn, to: Helpers.callback_url(conn))
   end
@@ -30,6 +29,7 @@ defmodule SyncMeWeb.AuthController do
 
           {:error, changeset} ->
             Logger.error("Failed to create user #{inspect(changeset)}.")
+
             conn
             |> put_flash(:error, "Failed to create user.")
             |> redirect(to: ~p"/")
@@ -47,16 +47,10 @@ defmodule SyncMeWeb.AuthController do
     |> redirect(to: "/")
   end
 
-
   def delete(conn, _params) do
     conn
     |> put_flash(:info, "You have been logged out!")
     |> clear_session()
     |> redirect(to: "/")
   end
-
-
-
-
-
 end

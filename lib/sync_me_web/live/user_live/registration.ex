@@ -39,7 +39,11 @@ defmodule SyncMeWeb.UserLive.Registration do
 
         <footer class="footer sm:footer-horizontal absolute bottom-4 left-0 footer-center  text-base-content p-4">
           <aside>
-          <p class="text-xs">By continuing, you agree to SyncMe.Link's <a><span class="font-semibold">Terms of Service</span></a> and <a><span class="font-semibold">Privacy Policy</span></a></p>
+            <p class="text-xs">
+              By continuing, you agree to SyncMe.Link's
+              <a><span class="font-semibold">Terms of Service</span></a>
+              and <a><span class="font-semibold">Privacy Policy</span></a>
+            </p>
           </aside>
         </footer>
       </div>

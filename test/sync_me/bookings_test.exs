@@ -9,7 +9,14 @@ defmodule SyncMe.BookingsTest do
     import SyncMe.AccountsFixtures, only: [user_scope_fixture: 0]
     import SyncMe.BookingsFixtures
 
-    @invalid_attrs %{status: nil, start_time: nil, end_time: nil, video_conference_link: nil, price_at_booking: nil, duration_at_booking: nil}
+    @invalid_attrs %{
+      status: nil,
+      start_time: nil,
+      end_time: nil,
+      video_conference_link: nil,
+      price_at_booking: nil,
+      duration_at_booking: nil
+    }
 
     test "list_bookings/1 returns all scoped bookings" do
       scope = user_scope_fixture()
@@ -29,7 +36,15 @@ defmodule SyncMe.BookingsTest do
     end
 
     test "create_booking/2 with valid data creates a booking" do
-      valid_attrs = %{status: "some status", start_time: ~U[2025-08-27 00:20:00Z], end_time: ~U[2025-08-27 00:20:00Z], video_conference_link: "some video_conference_link", price_at_booking: "120.5", duration_at_booking: 42}
+      valid_attrs = %{
+        status: "some status",
+        start_time: ~U[2025-08-27 00:20:00Z],
+        end_time: ~U[2025-08-27 00:20:00Z],
+        video_conference_link: "some video_conference_link",
+        price_at_booking: "120.5",
+        duration_at_booking: 42
+      }
+
       scope = user_scope_fixture()
 
       assert {:ok, %Booking{} = booking} = Bookings.create_booking(scope, valid_attrs)
@@ -50,7 +65,15 @@ defmodule SyncMe.BookingsTest do
     test "update_booking/3 with valid data updates the booking" do
       scope = user_scope_fixture()
       booking = booking_fixture(scope)
-      update_attrs = %{status: "some updated status", start_time: ~U[2025-08-28 00:20:00Z], end_time: ~U[2025-08-28 00:20:00Z], video_conference_link: "some updated video_conference_link", price_at_booking: "456.7", duration_at_booking: 43}
+
+      update_attrs = %{
+        status: "some updated status",
+        start_time: ~U[2025-08-28 00:20:00Z],
+        end_time: ~U[2025-08-28 00:20:00Z],
+        video_conference_link: "some updated video_conference_link",
+        price_at_booking: "456.7",
+        duration_at_booking: 43
+      }
 
       assert {:ok, %Booking{} = booking} = Bookings.update_booking(scope, booking, update_attrs)
       assert booking.status == "some updated status"

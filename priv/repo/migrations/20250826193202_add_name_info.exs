@@ -14,5 +14,4 @@ defmodule SyncMe.Repo.Migrations.AddNameInfo do
       remove :last_name
     end
   end
-
 end

@@ -3,8 +3,6 @@ defmodule SyncMeWeb.UserLive.Login do
 
   alias SyncMe.Accounts
 
-
-
   @impl true
   def render(assigns) do
     ~H"""
@@ -13,7 +11,6 @@ defmodule SyncMeWeb.UserLive.Login do
         <div class="text-center">
           <.header>
             <p class="tracking-normal text-md font-semibold">Log in to your SyncMe.Link account</p>
-
           </.header>
         </div>
 
@@ -48,16 +45,21 @@ defmodule SyncMeWeb.UserLive.Login do
           </button>
         </.form>
 
-        <div class="divider divider-neutral/50 text-xs my-8" >OR</div>
-          <.link href={~p"/auth/google"} class="btn btn-outline w-full font-normal">Continue with Google</.link>
-        </div>
+        <div class="divider divider-neutral/50 text-xs my-8">OR</div>
+        <.link href={~p"/auth/google"} class="btn btn-outline w-full font-normal">
+          Continue with Google
+        </.link>
+      </div>
 
-        <footer class="footer sm:footer-horizontal absolute bottom-4 left-0 footer-center  text-base-content p-4">
-          <aside>
-          <p class="text-xs">By continuing, you agree to SyncMe.Link's <a><span class="font-semibold">Terms of Service</span></a> and <a><span class="font-semibold">Privacy Policy</span></a></p>
-          </aside>
-        </footer>
-
+      <footer class="footer sm:footer-horizontal absolute bottom-4 left-0 footer-center  text-base-content p-4">
+        <aside>
+          <p class="text-xs">
+            By continuing, you agree to SyncMe.Link's
+            <a><span class="font-semibold">Terms of Service</span></a>
+            and <a><span class="font-semibold">Privacy Policy</span></a>
+          </p>
+        </aside>
+      </footer>
     </Layouts.app>
     """
   end
@@ -70,7 +72,7 @@ defmodule SyncMeWeb.UserLive.Login do
 
     form = to_form(%{"email" => email}, as: "user")
 
-    {:ok, assign(socket, form: form, trigger_submit: false), }
+    {:ok, assign(socket, form: form, trigger_submit: false)}
   end
 
   @impl true

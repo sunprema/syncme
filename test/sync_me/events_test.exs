@@ -9,7 +9,14 @@ defmodule SyncMe.EventsTest do
     import SyncMe.AccountsFixtures, only: [user_scope_fixture: 0]
     import SyncMe.EventsFixtures
 
-    @invalid_attrs %{name: nil, description: nil, slug: nil, duration_in_minutes: nil, price: nil, is_active: nil}
+    @invalid_attrs %{
+      name: nil,
+      description: nil,
+      slug: nil,
+      duration_in_minutes: nil,
+      price: nil,
+      is_active: nil
+    }
 
     test "list_event_types/1 returns all scoped event_types" do
       scope = user_scope_fixture()
@@ -25,11 +32,22 @@ defmodule SyncMe.EventsTest do
       event_type = event_type_fixture(scope)
       other_scope = user_scope_fixture()
       assert Events.get_event_type!(scope, event_type.id) == event_type
-      assert_raise Ecto.NoResultsError, fn -> Events.get_event_type!(other_scope, event_type.id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Events.get_event_type!(other_scope, event_type.id)
+      end
     end
 
     test "create_event_type/2 with valid data creates a event_type" do
-      valid_attrs = %{name: "some name", description: "some description", slug: "some slug", duration_in_minutes: 42, price: "120.5", is_active: true}
+      valid_attrs = %{
+        name: "some name",
+        description: "some description",
+        slug: "some slug",
+        duration_in_minutes: 42,
+        price: "120.5",
+        is_active: true
+      }
+
       scope = user_scope_fixture()
 
       assert {:ok, %EventType{} = event_type} = Events.create_event_type(scope, valid_attrs)
@@ -50,9 +68,19 @@ defmodule SyncMe.EventsTest do
     test "update_event_type/3 with valid data updates the event_type" do
       scope = user_scope_fixture()
       event_type = event_type_fixture(scope)
-      update_attrs = %{name: "some updated name", description: "some updated description", slug: "some updated slug", duration_in_minutes: 43, price: "456.7", is_active: false}
 
-      assert {:ok, %EventType{} = event_type} = Events.update_event_type(scope, event_type, update_attrs)
+      update_attrs = %{
+        name: "some updated name",
+        description: "some updated description",
+        slug: "some updated slug",
+        duration_in_minutes: 43,
+        price: "456.7",
+        is_active: false
+      }
+
+      assert {:ok, %EventType{} = event_type} =
+               Events.update_event_type(scope, event_type, update_attrs)
+
       assert event_type.name == "some updated name"
       assert event_type.description == "some updated description"
       assert event_type.slug == "some updated slug"
@@ -74,7 +102,10 @@ defmodule SyncMe.EventsTest do
     test "update_event_type/3 with invalid data returns error changeset" do
       scope = user_scope_fixture()
       event_type = event_type_fixture(scope)
-      assert {:error, %Ecto.Changeset{}} = Events.update_event_type(scope, event_type, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Events.update_event_type(scope, event_type, @invalid_attrs)
+
       assert event_type == Events.get_event_type!(scope, event_type.id)
     end
 

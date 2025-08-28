@@ -14,6 +14,9 @@ defmodule SyncMe.Events.EventType do
     field :partner_id, :binary_id
     field :user_id, :binary_id
 
+    # A User is a guest in many bookings
+    has_many :bookings, SyncMe.Bookings.Booking
+
     timestamps(type: :utc_datetime)
   end
 

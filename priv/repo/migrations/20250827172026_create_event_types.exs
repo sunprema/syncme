@@ -19,7 +19,8 @@ defmodule SyncMe.Repo.Migrations.CreateEventTypes do
     create index(:event_types, [:user_id])
     create index(:event_types, [:partner_id])
 
-    create unique_index(:event_types, [:partner_id, :slug], name: :event_types_partner_id_slug_index)
-
+    create unique_index(:event_types, [:partner_id, :slug],
+             name: :event_types_partner_id_slug_index
+           )
   end
 end

@@ -300,5 +300,4 @@ defmodule SyncMe.Accounts do
     |> User.oauth_registration_changeset(attrs)
     |> Repo.insert()
   end
-
 end

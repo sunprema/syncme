@@ -14,5 +14,4 @@ defmodule SyncMe.Repo.Migrations.AddOauthUser do
       modify :hashed_password, :string, null: false
     end
   end
-
 end

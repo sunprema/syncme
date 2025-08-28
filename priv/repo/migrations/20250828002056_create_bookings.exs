@@ -2,11 +2,16 @@ defmodule SyncMe.Repo.Migrations.CreateBookings do
   use Ecto.Migration
 
   def change do
+    create table(:booking_statuses, primary_key: false) do
+      add :value, :string, primary_key: true
+    end
+
     create table(:bookings, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :start_time, :utc_datetime
       add :end_time, :utc_datetime
-      add :status, :string
+
+      add :status, :string, references: :booking_statuses
       add :video_conference_link, :string
       add :price_at_booking, :decimal
       add :duration_at_booking, :integer

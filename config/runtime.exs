@@ -28,7 +28,7 @@ if config_env() == :prod do
       For example: ecto://USER:PASS@HOST/DATABASE
       """
 
- maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
+  maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
   config :sync_me, SyncMe.Repo,
     # ssl: true,
@@ -106,11 +106,10 @@ if config_env() == :prod do
   # are not using SMTP. Here is an example of the configuration:
   #
   config :sync_me, SyncMe.Mailer,
-         adapter: Swoosh.Adapters.Sendgrid,
-         api_key: System.get_env("SENDGRID_API_KEY")
+    adapter: Swoosh.Adapters.Sendgrid,
+    api_key: System.get_env("SENDGRID_API_KEY")
 
-
-  #Google Auth config
+  # Google Auth config
   config :ueberauth, Ueberauth,
     providers: [
       google: {Ueberauth.Strategy.Google, [default_scope: "email profile"]}
@@ -119,5 +118,4 @@ if config_env() == :prod do
   config :ueberauth, Ueberauth.Strategy.Google.OAuth,
     client_id: System.get_env("GOOGLE_CLIENT_ID"),
     client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
-
 end

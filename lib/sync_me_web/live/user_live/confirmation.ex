@@ -30,7 +30,10 @@ defmodule SyncMeWeb.UserLive.Confirmation do
           >
             Confirm and stay logged in
           </button>
-          <button phx-disable-with="Confirming..." class="btn btn-secondary btn-outline btn-soft w-full mt-4">
+          <button
+            phx-disable-with="Confirming..."
+            class="btn btn-secondary btn-outline btn-soft w-full mt-4"
+          >
             Confirm and log in only this time
           </button>
         </.form>

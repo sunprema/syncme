@@ -12,6 +12,5 @@ defmodule SyncMe.Repo.Migrations.CreatePartners do
 
     create index(:partners, [:user_id])
     create index(:partners, [:syncme_link])
-
   end
 end

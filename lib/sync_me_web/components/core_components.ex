@@ -240,7 +240,7 @@ defmodule SyncMeWeb.CoreComponents do
   def input(assigns) do
     ~H"""
     <fieldset class="fieldset mb-2">
-      <label >
+      <label>
         <span :if={@label} class="fieldset-legend mb-2">{@label}</span>
         <input
           type={@type}

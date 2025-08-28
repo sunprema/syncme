@@ -1,5 +1,4 @@
 defmodule SyncMe.Accounts.Scope do
-
   alias SyncMe.Accounts.User
 
   defstruct user: nil
