@@ -1,295 +1,173 @@
 defmodule SyncMe.Availability do
-  @moduledoc """
-  The Availability context.
-  """
-
   import Ecto.Query, warn: false
   alias SyncMe.Repo
 
   alias SyncMe.Availability.AvailabilityRule
   alias SyncMe.Accounts.Scope
 
-  @doc """
-  Subscribes to scoped notifications about any availability_rule changes.
+  def list_availability_rules(%Scope{user: user}) when not is_nil(user) do
+    query =
+      from r in AvailabilityRule,
+        join: p in assoc(r, :partner),
+        where: p.user_id == ^user.id,
+        select: r
 
-  The broadcasted messages match the pattern:
-
-    * {:created, %AvailabilityRule{}}
-    * {:updated, %AvailabilityRule{}}
-    * {:deleted, %AvailabilityRule{}}
-
-  """
-  def subscribe_availability_rules(%Scope{} = scope) do
-    key = scope.user.id
-
-    Phoenix.PubSub.subscribe(SyncMe.PubSub, "user:#{key}:availability_rules")
+    Repo.all(query)
   end
 
-  defp broadcast(%Scope{} = scope, message) do
-    key = scope.user.id
-
-    Phoenix.PubSub.broadcast(SyncMe.PubSub, "user:#{key}:availability_rules", message)
+  def list_availability_rules(%Scope{user: nil}) do
+    []
   end
 
-  @doc """
-  Returns the list of availability_rules.
+  def get_availability_rule!(%Scope{user: user}, id) when not is_nil(user) do
+    query =
+      from r in AvailabilityRule,
+        join: p in assoc(r, :partner),
+        where: p.user_id == ^user.id and r.id == ^id,
+        select: r
 
-  ## Examples
-
-      iex> list_availability_rules(scope)
-      [%AvailabilityRule{}, ...]
-
-  """
-  def list_availability_rules(%Scope{} = scope) do
-    Repo.all_by(AvailabilityRule, user_id: scope.user.id)
+    Repo.one!(query)
   end
 
-  @doc """
-  Gets a single availability_rule.
+  @spec create_availability_rule(
+          %SyncMe.Accounts.Scope{:user => any(), optional(any()) => any()},
+          any()
+        ) :: any()
+  def create_availability_rule(%Scope{user: user}, attrs) when not is_nil(user) do
+    with partner <- Repo.get_by(Partner, user_id: user.id),
+         true <- !is_nil(partner) do
+      attrs_with_partner = Map.put(attrs, "partner_id", partner.id)
 
-  Raises `Ecto.NoResultsError` if the Availability rule does not exist.
-
-  ## Examples
-
-      iex> get_availability_rule!(scope, 123)
       %AvailabilityRule{}
-
-      iex> get_availability_rule!(scope, 456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_availability_rule!(%Scope{} = scope, id) do
-    Repo.get_by!(AvailabilityRule, id: id, user_id: scope.user.id)
-  end
-
-  @doc """
-  Creates a availability_rule.
-
-  ## Examples
-
-      iex> create_availability_rule(scope, %{field: value})
-      {:ok, %AvailabilityRule{}}
-
-      iex> create_availability_rule(scope, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_availability_rule(%Scope{} = scope, attrs) do
-    with {:ok, availability_rule = %AvailabilityRule{}} <-
-           %AvailabilityRule{}
-           |> AvailabilityRule.changeset(attrs, scope)
-           |> Repo.insert() do
-      broadcast(scope, {:created, availability_rule})
-      {:ok, availability_rule}
+      |> AvailabilityRule.changeset(attrs_with_partner)
+      |> Repo.insert()
+    else
+      false -> {:error, :partner_not_found}
     end
   end
 
   @doc """
-  Updates a availability_rule.
+  Updates an availability rule.
 
-  ## Examples
+  It securely finds the rule by its ID, ensuring it belongs to the
+  user in the scope, before applying the changes.
 
-      iex> update_availability_rule(scope, availability_rule, %{field: new_value})
-      {:ok, %AvailabilityRule{}}
-
-      iex> update_availability_rule(scope, availability_rule, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
+  Returns `{:ok, rule}` on success, `{:error, changeset}` on validation
+  failure, or `{:error, :not_found_or_unauthorized}` if the rule
+  doesn't exist or doesn't belong to the user.
   """
-  def update_availability_rule(%Scope{} = scope, %AvailabilityRule{} = availability_rule, attrs) do
-    true = availability_rule.user_id == scope.user.id
-
-    with {:ok, availability_rule = %AvailabilityRule{}} <-
-           availability_rule
-           |> AvailabilityRule.changeset(attrs, scope)
-           |> Repo.update() do
-      broadcast(scope, {:updated, availability_rule})
-      {:ok, availability_rule}
+  def update_availability_rule(%Scope{} = scope, %AvailabilityRule{} = rule, attrs) do
+    with :ok <- verify_rule_ownership(scope, rule),
+         {:ok, changeset} <-
+           rule
+           |> AvailabilityRule.changeset(attrs)
+           |> Ecto.Changeset.apply_action(:update) do
+      Repo.update(changeset)
+    else
+      {:error, reason} -> {:error, reason}
     end
   end
 
-  @doc """
-  Deletes a availability_rule.
+  defp verify_rule_ownership(%Scope{user: user}, rule) when not is_nil(user) do
+    partner = Repo.get_by(Partner, user_id: user.id)
 
-  ## Examples
-
-      iex> delete_availability_rule(scope, availability_rule)
-      {:ok, %AvailabilityRule{}}
-
-      iex> delete_availability_rule(scope, availability_rule)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_availability_rule(%Scope{} = scope, %AvailabilityRule{} = availability_rule) do
-    true = availability_rule.user_id == scope.user.id
-
-    with {:ok, availability_rule = %AvailabilityRule{}} <-
-           Repo.delete(availability_rule) do
-      broadcast(scope, {:deleted, availability_rule})
-      {:ok, availability_rule}
+    if partner && partner.id == rule.partner_id do
+      :ok
+    else
+      {:error, :not_found_or_unauthorized}
     end
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking availability_rule changes.
+  defp verify_rule_ownership(%Scope{user: nil}, _rule) do
+    {:error, :user_not_authenticated}
+  end
 
-  ## Examples
-
-      iex> change_availability_rule(scope, availability_rule)
-      %Ecto.Changeset{data: %AvailabilityRule{}}
-
-  """
-  def change_availability_rule(
-        %Scope{} = scope,
-        %AvailabilityRule{} = availability_rule,
-        attrs \\ %{}
-      ) do
-    true = availability_rule.user_id == scope.user.id
-
-    AvailabilityRule.changeset(availability_rule, attrs, scope)
+  def delete_availability_rule(%Scope{} = scope, %AvailabilityRule{} = rule) do
+    with :ok <- verify_rule_ownership(scope, rule) do
+      Repo.delete(rule)
+    else
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   alias SyncMe.Availability.AvailabilityOverride
   alias SyncMe.Accounts.Scope
 
-  @doc """
-  Subscribes to scoped notifications about any availability_override changes.
+  def list_availability_overrides(%Scope{user: user}) when not is_nil(user) do
+    query =
+      from r in AvailabilityOverride,
+        join: p in assoc(r, :partner),
+        where: p.user_id == ^user.id,
+        select: r
 
-  The broadcasted messages match the pattern:
-
-    * {:created, %AvailabilityOverride{}}
-    * {:updated, %AvailabilityOverride{}}
-    * {:deleted, %AvailabilityOverride{}}
-
-  """
-  def subscribe_availability_overrides(%Scope{} = scope) do
-    key = scope.user.id
-
-    Phoenix.PubSub.subscribe(SyncMe.PubSub, "user:#{key}:availability_overrides")
+    Repo.all(query)
   end
 
-  @doc """
-  Returns the list of availability_overrides.
-
-  ## Examples
-
-      iex> list_availability_overrides(scope)
-      [%AvailabilityOverride{}, ...]
-
-  """
-  def list_availability_overrides(%Scope{} = scope) do
-    Repo.all_by(AvailabilityOverride, user_id: scope.user.id)
+  def list_availability_overrides(%Scope{user: nil}) do
+    []
   end
 
-  @doc """
-  Gets a single availability_override.
+  def get_availability_override!(%Scope{user: user}, id) when not is_nil(user) do
+    query =
+      from r in AvailabilityOverride,
+        join: p in assoc(r, :partner),
+        where: p.user_id == ^user.id and r.id == ^id,
+        select: r
 
-  Raises `Ecto.NoResultsError` if the Availability override does not exist.
+    Repo.one!(query)
+  end
 
-  ## Examples
+  def create_availability_override(%Scope{user: user}, attrs) when not is_nil(user) do
+    with partner <- Repo.get_by(Partner, user_id: user.id),
+         true <- !is_nil(partner) do
+      attrs_with_partner_id = Map.put(attrs, "partner_id", partner.id)
 
-      iex> get_availability_override!(scope, 123)
       %AvailabilityOverride{}
-
-      iex> get_availability_override!(scope, 456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_availability_override!(%Scope{} = scope, id) do
-    Repo.get_by!(AvailabilityOverride, id: id, user_id: scope.user.id)
-  end
-
-  @doc """
-  Creates a availability_override.
-
-  ## Examples
-
-      iex> create_availability_override(scope, %{field: value})
-      {:ok, %AvailabilityOverride{}}
-
-      iex> create_availability_override(scope, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_availability_override(%Scope{} = scope, attrs) do
-    with {:ok, availability_override = %AvailabilityOverride{}} <-
-           %AvailabilityOverride{}
-           |> AvailabilityOverride.changeset(attrs, scope)
-           |> Repo.insert() do
-      broadcast(scope, {:created, availability_override})
-      {:ok, availability_override}
+      |> AvailabilityOverride.changeset(attrs_with_partner_id)
+      |> Repo.insert()
+    else
+      false -> {:error, :partner_not_found}
     end
   end
 
-  @doc """
-  Updates a availability_override.
-
-  ## Examples
-
-      iex> update_availability_override(scope, availability_override, %{field: new_value})
-      {:ok, %AvailabilityOverride{}}
-
-      iex> update_availability_override(scope, availability_override, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
   def update_availability_override(
         %Scope{} = scope,
-        %AvailabilityOverride{} = availability_override,
+        %AvailabilityOverride{} = override,
         attrs
       ) do
-    true = availability_override.user_id == scope.user.id
-
-    with {:ok, availability_override = %AvailabilityOverride{}} <-
-           availability_override
-           |> AvailabilityOverride.changeset(attrs, scope)
-           |> Repo.update() do
-      broadcast(scope, {:updated, availability_override})
-      {:ok, availability_override}
+    with :ok <- verify_override_ownership(scope, override),
+         {:ok, changeset} <-
+           override
+           |> AvailabilityOverride.changeset(attrs)
+           |> Ecto.Changeset.apply_action(:update) do
+      Repo.update(changeset)
+    else
+      {:error, reason} -> {:error, reason}
     end
   end
 
-  @doc """
-  Deletes a availability_override.
-
-  ## Examples
-
-      iex> delete_availability_override(scope, availability_override)
-      {:ok, %AvailabilityOverride{}}
-
-      iex> delete_availability_override(scope, availability_override)
-      {:error, %Ecto.Changeset{}}
-
-  """
   def delete_availability_override(
         %Scope{} = scope,
-        %AvailabilityOverride{} = availability_override
+        %AvailabilityOverride{} = override
       ) do
-    true = availability_override.user_id == scope.user.id
-
-    with {:ok, availability_override = %AvailabilityOverride{}} <-
-           Repo.delete(availability_override) do
-      broadcast(scope, {:deleted, availability_override})
-      {:ok, availability_override}
+    with :ok <- verify_override_ownership(scope, override) do
+      Repo.delete(override)
+    else
+      {:error, reason} -> {:error, reason}
     end
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking availability_override changes.
+  defp verify_override_ownership(%Scope{user: user}, override) when not is_nil(user) do
+    partner = Repo.get_by(Partner, user_id: user.id)
 
-  ## Examples
+    if partner && partner.id == override.partner_id do
+      :ok
+    else
+      {:error, :not_found_or_unauthorized}
+    end
+  end
 
-      iex> change_availability_override(scope, availability_override)
-      %Ecto.Changeset{data: %AvailabilityOverride{}}
-
-  """
-  def change_availability_override(
-        %Scope{} = scope,
-        %AvailabilityOverride{} = availability_override,
-        attrs \\ %{}
-      ) do
-    true = availability_override.user_id == scope.user.id
-
-    AvailabilityOverride.changeset(availability_override, attrs, scope)
+  defp verify_override_ownership(%Scope{user: nil}, _rule) do
+    {:error, :user_not_authenticated}
   end
 end

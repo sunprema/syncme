@@ -19,14 +19,13 @@ defmodule SyncMe.Billing.Transaction do
       ]
 
     field :payment_gateway_id, :string
-    field :booking_id, :binary_id
-    field :user_id, :binary_id
+    belongs_to :booking, SyncMe.Bookings.Booking
 
     timestamps(type: :utc_datetime)
   end
 
   @doc false
-  def changeset(transaction, attrs, user_scope) do
+  def changeset(transaction, attrs) do
     transaction
     |> cast(attrs, [
       :total_amount_charged,
@@ -34,7 +33,8 @@ defmodule SyncMe.Billing.Transaction do
       :partner_payout_amount,
       :referral_payout_amount,
       :status,
-      :payment_gateway_id
+      :payment_gateway_id,
+      :booking_id
     ])
     |> validate_required([
       :total_amount_charged,
@@ -42,8 +42,8 @@ defmodule SyncMe.Billing.Transaction do
       :partner_payout_amount,
       :referral_payout_amount,
       :status,
-      :payment_gateway_id
+      :payment_gateway_id,
+      :booking_id
     ])
-    |> put_change(:user_id, user_scope.user.id)
   end
 end

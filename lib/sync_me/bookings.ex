@@ -4,6 +4,7 @@ defmodule SyncMe.Bookings do
   """
 
   import Ecto.Query, warn: false
+  alias SyncMe.Partners.Partner
   alias SyncMe.Repo
 
   alias SyncMe.Bookings.Booking
@@ -31,17 +32,24 @@ defmodule SyncMe.Bookings do
     Phoenix.PubSub.broadcast(SyncMe.PubSub, "user:#{key}:bookings", message)
   end
 
-  @doc """
-  Returns the list of bookings.
+  def list_bookings(%Scope{user: user}, filters \\ %{}) when not is_nil(user) do
+    partner = Repo.get_by(Partner, user_id: user.id)
 
-  ## Examples
+    base_query =
+      cond do
+        !is_nil(partner) ->
+          from b in Booking,
+            where: b.partner_id == ^partner.id,
+            preload: [:guest_user, :event_type]
 
-      iex> list_bookings(scope)
-      [%Booking{}, ...]
+        true ->
+          from b in Booking,
+            where: b.guest_user_id == ^user.id,
+            preload: [partner: [user: :partner], event_type: []]
+      end
 
-  """
-  def list_bookings(%Scope{} = scope) do
-    Repo.all_by(Booking, user_id: scope.user.id)
+    query_with_filters = apply_booking_filters(base_query, filters)
+    Repo.all(query_with_filters)
   end
 
   @doc """
@@ -84,17 +92,6 @@ defmodule SyncMe.Bookings do
     end
   end
 
-  @doc """
-  Updates a booking.
-
-  ## Examples
-
-      iex> update_booking(scope, booking, %{field: new_value})
-      {:ok, %Booking{}}
-
-      iex> update_booking(scope, booking, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
   """
   def update_booking(%Scope{} = scope, %Booking{} = booking, attrs) do
     true = booking.user_id == scope.user.id
@@ -108,7 +105,7 @@ defmodule SyncMe.Bookings do
     end
   end
 
-  @doc """
+  @doc \"""
   Deletes a booking.
 
   ## Examples
@@ -120,6 +117,7 @@ defmodule SyncMe.Bookings do
       {:error, %Ecto.Changeset{}}
 
   """
+
   def delete_booking(%Scope{} = scope, %Booking{} = booking) do
     true = booking.user_id == scope.user.id
 
@@ -143,5 +141,22 @@ defmodule SyncMe.Bookings do
     true = booking.user_id == scope.user.id
 
     Booking.changeset(booking, attrs, scope)
+  end
+
+  # --- Private Helper for Filtering ---
+
+  defp apply_booking_filters(query, %{"status" => status}) when not is_nil(status) do
+    # Example: filter by a specific status
+    from q in query, where: q.status == ^String.to_existing_atom(status)
+  end
+
+  defp apply_booking_filters(query, %{"upcoming" => true}) do
+    # Example: filter for only upcoming bookings
+    from q in query, where: q.start_time > ^DateTime.utc_now()
+  end
+
+  # If no recognized filters are passed, return the original query.
+  defp apply_booking_filters(query, _filters) do
+    query
   end
 end

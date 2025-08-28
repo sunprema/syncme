@@ -18,12 +18,9 @@ defmodule SyncMe.Repo.Migrations.CreateBookings do
       add :partner_id, references(:partners, on_delete: :nothing, type: :binary_id)
       add :guest_user_id, references(:users, on_delete: :nothing, type: :binary_id)
       add :event_type_id, references(:event_types, on_delete: :nothing, type: :binary_id)
-      add :user_id, references(:users, type: :binary_id, on_delete: :delete_all)
 
       timestamps(type: :utc_datetime)
     end
-
-    create index(:bookings, [:user_id])
 
     create index(:bookings, [:partner_id])
     create index(:bookings, [:guest_user_id])

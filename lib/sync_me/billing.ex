@@ -40,6 +40,15 @@ defmodule SyncMe.Billing do
       [%Transaction{}, ...]
 
   """
+
+  def list_partner_transactions(%Scope{} = scope) do
+    Repo.all_by(Transaction, partner_id: scope.user.id)
+  end
+
+  def list_guest_transactions(%Scope{} = scope) do
+    Repo.all_by(Transaction, partner_id: scope.user.id)
+  end
+
   def list_transactions(%Scope{} = scope) do
     Repo.all_by(Transaction, user_id: scope.user.id)
   end

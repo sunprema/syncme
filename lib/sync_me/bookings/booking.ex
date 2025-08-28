@@ -19,18 +19,17 @@ defmodule SyncMe.Bookings.Booking do
     field :video_conference_link, :string
     field :price_at_booking, :decimal
     field :duration_at_booking, :integer
-    field :event_type_id, :binary_id
-    field :partner_id, :binary_id
-    field :user_id, :binary_id
 
-    belongs_to :guest, SyncMe.Accounts.User, foreign_key: :guest_user_id
+    belongs_to :event_type, SyncMe.Events.EventType
+    belongs_to :partner, SyncMe.Partners.Partner
+    belongs_to :guest_user, SyncMe.Accounts.User, foreign_key: :guest_user_id
     has_one :transaction, SyncMe.Billing.Transaction
-    timestamps(type: :utc_datetime)
 
+    timestamps(type: :utc_datetime)
   end
 
   @doc false
-  def changeset(booking, attrs, user_scope) do
+  def changeset(booking, attrs) do
     booking
     |> cast(attrs, [
       :start_time,
@@ -38,16 +37,32 @@ defmodule SyncMe.Bookings.Booking do
       :status,
       :video_conference_link,
       :price_at_booking,
-      :duration_at_booking
+      :duration_at_booking,
+      :partner_id,
+      :guest_user_id,
+      :event_type_id
     ])
     |> validate_required([
       :start_time,
       :end_time,
-      :status,
       :video_conference_link,
       :price_at_booking,
-      :duration_at_booking
+      :duration_at_booking,
+      :partner_id,
+      :guest_user_id,
+      :event_type_id
     ])
-    |> put_change(:user_id, user_scope.user.id)
+    |> validate_time_order()
+  end
+
+  defp validate_time_order(changeset) do
+    start_time = get_field(changeset, :start_time)
+    end_time = get_field(changeset, :end_time)
+
+    if start_time && end_time && Time.compare(end_time, start_time) != :gt do
+      add_error(changeset, :end_time, "must be after start time")
+    else
+      changeset
+    end
   end
 end

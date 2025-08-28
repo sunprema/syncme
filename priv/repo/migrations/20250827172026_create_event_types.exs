@@ -11,12 +11,10 @@ defmodule SyncMe.Repo.Migrations.CreateEventTypes do
       add :price, :decimal
       add :is_active, :boolean, default: true, null: false
       add :partner_id, references(:partners, on_delete: :nothing, type: :binary_id)
-      add :user_id, references(:users, type: :binary_id, on_delete: :delete_all)
 
       timestamps(type: :utc_datetime)
     end
 
-    create index(:event_types, [:user_id])
     create index(:event_types, [:partner_id])
 
     create unique_index(:event_types, [:partner_id, :slug],

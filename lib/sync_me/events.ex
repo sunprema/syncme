@@ -9,139 +9,70 @@ defmodule SyncMe.Events do
   alias SyncMe.Events.EventType
   alias SyncMe.Accounts.Scope
 
-  @doc """
-  Subscribes to scoped notifications about any event_type changes.
+  def list_event_types(%Scope{user: user}) when not is_nil(user) do
+    query =
+      from r in EventType,
+        join: p in assoc(r, :partner),
+        where: p.user_id == ^user.id,
+        select: r
 
-  The broadcasted messages match the pattern:
-
-    * {:created, %EventType{}}
-    * {:updated, %EventType{}}
-    * {:deleted, %EventType{}}
-
-  """
-  def subscribe_event_types(%Scope{} = scope) do
-    key = scope.user.id
-
-    Phoenix.PubSub.subscribe(SyncMe.PubSub, "user:#{key}:event_types")
+    Repo.all(query)
   end
 
-  defp broadcast(%Scope{} = scope, message) do
-    key = scope.user.id
+  def get_event_type!(%Scope{user: user}, id) do
+    query =
+      from r in EventType,
+        join: p in assoc(r, :partner),
+        where: p.user_id == ^user.id and r.id == ^id,
+        select: r
 
-    Phoenix.PubSub.broadcast(SyncMe.PubSub, "user:#{key}:event_types", message)
+    Repo.one!(query)
   end
 
-  @doc """
-  Returns the list of event_types.
+  def create_event_type(%Scope{user: user}, attrs) when not is_nil(user) do
+    with partner <- Repo.get_by(Partner, user_id: user.id),
+         true <- !is_nil(partner) do
+      attrs_with_partner_id = Map.put(attrs, "partner_id", partner.id)
 
-  ## Examples
-
-      iex> list_event_types(scope)
-      [%EventType{}, ...]
-
-  """
-  def list_event_types(%Scope{} = scope) do
-    Repo.all_by(EventType, user_id: scope.user.id)
-  end
-
-  @doc """
-  Gets a single event_type.
-
-  Raises `Ecto.NoResultsError` if the Event type does not exist.
-
-  ## Examples
-
-      iex> get_event_type!(scope, 123)
       %EventType{}
-
-      iex> get_event_type!(scope, 456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_event_type!(%Scope{} = scope, id) do
-    Repo.get_by!(EventType, id: id, user_id: scope.user.id)
-  end
-
-  @doc """
-  Creates a event_type.
-
-  ## Examples
-
-      iex> create_event_type(scope, %{field: value})
-      {:ok, %EventType{}}
-
-      iex> create_event_type(scope, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_event_type(%Scope{} = scope, attrs) do
-    with {:ok, event_type = %EventType{}} <-
-           %EventType{}
-           |> EventType.changeset(attrs, scope)
-           |> Repo.insert() do
-      broadcast(scope, {:created, event_type})
-      {:ok, event_type}
+      |> EventType.changeset(attrs_with_partner_id)
+      |> Repo.insert()
+    else
+      false -> {:error, :partner_not_found}
     end
   end
 
-  @doc """
-  Updates a event_type.
-
-  ## Examples
-
-      iex> update_event_type(scope, event_type, %{field: new_value})
-      {:ok, %EventType{}}
-
-      iex> update_event_type(scope, event_type, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
   def update_event_type(%Scope{} = scope, %EventType{} = event_type, attrs) do
-    true = event_type.user_id == scope.user.id
-
-    with {:ok, event_type = %EventType{}} <-
+    with :ok <- verify_event_type_ownership(scope, event_type),
+         {:ok, changeset} <-
            event_type
-           |> EventType.changeset(attrs, scope)
-           |> Repo.update() do
-      broadcast(scope, {:updated, event_type})
-      {:ok, event_type}
+           |> EventType.changeset(attrs)
+           |> Ecto.Changeset.apply_action(:update) do
+      Repo.update(changeset)
+    else
+      {:error, reason} -> {:error, reason}
     end
   end
 
-  @doc """
-  Deletes a event_type.
-
-  ## Examples
-
-      iex> delete_event_type(scope, event_type)
-      {:ok, %EventType{}}
-
-      iex> delete_event_type(scope, event_type)
-      {:error, %Ecto.Changeset{}}
-
-  """
   def delete_event_type(%Scope{} = scope, %EventType{} = event_type) do
-    true = event_type.user_id == scope.user.id
-
-    with {:ok, event_type = %EventType{}} <-
-           Repo.delete(event_type) do
-      broadcast(scope, {:deleted, event_type})
-      {:ok, event_type}
+    with :ok <- verify_event_type_ownership(scope, event_type) do
+      Repo.delete(event_type)
+    else
+      {:error, reason} -> {:error, reason}
     end
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking event_type changes.
+  defp verify_event_type_ownership(%Scope{user: user}, event_type) when not is_nil(user) do
+    partner = Repo.get_by(Partner, user_id: user.id)
 
-  ## Examples
+    if partner && partner.id == event_type.partner_id do
+      :ok
+    else
+      {:error, :not_found_or_unauthorized}
+    end
+  end
 
-      iex> change_event_type(scope, event_type)
-      %Ecto.Changeset{data: %EventType{}}
-
-  """
-  def change_event_type(%Scope{} = scope, %EventType{} = event_type, attrs \\ %{}) do
-    true = event_type.user_id == scope.user.id
-
-    EventType.changeset(event_type, attrs, scope)
+  defp verify_event_type_ownership(%Scope{user: nil}, _rule) do
+    {:error, :user_not_authenticated}
   end
 end

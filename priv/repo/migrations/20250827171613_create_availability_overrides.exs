@@ -9,12 +9,9 @@ defmodule SyncMe.Repo.Migrations.CreateAvailabilityOverrides do
       add :end_time, :time
       add :is_available, :boolean, default: false, null: false
       add :partner_id, references(:partners, on_delete: :nothing, type: :binary_id)
-      add :user_id, references(:users, type: :binary_id, on_delete: :delete_all)
 
       timestamps(type: :utc_datetime)
     end
-
-    create index(:availability_overrides, [:user_id])
 
     create index(:availability_overrides, [:partner_id])
   end

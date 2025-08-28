@@ -10,22 +10,33 @@ defmodule SyncMe.Events.EventType do
     field :description, :string
     field :duration_in_minutes, :integer
     field :price, :decimal
-    field :is_active, :boolean, default: false
-    field :partner_id, :binary_id
-    field :user_id, :binary_id
+    field :is_active, :boolean, default: true
 
-    # A User is a guest in many bookings
+    belongs_to :partner, SyncMe.Partners.Partner
     has_many :bookings, SyncMe.Bookings.Booking
 
     timestamps(type: :utc_datetime)
   end
 
   @doc false
-  def changeset(event_type, attrs, user_scope) do
+  def changeset(event_type, attrs) do
     event_type
-    |> cast(attrs, [:name, :slug, :description, :duration_in_minutes, :price, :is_active])
-    |> validate_required([:name, :slug, :description, :duration_in_minutes, :price, :is_active])
-    |> put_change(:user_id, user_scope.user.id)
+    |> cast(attrs, [
+      :name,
+      :slug,
+      :description,
+      :duration_in_minutes,
+      :price,
+      :is_active,
+      :partner_id
+    ])
+    |> validate_required([
+      :name,
+      :duration_in_minutes,
+      :price,
+      :partner_id
+    ])
+    |> validate_number(:duration_in_minutes, greater_than: 0)
     |> unique_constraint(:slug, name: :event_types_partner_id_slug_index)
   end
 end

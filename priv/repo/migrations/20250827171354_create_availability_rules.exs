@@ -8,12 +8,9 @@ defmodule SyncMe.Repo.Migrations.CreateAvailabilityRules do
       add :start_time, :time
       add :end_time, :time
       add :partner_id, references(:partners, on_delete: :nothing, type: :binary_id)
-      add :user_id, references(:users, type: :binary_id, on_delete: :delete_all)
 
       timestamps(type: :utc_datetime)
     end
-
-    create index(:availability_rules, [:user_id])
 
     create index(:availability_rules, [:partner_id])
   end
