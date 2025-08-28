@@ -19,12 +19,14 @@ defmodule SyncMe.Bookings.Booking do
     field :video_conference_link, :string
     field :price_at_booking, :decimal
     field :duration_at_booking, :integer
-    field :partner_id, :binary_id
-    belongs_to :guest, SyncMe.Accounts.User, foreign_key: :guest_user_id
     field :event_type_id, :binary_id
+    field :partner_id, :binary_id
     field :user_id, :binary_id
 
+    belongs_to :guest, SyncMe.Accounts.User, foreign_key: :guest_user_id
+    has_one :transaction, SyncMe.Billing.Transaction
     timestamps(type: :utc_datetime)
+
   end
 
   @doc false

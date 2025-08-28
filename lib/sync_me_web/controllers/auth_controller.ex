@@ -4,6 +4,7 @@ defmodule SyncMeWeb.AuthController do
   alias Ueberauth.Strategy.Helpers
   alias SyncMe.Accounts
   alias SyncMeWeb.UserAuth
+  require Logger
 
   plug Ueberauth
 

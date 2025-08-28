@@ -13,6 +13,10 @@ defmodule SyncMe.Accounts.User do
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
     field :is_oauth_user, :boolean
+    has_one :partner, SyncMe.Partners.Partner
+
+    # A User is a guest in many bookings
+    has_many :bookings, SyncMe.Bookings.Booking, foreign_key: :guest_user_id
     timestamps(type: :utc_datetime)
   end
 
