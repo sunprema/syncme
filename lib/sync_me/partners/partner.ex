@@ -22,6 +22,7 @@ defmodule SyncMe.Partners.Partner do
     partner
     |> cast(attrs, [:bio, :syncme_link])
     |> validate_required([:bio, :syncme_link])
+
     |> put_change(:user_id, user_scope.user.id)
   end
 end
