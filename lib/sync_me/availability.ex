@@ -29,10 +29,6 @@ defmodule SyncMe.Availability do
     Repo.one!(query)
   end
 
-  @spec create_availability_rule(
-          %SyncMe.Accounts.Scope{:user => any(), optional(any()) => any()},
-          any()
-        ) :: any()
   def create_availability_rule(%Scope{user: user}, attrs) when not is_nil(user) do
     with partner <- Repo.get_by(Partner, user_id: user.id),
          true <- !is_nil(partner) do
@@ -155,6 +151,12 @@ defmodule SyncMe.Availability do
     else
       {:error, reason} -> {:error, reason}
     end
+  end
+
+  def get_partner_availability(partner_id, date) do
+    # returns list of available [start, end] slots
+    IO.puts("Get the list of slots for #{partner_id} , #{date}")
+    []
   end
 
   defp verify_override_ownership(%Scope{user: user}, override) when not is_nil(user) do

@@ -67,6 +67,11 @@ defmodule SyncMeWeb.Router do
       live "/user/home", UserHome, :index
     end
 
+    live_session :partner_flow,
+      on_mount: [{SyncMeWeb.UserAuth, :require_authenticated}] do
+        live "/partner/signup" , PartnerLive.Signup, :new
+      end
+
     post "/users/update-password", UserSessionController, :update_password
   end
 
