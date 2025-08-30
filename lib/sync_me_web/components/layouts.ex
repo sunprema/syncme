@@ -52,14 +52,73 @@ defmodule SyncMeWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <main class="px-4 py-20 sm:px-6 lg:px-8">
+    <main class="px-4 pb-16 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-2xl space-y-4">
         {render_slot(@inner_block)}
       </div>
     </main>
-
+    <footer class="footer fixed left-50 right-50 mx-auto bottom-4 text-center footer-center  text-base-content p-4">
+          <aside>
+            <p class="text-xs text-center">
+              By continuing, you agree to SyncMe.Link's
+              <a><span class="font-semibold">Terms of Service</span></a>
+              and <a><span class="font-semibold">Privacy Policy</span></a>
+            </p>
+          </aside>
+      </footer>
     <.flash_group flash={@flash} />
     """
+  end
+
+
+  def partner_layout(assigns) do
+    ~H"""
+
+    <div class="drawer md:drawer-open">
+    <input id="my-drawer" type="checkbox" class="drawer-toggle " />
+    <div class="drawer-content px-4 ">
+    <label for="my-drawer" class="btn btn-primary drawer-button md:hidden">Open drawer</label>
+
+    <main class="px-4 pb-16 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-2xl space-y-4">
+        {render_slot(@inner_block)}
+      </div>
+    </main>
+    </div>
+    <div class="drawer-side z-10">
+      <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+      <ul class="menu bg-base-200 text-base-content min-h-full w-80 p-4">
+      <!-- Sidebar content here -->
+        <li><.link patch={~p"/partner/home/event_types"} class={[@tab == "event_types" && "menu-active"]} >
+             <.icon name="hero-link-mini" class="size-4 shrink-0" /> Event Types
+        </.link>
+        </li>
+        <li><.link patch={~p"/partner/home/bookings"}  class={[@tab == "bookings" && "menu-active"]} >
+         <.icon name="hero-calendar-mini" class="size-4 shrink-0" />
+        Bookings</.link></li>
+        <li><.link patch={~p"/partner/home/availability"} class={[@tab == "availability" && "menu-active"]} >
+        <.icon name="hero-clock" class="size-4 shrink-0" />Availability</.link></li>
+        <li><.link patch={~p"/partner/home/insights"}  class={[@tab == "insights" && "menu-active"]} >
+        <.icon name="hero-chart-bar-square" class="size-4 shrink-0" />
+        Insights</.link></li>
+        <li><.link patch={~p"/partner/home/settings"}  class={[@tab == "settings" && "menu-active"]} >
+        <.icon name="hero-cog-6-tooth" class="size-4 shrink-0" />Settings</.link></li>
+      </ul>
+    </div>
+    </div>
+
+    <footer class="footer fixed left-50 right-50 mx-auto bottom-4 text-center footer-center  text-base-content p-4">
+          <aside>
+            <p class="text-xs text-center">
+              By continuing, you agree to SyncMe.Link's
+              <a><span class="font-semibold">Terms of Service</span></a>
+              and <a><span class="font-semibold">Privacy Policy</span></a>
+            </p>
+          </aside>
+      </footer>
+    <.flash_group flash={@flash} />
+    """
+
   end
 
   @doc """

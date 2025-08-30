@@ -7,15 +7,21 @@ alias SyncMe.Events.EventType
 
 
   @impl true
+  @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
     <div>
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-    <div class="mx-auto max-w-md">
+    <div class="mx-auto w-full ">
         <div class="text-start">
           <.header>
             Event Types
             <:subtitle>Create events for people to book on your calendar</:subtitle>
+            <:actions>
+          <.link patch={~p"/partner/home/event_types?action=new"}>
+              <button class="btn btn-neutral">New Event Type</button>
+            </.link>
+          </:actions>
           </.header>
         </div>
 
@@ -71,15 +77,7 @@ alias SyncMe.Events.EventType
           </button>
         </.form>
 
-        <footer class="footer absolute left-50 right-50 mx-auto bottom-4 text-center footer-center  text-base-content p-4">
-          <aside>
-            <p class="text-xs text-center">
-              By continuing, you agree to SyncMe.Link's
-              <a><span class="font-semibold">Terms of Service</span></a>
-              and <a><span class="font-semibold">Privacy Policy</span></a>
-            </p>
-          </aside>
-        </footer>
+
       </div>
     </Layouts.app>
     </div>

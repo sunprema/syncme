@@ -4,7 +4,7 @@ defmodule SyncMe.Events do
   """
 
   import Ecto.Query, warn: false
-  alias SyncMe.Events
+
   alias SyncMe.Repo
 
   alias SyncMe.Events.EventType

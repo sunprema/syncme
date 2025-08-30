@@ -18,7 +18,7 @@ defmodule SyncMeWeb.PartnerLive.Signup do
 
   def render(assigns) do
     ~H"""
-     <Layouts.app flash={@flash} current_scope={@current_scope}>
+     <Layouts.partner_layout flash={@flash} current_scope={@current_scope}>
       <div class="mx-auto max-w-sm">
         <div class="text-center">
           <.header>
@@ -66,7 +66,7 @@ defmodule SyncMeWeb.PartnerLive.Signup do
           </aside>
         </footer>
       </div>
-    </Layouts.app>
+    </Layouts.partner_layout>
     """
 
   end

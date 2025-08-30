@@ -1,0 +1,27 @@
+<Layouts.partner_layout flash={@flash} current_scope={@current_scope} tab="event_types">
+    
+ <.header>
+  Event Types
+  <:actions>
+    <.link patch={~p"/partner/event_types/new"}>
+      <.button>New Event Type</.button>
+    </.link>
+  </:actions>
+</.header>
+
+
+<.table
+  id="event_types"
+  rows={@streams.event_types}
+  row_click={fn {_id, event_type} -> JS.navigate(~p"/partner/event_types/#{event_type}") end}
+>
+  <:col :let={{_id, event_type}} label="Title">{event_type.name}</:col>
+  <:col :let={{_id, event_type}} label="Description">{event_type.description}</:col>
+  <:col :let={{_id, event_type}} label="Slug">{event_type.slug}</:col>
+  <:col :let={{_id, event_type}} label="Duration">{event_type.duration_in_minutes}</:col>
+  
+</.table>
+
+
+
+</Layouts.partner_layout>
