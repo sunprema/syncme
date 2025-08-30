@@ -10,7 +10,7 @@ defmodule SyncMe.Repo.Migrations.CreatePartners do
       timestamps(type: :utc_datetime)
     end
 
-    create index(:partners, [:user_id])
-    create index(:partners, [:syncme_link])
+    create unique_index(:partners, [:user_id])
+    create unique_index(:partners, [:syncme_link])
   end
 end

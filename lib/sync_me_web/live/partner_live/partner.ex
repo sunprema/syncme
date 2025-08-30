@@ -2,12 +2,12 @@ defmodule SyncMeWeb.PartnerLive.Signup do
   use SyncMeWeb, :live_view
 
 
-  alias SyncMe.Partners.Partner
+  alias SyncMe.Partners
 
 
   def mount(_params, _session, socket) do
     scope = socket.assigns.current_scope
-    partner_signup_change_set = SyncMe.Partners.Partner.changeset(%Partner{}, %{}, scope)
+    partner_signup_change_set = Partners.change_partner(scope, %Partners.Partner{}, %{})
     form = to_form(partner_signup_change_set)
     {:ok,
       socket
@@ -39,6 +39,7 @@ defmodule SyncMeWeb.PartnerLive.Signup do
             type="textarea"
             label="Bio"
             required
+            phx-debounce="200"
 
           />
 
@@ -46,6 +47,7 @@ defmodule SyncMeWeb.PartnerLive.Signup do
             field={@form[:syncme_link]}
             label="Your syncme link"
             required
+            phx-debounce="200"
             phx-mounted={JS.focus()}
           />
 
@@ -69,17 +71,34 @@ defmodule SyncMeWeb.PartnerLive.Signup do
 
   end
 
-  def handle_event("validate", params, socket) do
-    %{"partner" => partner} = params
-    IO.inspect(partner)
-    form =
-      Partners.c
-    {:noreply, socket}
+  def handle_event("validate", %{"partner" => partner} = _params, socket) do
+    scope = socket.assigns.current_scope
+    change_set = Partners.change_partner(scope, %Partners.Partner{}, partner)
+    change_set = Map.put(change_set, :action, :validate)
+    {:noreply ,
+    assign(socket, form: to_form(change_set))
+  }
+
   end
 
-  def handle_event("save", unsigned_params, socket) do
-    IO.inspect(unsigned_params)
-    {:noreply, socket}
+  def handle_event("save", %{"partner" => partner} = _params, socket) do
+    scope = socket.assigns.current_scope
+   case Partners.create_partner(scope, partner) do
+    {:ok, partner} ->
+      {:noreply,
+      socket
+      |> put_flash(:info, "Partner signup success - id #{partner.id}!")
+      |> redirect(to: ~p"/partner/home")
+      }
+    {:error, changeset} ->
+      IO.inspect(changeset)
+      changeset = Map.put(changeset, :action, :validate)
+      {:noreply ,
+        socket
+        |> assign( form: to_form(changeset))
+    }
+   end
+
   end
 
 

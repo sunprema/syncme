@@ -4,10 +4,12 @@ defmodule SyncMe.Events do
   """
 
   import Ecto.Query, warn: false
+  alias SyncMe.Events
   alias SyncMe.Repo
 
   alias SyncMe.Events.EventType
   alias SyncMe.Accounts.Scope
+  alias SyncMe.Partners.Partner
 
   def list_event_types(%Scope{user: user}) when not is_nil(user) do
     query =
@@ -75,4 +77,11 @@ defmodule SyncMe.Events do
   defp verify_event_type_ownership(%Scope{user: nil}, _rule) do
     {:error, :user_not_authenticated}
   end
+
+
+
+  def change_event_type(%Scope{user: user}, %EventType{} = event_type, attrs \\ %{}) when not is_nil(user) do
+      EventType.changeset(event_type, attrs)
+  end
+
 end
