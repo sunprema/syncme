@@ -10,18 +10,12 @@ alias SyncMe.Events.EventType
   @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
-    <div>
-    <Layouts.app flash={@flash} current_scope={@current_scope}>
+
     <div class="mx-auto w-full ">
         <div class="text-start">
           <.header>
             Event Types
             <:subtitle>Create events for people to book on your calendar</:subtitle>
-            <:actions>
-          <.link patch={~p"/partner/home/event_types?action=new"}>
-              <button class="btn btn-neutral">New Event Type</button>
-            </.link>
-          </:actions>
           </.header>
         </div>
 
@@ -79,8 +73,7 @@ alias SyncMe.Events.EventType
 
 
       </div>
-    </Layouts.app>
-    </div>
+
     """
   end
 
@@ -133,7 +126,7 @@ alias SyncMe.Events.EventType
       {:noreply,
       socket
       |> put_flash(:info, "Event Type created.")
-
+      |> redirect( to: ~p"/partner/event_types")
 
       }
     {:error, changeset} ->

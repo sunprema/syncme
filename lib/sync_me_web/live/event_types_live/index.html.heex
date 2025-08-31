@@ -1,10 +1,12 @@
+
 <Layouts.partner_layout flash={@flash} current_scope={@current_scope} tab="event_types">
-    
+  <div :if={@live_action == :index}>    
  <.header>
   Event Types
+  <:subtitle>Events that can be booked on your calendar.</:subtitle>
   <:actions>
     <.link patch={~p"/partner/event_types/new"}>
-      <.button>New Event Type</.button>
+      <button class="btn btn-neutral">New Event Type</button>
     </.link>
   </:actions>
 </.header>
@@ -21,7 +23,10 @@
   <:col :let={{_id, event_type}} label="Duration">{event_type.duration_in_minutes}</:col>
   
 </.table>
+  </div>
 
 
-
+<div :if={@live_action == :new}>    
+ <.live_component module={SyncMeWeb.PartnerLive.EventTypesComponent} id={@current_scope.user.id} current_scope={@current_scope}/>
+</div>
 </Layouts.partner_layout>

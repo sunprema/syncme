@@ -1,4 +1,4 @@
-defmodule SyncMeWeb.PartnerLive.SettingsComponent do
+defmodule SyncMeWeb.SettingsLive.SettingsComponent do
   use SyncMeWeb, :live_component
   alias SyncMe.Partners
 
@@ -7,16 +7,7 @@ defmodule SyncMeWeb.PartnerLive.SettingsComponent do
   def render(assigns) do
     ~H"""
     <div>
-    <Layouts.app flash={@flash} current_scope={@current_scope}>
-    <div class="mx-auto max-w-md">
-        <div class="text-start">
-          <.header>
-            Profile
-            <:subtitle>Manage settings for your SyncMe.Link profile.</:subtitle>
-          </.header>
-        </div>
-
-        <.form for={@form} id="partner_signup_form" phx-debounce="2000"  phx-submit="save" phx-change="validate" phx-target={@myself}>
+     <.form for={@form} id="partner_signup_form" phx-debounce="2000"  phx-submit="save" phx-change="validate" phx-target={@myself}>
           <.input
             field={@form[:bio]}
             type="textarea"
@@ -36,11 +27,7 @@ defmodule SyncMeWeb.PartnerLive.SettingsComponent do
             Update
           </button>
         </.form>
-
-
       </div>
-    </Layouts.app>
-    </div>
     """
   end
 
@@ -89,12 +76,11 @@ defmodule SyncMeWeb.PartnerLive.SettingsComponent do
     scope = socket.assigns.current_scope
 
    case Partners.update_partner(scope, socket.assigns.partner, partner) do
-    {:ok, partner} ->
+    {:ok, _partner} ->
       {:noreply,
       socket
       |> put_flash(:info, "Profile updated.")
-
-
+      |> redirect( to: ~p"/partner/settings")
       }
     {:error, changeset} ->
       IO.inspect(changeset)

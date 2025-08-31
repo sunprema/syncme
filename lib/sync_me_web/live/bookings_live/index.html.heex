@@ -1,0 +1,12 @@
+<Layouts.partner_layout flash={@flash} current_scope={@current_scope} tab="bookings">
+  
+ <.header>
+  Bookings
+  <:subtitle>Manage your Bookings.</:subtitle>
+  <:actions>
+    <.link patch={~p"/partner/bookings"}>
+      <button class="btn btn-neutral">Calendar view</button>
+    </.link>
+  </:actions>
+</.header>
+</Layouts.partner_layout>

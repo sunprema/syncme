@@ -69,11 +69,14 @@ defmodule SyncMeWeb.Router do
 
     live_session :partner_flow,
       on_mount: [{SyncMeWeb.UserAuth, :require_authenticated}] do
-        live "/partner/event_types", EventTypesLive.Index, :index
         live "/partner/signup" , PartnerLive.Signup, :new
-        live "/partner/home/:tab" , PartnerLive.Home, :new
-        live "/partner/home" , PartnerLive.Home, :new
-        live "/partner/settings" , PartnerLive.Settings, :new
+        live "/partner/home" , EventTypesLive.Index, :index
+        live "/partner/event_types", EventTypesLive.Index, :index
+        live "/partner/event_types/new", EventTypesLive.Index, :new
+        live "/partner/settings", SettingsLive
+        live "/partner/availability", AvailabilityLive
+        live "/partner/bookings", BookingsLive.Index, :index
+        live "/partner/insights", InsightsLive.Dashboard, :dashboard
       end
 
     post "/users/update-password", UserSessionController, :update_password

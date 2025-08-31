@@ -89,19 +89,19 @@ defmodule SyncMeWeb.Layouts do
       <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
       <ul class="menu bg-base-200 text-base-content min-h-full w-80 p-4">
       <!-- Sidebar content here -->
-        <li><.link patch={~p"/partner/home/event_types"} class={[@tab == "event_types" && "menu-active"]} >
+        <li><.link patch={~p"/partner/event_types"} class={[@tab == "event_types" && "menu-active"]} >
              <.icon name="hero-link-mini" class="size-4 shrink-0" /> Event Types
         </.link>
         </li>
-        <li><.link patch={~p"/partner/home/bookings"}  class={[@tab == "bookings" && "menu-active"]} >
+        <li><.link patch={~p"/partner/bookings"}  class={[@tab == "bookings" && "menu-active"]} >
          <.icon name="hero-calendar-mini" class="size-4 shrink-0" />
         Bookings</.link></li>
-        <li><.link patch={~p"/partner/home/availability"} class={[@tab == "availability" && "menu-active"]} >
+        <li><.link patch={~p"/partner/availability"} class={[@tab == "availability" && "menu-active"]} >
         <.icon name="hero-clock" class="size-4 shrink-0" />Availability</.link></li>
-        <li><.link patch={~p"/partner/home/insights"}  class={[@tab == "insights" && "menu-active"]} >
+        <li><.link patch={~p"/partner/insights"}  class={[@tab == "insights" && "menu-active"]} >
         <.icon name="hero-chart-bar-square" class="size-4 shrink-0" />
         Insights</.link></li>
-        <li><.link patch={~p"/partner/home/settings"}  class={[@tab == "settings" && "menu-active"]} >
+        <li><.link patch={~p"/partner/settings"}  class={[@tab == "settings" && "menu-active"]} >
         <.icon name="hero-cog-6-tooth" class="size-4 shrink-0" />Settings</.link></li>
       </ul>
     </div>
@@ -111,8 +111,8 @@ defmodule SyncMeWeb.Layouts do
           <aside>
             <p class="text-xs text-center">
               By continuing, you agree to SyncMe.Link's
-              <a><span class="font-semibold">Terms of Service</span></a>
-              and <a><span class="font-semibold">Privacy Policy</span></a>
+              <a href={~p"/terms_of_service"} target="_blank" rel="noopener noreferrer"><span class="font-semibold">Terms of Service</span></a>
+              and <a href={~p"/privacy"} target="_blank" rel="noopener noreferrer"><span class="font-semibold">Privacy Policy</span></a>
             </p>
           </aside>
       </footer>
