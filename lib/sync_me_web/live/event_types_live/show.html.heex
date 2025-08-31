@@ -1,6 +1,10 @@
 <Layouts.partner_layout flash={@flash} current_scope={@current_scope} tab="event_types">
   <div :if={@live_action == :edit}>    
     <.header>
+    
+    <.link patch={~p"/partner/event_types"} class="btn btn-ghost btn-square -ml-8 btn-xs" >
+    <.icon name="hero-arrow-left-micro" class="size-4 " />
+    </.link>
     Event Type (Edit)
     <:subtitle>Events that can be booked on your calendar.</:subtitle>  
     </.header>
