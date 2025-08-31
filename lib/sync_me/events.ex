@@ -21,14 +21,14 @@ defmodule SyncMe.Events do
     Repo.all(query)
   end
 
-  def get_event_type!(%Scope{user: user}, id) do
+  def get_event_type(%Scope{user: user}, id) do
     query =
       from r in EventType,
         join: p in assoc(r, :partner),
         where: p.user_id == ^user.id and r.id == ^id,
         select: r
 
-    Repo.one!(query)
+    Repo.one(query)
   end
 
   def create_event_type(%Scope{user: user}, attrs) when not is_nil(user) do

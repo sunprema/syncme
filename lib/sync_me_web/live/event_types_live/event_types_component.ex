@@ -12,13 +12,6 @@ alias SyncMe.Events.EventType
     ~H"""
 
     <div class="mx-auto w-full ">
-        <div class="text-start">
-          <.header>
-            Event Types
-            <:subtitle>Create events for people to book on your calendar</:subtitle>
-          </.header>
-        </div>
-
         <.form for={@form} id="event_type_form" phx-debounce="2000"  phx-submit="create" phx-change="validate" phx-target={@myself}>
           <.input
             field={@form[:name]}
@@ -66,8 +59,8 @@ alias SyncMe.Events.EventType
             label="Active"
             required
           />
-          <button phx-disable-with="Creating event type..." class="btn btn-neutral w-full font-normal">
-            Create
+          <button phx-disable-with="Saving Event Type..." class="btn btn-neutral w-full font-normal">
+            Save Event Type
           </button>
         </.form>
 
@@ -94,7 +87,7 @@ alias SyncMe.Events.EventType
 
       }
     else
-      change_set = Events.change_event_type(scope, %Events.EventType{})
+      change_set = Events.change_event_type(scope, assigns.event_type)
       form = to_form(change_set)
       {:ok,
       socket
