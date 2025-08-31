@@ -29,7 +29,7 @@ defmodule SyncMe.Bookings.Booking do
   end
 
   @doc false
-  def changeset(booking, attrs) do
+  def changeset(booking, attrs \\ %{}) do
     booking
     |> cast(attrs, [
       :start_time,

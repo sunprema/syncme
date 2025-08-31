@@ -1,6 +1,6 @@
 defmodule SyncMeWeb.BookingsLive.Index do
   use SyncMeWeb, :live_view
-
+  alias SyncMe.Bookings
 
   @impl true
   def mount(_params, _session, socket) do
@@ -8,8 +8,23 @@ defmodule SyncMeWeb.BookingsLive.Index do
   end
 
   @impl true
-  def handle_params(_unsigned_params, _uri, socket) do
-    {:noreply, socket}
+  def handle_params(params, _uri, socket) do
+    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
+
+  defp apply_action(socket, :upcoming, _params) do
+      filters = %{"upcoming" => true }
+      bookings = Bookings.list_bookings(socket.assigns.current_scope, filters)
+
+      socket
+      |> stream(:bookings, bookings)
+  end
+
+  defp apply_action(socket, _, _) do
+
+      socket
+
+  end
+
 
 end
