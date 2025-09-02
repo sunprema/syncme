@@ -57,11 +57,11 @@ defmodule SyncMeWeb.UserLive.Confirmation do
               name={@form[:remember_me].name}
               value="true"
               phx-disable-with="Logging in..."
-              class="btn btn-primary w-full"
+              class="btn btn-neutral w-full"
             >
               Keep me logged in on this device
             </button>
-            <button phx-disable-with="Logging in..." class="btn btn-primary btn-soft w-full mt-4">
+            <button phx-disable-with="Logging in..." class="btn btn-neutral btn-soft w-full mt-4">
               Log me in only this time
             </button>
           <% end %>

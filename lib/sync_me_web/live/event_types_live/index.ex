@@ -6,7 +6,8 @@ defmodule SyncMeWeb.EventTypesLive.Index do
   def mount(_params, _session, socket) do
     scope = socket.assigns.current_scope
     {:ok,
-    stream(socket, :event_types, Events.list_event_types(scope))}
+      stream(socket, :event_types, Events.list_event_types(scope))
+    }
   end
 
   @impl true

@@ -89,22 +89,22 @@ defmodule SyncMeWeb.CoreComponents do
       <.button navigate={~p"/"}>Home</.button>
   """
   attr :rest, :global, include: ~w(href navigate patch)
-  attr :variant, :string, values: ~w(primary)
+  attr :variant, :string, values: ~w(primary neutral)
   slot :inner_block, required: true
 
   def button(%{rest: rest} = assigns) do
-    variants = %{"primary" => "btn-primary", nil => "btn-primary btn-soft"}
+    variants = %{"primary" => "btn-neutral", "neutral" => "btn-neutral", nil => "btn-neutral btn-soft"}
     assigns = assign(assigns, :class, Map.fetch!(variants, assigns[:variant]))
 
     if rest[:href] || rest[:navigate] || rest[:patch] do
       ~H"""
-      <.link class={["btn", @class]} {@rest}>
+      <.link class={["btn ", @class]} {@rest}>
         {render_slot(@inner_block)}
       </.link>
       """
     else
       ~H"""
-      <button class={["btn", @class]} {@rest}>
+      <button class={["btn btn-neutral", @class]} {@rest}>
         {render_slot(@inner_block)}
       </button>
       """
@@ -457,5 +457,330 @@ defmodule SyncMeWeb.CoreComponents do
   """
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
+  end
+
+
+  @doc """
+  Renders a message notice.
+
+  Similar to `flash/1`, but for permanent messages on the page.
+
+  ## Examples
+
+      <.message_box kind="info" message="🦊 in a 📦" />
+
+      <.message_box kind="info">
+        <span>🦊</span> in a <span>📦</span>
+      </.message_box>
+
+  """
+
+  attr :message, :string, default: nil
+  attr :kind, :string, values: ~w(info neutral success warning error)
+
+  slot :inner_block
+
+  def message_box(assigns) do
+    if assigns.message && assigns.inner_block != [] do
+      raise ArgumentError, "expected either message or inner_block, got both."
+    end
+
+    ~H"""
+    <div class={[
+      "shadow text-sm rounded-sm px-4 py-2 border-l-4 rounded-l-none bg-white text-gray-700",
+      @kind == "info" && "border-blue-500",
+      @kind == "success" && "border-green-400",
+      @kind == "warning" && "border-yellow-300",
+      @kind == "error" && "border-red-500",
+      @kind == "neutral" && "border-gray-500"
+    ]}>
+      <div
+        :if={@message}
+        class="whitespace-pre-wrap pr-2 max-h-52 overflow-y-auto tiny-scrollbar"
+        phx-no-format
+      >{@message}</div>
+      <%= if @inner_block != [] do %>
+        {render_slot(@inner_block)}
+      <% end %>
+    </div>
+    """
+  end
+
+
+  @doc """
+  Renders a text content skeleton.
+  """
+  attr :empty, :boolean, default: false, doc: "if the source is empty"
+  attr :bg_class, :string, default: "bg-gray-200", doc: "the skeleton background color"
+
+  def content_skeleton(assigns) do
+    ~H"""
+    <%= if @empty do %>
+      <div class="h-4"></div>
+    <% else %>
+      <div class="max-w-2xl w-full animate-pulse">
+        <div class="flex-1 space-y-4">
+          <div class={[@bg_class, "h-4 rounded-lg w-3/4"]}></div>
+          <div class={[@bg_class, "h-4 rounded-lg"]}></div>
+          <div class={[@bg_class, "h-4 rounded-lg w-5/6"]}></div>
+        </div>
+      </div>
+    <% end %>
+    """
+  end
+
+
+
+  @doc """
+  Renders text with a tiny label.
+
+  ## Examples
+
+      <.labeled_text label="Name">Sherlock Holmes</.labeled_text>
+
+  """
+  attr :label, :string, required: true
+
+  attr :one_line, :boolean,
+    default: false,
+    doc: "whether to force the text into a single scrollable line"
+
+  attr :class, :string, default: nil
+
+  slot :inner_block, required: true
+
+  def labeled_text(assigns) do
+    ~H"""
+    <div class={["flex flex-col space-y-1", @class]}>
+      <span class="text-xs text-gray-500">
+        {@label}
+      </span>
+      <span class={[
+        "text-gray-800 text-xs font-semibold",
+        @one_line &&
+          "whitespace-nowrap overflow-hidden text-ellipsis hover:text-clip hover:overflow-auto hover:tiny-scrollbar"
+      ]}>
+        {render_slot(@inner_block)}
+      </span>
+    </div>
+    """
+  end
+
+
+  @doc """
+  Renders a choice button that is either active or not.
+
+  ## Examples
+
+      <.choice_button active={@tab == "my_tab"} phx-click="set_my_tab">
+        My tab
+      </.choice_button>
+
+  """
+  attr :active, :boolean, required: true
+  attr :disabled, :boolean
+  attr :class, :string, default: nil
+  attr :rest, :global
+
+  slot :inner_block, required: true
+
+  def choice_button(assigns) do
+    assigns =
+      assigns
+      |> assign_new(:disabled, fn -> assigns.active end)
+
+    ~H"""
+    <button
+      class={[
+        "px-5 py-2 rounded-lg text-gray-700 border",
+        if(@active, do: "bg-blue-100 border-blue-600", else: "bg-white border-gray-200"),
+        @class
+      ]}
+      disabled={@disabled}
+      {@rest}
+    >
+      {render_slot(@inner_block)}
+    </button>
+    """
+  end
+
+
+   @doc """
+  Renders an status indicator circle.
+  """
+  attr :variant, :string,
+    required: true,
+    values: ~w(success warning error inactive waiting progressing)
+
+  def status_indicator(assigns) do
+    ~H"""
+    <span class="relative flex h-2.5 w-2.5">
+      <span
+        :if={animated_status_circle_class(@variant)}
+        class={[
+          animated_status_circle_class(@variant),
+          "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+        ]}
+      >
+      </span>
+      <span class={[status_circle_class(@variant), "relative inline-flex rounded-full h-2.5 w-2.5"]}>
+      </span>
+    </span>
+    """
+  end
+
+  @doc """
+  Returns background class based on the given variant.
+
+  See `status_indicator/1` for available variants.
+  """
+  def status_circle_class(variant)
+
+  def status_circle_class("success"), do: "bg-green-400"
+  def status_circle_class("warning"), do: "bg-yellow-200"
+  def status_circle_class("error"), do: "bg-red-400"
+  def status_circle_class("inactive"), do: "bg-gray-500"
+  def status_circle_class("waiting"), do: "bg-gray-400"
+  def status_circle_class("progressing"), do: "bg-blue-500"
+
+  defp animated_status_circle_class("waiting"), do: "bg-gray-300"
+  defp animated_status_circle_class("progressing"), do: "bg-blue-400"
+  defp animated_status_circle_class(_other), do: nil
+
+  @doc """
+  Renders an informative box as a placeholder for a list.
+  """
+
+  slot :inner_block, required: true
+  slot :actions
+
+  def no_entries(assigns) do
+    ~H"""
+    <div class="p-5 flex space-x-4 items-center border border-gray-200 rounded-lg">
+      <div>
+        <.icon name="hero-viewfinder-circle" class="text-gray-400 text-xl" />
+      </div>
+      <div class="grow flex items-center justify-between">
+        <div class="text-gray-600">
+          {render_slot(@inner_block)}
+        </div>
+        {render_slot(@actions)}
+      </div>
+    </div>
+    """
+  end
+
+  @doc """
+  Renders a circular spinner.
+  """
+
+  attr :class, :string, default: nil
+  attr :rest, :global
+
+  def spinner(assigns) do
+    ~H"""
+    <svg
+      aria-hidden="true"
+      class={["inline w-4 h-4 text-gray-200 animate-spin fill-blue-600", @class]}
+      viewBox="0 0 100 101"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {@rest}
+    >
+      <path
+        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+        fill="currentColor"
+      />
+      <path
+        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+        fill="currentFill"
+      />
+    </svg>
+    """
+  end
+
+  @doc """
+  Renders stateful tabs with content.
+
+  ## Examples
+
+      <.tabs id="animals" default="cat">
+        <:tab id="cat" label="Cat">
+          This is a cat.
+        </:tab>
+        <:tab id="dog" label="Dog">
+          This is a dog.
+        </:tab>
+      </.tabs>
+
+  """
+
+  attr :id, :string, required: true
+  attr :default, :string, required: true
+  attr :variant, :string, default: "border", values: ~w(border box lift)
+  attr :size, :string, default: "md", values: ~w(xs sm md l xl)
+
+  slot :tab do
+    attr :id, :string, required: true
+    attr :label, :string, required: true
+  end
+
+  def tabs(assigns) do
+
+    variants = %{"border" => "tabs-border", "box" => "tabs-box", "lift" => "tabs-lift"}
+    assigns = assign(assigns, :tab_class, Map.fetch!(variants, assigns[:variant]))
+
+    sizes = %{"xs" => "tabs-xs" , "sm" => "tabs-sm" , "md" => "", "l" => "tabs-lg", "xl" => "tabs-xl"}
+    assigns = assign(assigns, :tab_size, Map.fetch!(sizes, assigns[:size]))
+
+
+    ~H"""
+    <div id={@id} class="flex flex-col gap-4">
+      <div class={["tabs" , @tab_class , @tab_size]} >
+        <button
+          :for={tab <- @tab}
+          class={["tab", @default == tab.id && "active tab-active"]}
+          phx-click={
+            JS.remove_class("tab-active", to: "##{@id} .tab-active")
+            |> JS.add_class("tab-active")
+            |> JS.add_class("hidden", to: "##{@id} [data-tab]")
+            |> JS.remove_class("hidden", to: "##{@id} [data-tab='#{tab.id}']")
+          }
+        >
+          <span class="font-medium">
+            {tab.label}
+          </span>
+        </button>
+      </div>
+
+      <div :for={tab <- @tab} data-tab={tab.id} class={@default == tab.id || "hidden"}>
+        {render_slot(tab)}
+      </div>
+    </div>
+    """
+  end
+
+
+  attr :title, :string, required: true
+  attr :class, :string, default: ""
+  slot :inner_block, required: true , doc: "card body inner block"
+  slot :actions
+  def card(assigns) do
+    ~H"""
+    <div class={["card bg-base-100 border overflow-auto", @class]}>
+    <div class="card-body">
+      <h2 class="card-title">{@title}</h2>
+      {render_slot(@inner_block)}
+      <div class="card-actions justify-end">
+        {render_slot(@actions)}
+      </div>
+    </div>
+    </div>
+    """
+  end
+
+
+  def modal(assigns) do
+
   end
 end
