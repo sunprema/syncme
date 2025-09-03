@@ -79,8 +79,8 @@ defmodule SyncMeWeb.Layouts do
     <div class="drawer-content px-4 ">
     <label for="my-drawer" class="btn btn-primary drawer-button md:hidden">Open drawer</label>
 
-    <main class="px-4 pb-16 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl space-y-4">
+    <main class="">
+      <div class="mx-auto w-full space-y-4 px-4 pb-16 sm:px-6 lg:px-8 sm:mt-8">
         {render_slot(@inner_block)}
       </div>
     </main>
@@ -107,7 +107,7 @@ defmodule SyncMeWeb.Layouts do
     </div>
     </div>
 
-    <footer class="footer fixed left-50 right-50 mx-auto bottom-4 text-center footer-center  text-base-content p-4">
+    <footer class="footer fixed mx-auto bottom-4 text-center footer-center  text-base-content p-4">
           <aside>
             <p class="text-xs text-center">
               By continuing, you agree to SyncMe.Link's

@@ -42,6 +42,17 @@ defmodule SyncMe.Availability do
     end
   end
 
+  def create_availability_rule(%Scope{user: user}, %Ecto.Changeset{} = changeset) when not is_nil(user) do
+    with partner <- Repo.get_by(Partner, user_id: user.id),
+         true <- !is_nil(partner) do
+      changeset
+      |> Ecto.Changeset.put_change("partner_id", partner.id)
+      |> Repo.insert()
+    else
+      false -> {:error, :partner_not_found}
+    end
+  end
+
   @doc """
   Updates an availability rule.
 
