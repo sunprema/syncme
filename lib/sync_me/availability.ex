@@ -1,7 +1,8 @@
 defmodule SyncMe.Availability do
   import Ecto.Query, warn: false
   alias SyncMe.Repo
-
+  alias Ecto.Multi
+  alias SyncMe.Partners.Partner
   alias SyncMe.Availability.AvailabilityRule
   alias SyncMe.Accounts.Scope
 
@@ -42,16 +43,7 @@ defmodule SyncMe.Availability do
     end
   end
 
-  def create_availability_rule(%Scope{user: user}, %Ecto.Changeset{} = changeset) when not is_nil(user) do
-    with partner <- Repo.get_by(Partner, user_id: user.id),
-         true <- !is_nil(partner) do
-      changeset
-      |> Ecto.Changeset.put_change("partner_id", partner.id)
-      |> Repo.insert()
-    else
-      false -> {:error, :partner_not_found}
-    end
-  end
+
 
   @doc """
   Updates an availability rule.
@@ -95,6 +87,30 @@ defmodule SyncMe.Availability do
     else
       {:error, reason} -> {:error, reason}
     end
+  end
+
+  def save_availability_rule( %Scope{user: user} , rules) when not is_nil(user) do
+    IO.inspect(rules)
+    partner = Repo.get_by(Partner, user_id: user.id)
+    partner_id = partner.id
+    availability_rules =
+      rules
+      |> Enum.map( fn rule ->  Map.put( rule,  :partner_id , partner.id) end)
+      |> Enum.map( fn rule ->  Map.delete(rule, :enabled) end)
+      |> Enum.map( fn rule ->   AvailabilityRule.changeset(%AvailabilityRule{}, rule)  end)
+
+
+
+    IO.inspect(availability_rules)
+    queryable = from p in AvailabilityRule, where: p.partner_id == ^partner_id
+    #Repo.delete_all(queryable)
+
+    Repo.transact( fn ->
+      Repo.delete_all( queryable)
+      Repo.insert(Enum.at(availability_rules,0))
+    end)
+
+
   end
 
   alias SyncMe.Availability.AvailabilityOverride

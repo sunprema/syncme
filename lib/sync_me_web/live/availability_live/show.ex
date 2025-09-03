@@ -5,6 +5,7 @@ defmodule SyncMeWeb.AvailabilityLive do
   alias SyncMe.Partners
 
 
+  @impl true
   def mount(_params, _session, socket) do
     scope = socket.assigns.current_scope
     partner = Partners.get_partner(scope)
@@ -39,6 +40,7 @@ defmodule SyncMeWeb.AvailabilityLive do
   end
 
 
+  @impl true
   def handle_event("toggle_day", %{"day" => day_str}, socket) do
     day_index = String.to_integer(day_str) - 1
 
@@ -51,6 +53,7 @@ defmodule SyncMeWeb.AvailabilityLive do
     {:noreply, assign(socket, :days, days)}
   end
 
+  @impl true
   def handle_event("update_time", %{"day" => day_str, "field" => field, "time" => value}, socket) do
     day_index = day_str #String.to_integer(day_str) - 1
 
@@ -66,14 +69,26 @@ defmodule SyncMeWeb.AvailabilityLive do
     {:noreply, assign(socket, :days, days)}
   end
 
-
+  @impl true
   def handle_event("update_time", params, socket) do
 
     IO.inspect(params)
     {:noreply, socket}
   end
 
+
+  @impl true
   def handle_event("save", _params, socket) do
+
+    enabled_rules = Enum.filter(socket.assigns.days, & &1.enabled)
+    IO.inspect(enabled_rules)
+    Availability.save_availability_rule(socket.assigns.current_scope, enabled_rules)
+    {:noreply, socket}
+  end
+
+
+  @impl true
+  def handle_event("save2", _params, socket) do
     days = socket.assigns.days
     partner_id = socket.assigns.partner_id
     scope = socket.assigns.current_scope
