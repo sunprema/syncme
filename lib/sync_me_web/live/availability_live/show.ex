@@ -7,7 +7,8 @@ defmodule SyncMeWeb.AvailabilityLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
-
+    availability_rules = Availability.list_availability_rules(socket.assigns.current_scope)
+    IO.inspect(availability_rules, label: "Availability Rules")
     days = [
 
       %{day_of_week: 1, enabled: false, start_time: ~T[09:00:00], end_time: ~T[17:00:00]},
@@ -18,9 +19,32 @@ defmodule SyncMeWeb.AvailabilityLive.Show do
       %{day_of_week: 6, enabled: false, start_time: ~T[09:00:00], end_time: ~T[17:00:00]},
       %{day_of_week: 7, enabled: false, start_time: ~T[09:00:00], end_time: ~T[17:00:00]},
     ]
+
+    updated_days = case availability_rules do
+      nil ->
+        days
+      rules ->
+          Enum.map(days, fn day ->
+        case Enum.find(rules, fn rule -> rule.day_of_week == day.day_of_week end) do
+          nil -> day
+          rule ->
+            %{day |
+              enabled: true,
+              start_time: rule.start_time,
+              end_time: rule.end_time
+            }
+        end
+      end)
+    end
+
+
+    IO.inspect(updated_days, label: "MERGED DAYS")
+
+
+
     socket =
       socket
-      |> assign(:days, days)
+      |> assign(:days, updated_days)
       |> assign(:time_options, generate_time_options())
 
     {:ok, socket}
@@ -77,6 +101,7 @@ defmodule SyncMeWeb.AvailabilityLive.Show do
       {:ok, _results} ->
         socket
         |> put_flash(:info, "Saved your availability")
+        |> redirect(to: socket.assigns.uri.path)
       {:error, _} ->
         socket
         |> put_flash(:error, "Couldnt save your availability. Check If the start time and end time are corect.")
@@ -85,8 +110,9 @@ defmodule SyncMeWeb.AvailabilityLive.Show do
   end
 
   @impl true
-  def handle_params(_unsigned_params, _uri, socket) do
-    {:noreply, socket}
+  @spec handle_params(any(), any(), any()) :: {:noreply, any()}
+  def handle_params(_unsigned_params, uri, socket) do
+    {:noreply, assign(socket, uri: URI.parse(uri))}
   end
 
 

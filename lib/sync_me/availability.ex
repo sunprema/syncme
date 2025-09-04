@@ -174,7 +174,7 @@ defmodule SyncMe.Availability do
     end
   end
 
-  def get_partner_availability(partner_id, date) do
+  def get_partner_availability(, date) do
     # returns list of available [start, end] slots
     IO.puts("Get the list of slots for #{partner_id} , #{date}")
     []
