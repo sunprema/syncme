@@ -65,11 +65,12 @@ defmodule SyncMeWeb.Router do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
       live "/user/home", UserHome, :index
+      live "/partner/signup" , PartnerLive.Signup, :new
+
     end
 
     live_session :partner_flow,
-      on_mount: [{SyncMeWeb.UserAuth, :require_authenticated}] do
-        live "/partner/signup" , PartnerLive.Signup, :new
+      on_mount: [{SyncMeWeb.UserAuth, :require_authenticated}, {SyncMeWeb.PartnerCheck, :assign_partner_to_scope}] do
         live "/partner/home" , EventTypesLive.Index, :index
         live "/partner/event_types", EventTypesLive.Index, :index
         live "/partner/event_types/new", EventTypesLive.Show, :new
@@ -82,7 +83,6 @@ defmodule SyncMeWeb.Router do
         live "/partner/bookings/upcoming", BookingsLive.Index, :upcoming
         live "/partner/bookings/unconfirmed", BookingsLive.Index, :unconfirmed
         live "/partner/bookings/cancelled", BookingsLive.Index, :cancelled
-
         live "/partner/insights", InsightsLive.Dashboard, :dashboard
       end
 

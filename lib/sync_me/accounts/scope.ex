@@ -1,7 +1,8 @@
 defmodule SyncMe.Accounts.Scope do
   alias SyncMe.Accounts.User
+  alias SyncMe.Partners.Partner
 
-  defstruct user: nil
+  defstruct user: nil, partner: nil
 
   @doc """
   Creates a scope for the given user.
@@ -13,4 +14,12 @@ defmodule SyncMe.Accounts.Scope do
   end
 
   def for_user(nil), do: nil
+
+
+  def put_partner(%__MODULE__{} = scope , %Partner{} = partner ) do
+
+      %{scope | partner: partner}
+
+  end
+
 end

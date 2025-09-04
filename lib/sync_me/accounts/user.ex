@@ -143,4 +143,6 @@ defmodule SyncMe.Accounts.User do
     Argon2.no_user_verify()
     false
   end
+
+
 end

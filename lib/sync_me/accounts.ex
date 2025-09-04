@@ -300,4 +300,9 @@ defmodule SyncMe.Accounts do
     |> User.oauth_registration_changeset(attrs)
     |> Repo.insert()
   end
+
+
+  def preload_partner(user) do
+    Repo.preload(user, [:partner])
+  end
 end

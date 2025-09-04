@@ -7,31 +7,20 @@ defmodule SyncMeWeb.AvailabilityLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
-    scope = socket.assigns.current_scope
-    partner = Partners.get_partner(scope)
-
-    if is_nil(partner) do
-      {:ok,
-        socket
-          |> put_flash(:error, "No partnerships available")
-          |> redirect(~p"/partner/signup")
-    }
-    end
 
     days = [
 
-      %{day_of_week: 1, enabled: true, start_time: ~T[09:00:00], end_time: ~T[17:00:00]},
-      %{day_of_week: 2, enabled: true, start_time: ~T[09:00:00], end_time: ~T[17:00:00]},
-      %{day_of_week: 3, enabled: true, start_time: ~T[09:00:00], end_time: ~T[17:00:00]},
-      %{day_of_week: 4, enabled: true, start_time: ~T[09:00:00], end_time: ~T[17:00:00]},
-      %{day_of_week: 5, enabled: true, start_time: ~T[09:00:00], end_time: ~T[17:00:00]},
+      %{day_of_week: 1, enabled: false, start_time: ~T[09:00:00], end_time: ~T[17:00:00]},
+      %{day_of_week: 2, enabled: false, start_time: ~T[09:00:00], end_time: ~T[17:00:00]},
+      %{day_of_week: 3, enabled: false, start_time: ~T[09:00:00], end_time: ~T[17:00:00]},
+      %{day_of_week: 4, enabled: false, start_time: ~T[09:00:00], end_time: ~T[17:00:00]},
+      %{day_of_week: 5, enabled: false, start_time: ~T[09:00:00], end_time: ~T[17:00:00]},
       %{day_of_week: 6, enabled: false, start_time: ~T[09:00:00], end_time: ~T[17:00:00]},
       %{day_of_week: 7, enabled: false, start_time: ~T[09:00:00], end_time: ~T[17:00:00]},
     ]
     socket =
       socket
       |> assign(:days, days)
-      |> assign(partner: partner)
       |> assign(:time_options, generate_time_options())
 
     {:ok, socket}
@@ -40,7 +29,7 @@ defmodule SyncMeWeb.AvailabilityLive.Show do
 
 
   @impl true
-  def handle_event("toggle_day", %{"day" => day_str}, socket) do
+  def handle_event("toggle_day", %{"day_str" => day_str}, socket) do
     day_index = String.to_integer(day_str) - 1
 
     days =
@@ -53,35 +42,45 @@ defmodule SyncMeWeb.AvailabilityLive.Show do
   end
 
   @impl true
-  def handle_event("update_time", %{"day" => day_str, "field" => field, "time" => value}, socket) do
-    day_index = day_str #String.to_integer(day_str) - 1
-
+  def handle_event("update_start_time", %{"day" => day,  "start_time" => value}, socket) do
+    IO.inspect(value, label: "Start time value")
+    day_index = day - 1
     days =
       socket.assigns.days
       |> List.update_at(day_index, fn day ->
-        case field do
-          "start_time" -> %{day | start_time: parse_time(value)}
-          "end_time" -> %{day | end_time: parse_time(value)}
-        end
+          %{day | start_time: parse_time(value) }
       end)
-
+    IO.inspect( days, label: "Inside update_start_time")
     {:noreply, assign(socket, :days, days)}
   end
 
-  @impl true
-  def handle_event("update_time", params, socket) do
 
-    IO.inspect(params)
-    {:noreply, socket}
+  @impl true
+  def handle_event("update_end_time", %{"day" => day,  "end_time" => value}, socket) do
+    IO.inspect(value, label: "End time value")
+    day_index = day - 1
+    days =
+      socket.assigns.days
+      |> List.update_at(day_index, fn day ->
+          %{day | end_time: parse_time(value) }
+      end)
+    IO.inspect( days, label: "Inside update_end_time")
+    {:noreply, assign(socket, :days, days)}
   end
+
 
 
   @impl true
   def handle_event("save", _params, socket) do
-
     enabled_rules = Enum.filter(socket.assigns.days, & &1.enabled)
-    IO.inspect(enabled_rules)
-    Availability.save_availability_rule(socket.assigns.current_scope, enabled_rules)
+    socket = case Availability.save_availability_rule(socket.assigns.current_scope, enabled_rules) do
+      {:ok, _results} ->
+        socket
+        |> put_flash(:info, "Saved your availability")
+      {:error, _} ->
+        socket
+        |> put_flash(:error, "Couldnt save your availability. Check If the start time and end time are corect.")
+    end
     {:noreply, socket}
   end
 

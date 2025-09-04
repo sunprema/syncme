@@ -18,7 +18,7 @@ defmodule SyncMeWeb.PartnerLive.Signup do
 
   def render(assigns) do
     ~H"""
-     <Layouts.partner_layout flash={@flash} current_scope={@current_scope}>
+     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="mx-auto max-w-sm">
         <div class="text-center">
           <.header>
@@ -56,17 +56,9 @@ defmodule SyncMeWeb.PartnerLive.Signup do
           </button>
         </.form>
 
-        <footer class="footer sm:footer-horizontal absolute bottom-4 left-0 footer-center  text-base-content p-4">
-          <aside>
-            <p class="text-xs">
-              By continuing, you agree to SyncMe.Link's
-              <a><span class="font-semibold">Terms of Service</span></a>
-              and <a><span class="font-semibold">Privacy Policy</span></a>
-            </p>
-          </aside>
-        </footer>
+
       </div>
-    </Layouts.partner_layout>
+    </Layouts.app>
     """
 
   end

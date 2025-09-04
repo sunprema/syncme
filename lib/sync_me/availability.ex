@@ -7,41 +7,30 @@ defmodule SyncMe.Availability do
   alias SyncMe.Availability.AvailabilityRule
   alias SyncMe.Accounts.Scope
 
-  def list_availability_rules(%Scope{user: user}) when not is_nil(user) do
-    query =
-      from r in AvailabilityRule,
-        join: p in assoc(r, :partner),
-        where: p.user_id == ^user.id,
-        select: r
-
-    Repo.all(query)
+  def list_availability_rules(%Scope{partner: partner}) when not is_nil(partner) do
+    partner = Repo.preload(partner, :availability_rules)
+    partner.availability_rules
   end
 
-  def list_availability_rules(%Scope{user: nil}) do
+  def list_availability_rules(%Scope{partner: nil}) do
     []
   end
 
-  def get_availability_rule!(%Scope{user: user}, id) when not is_nil(user) do
+  def get_availability_rule!(%Scope{partner: partner}, id) when not is_nil(partner) do
     query =
       from r in AvailabilityRule,
         join: p in assoc(r, :partner),
-        where: p.user_id == ^user.id and r.id == ^id,
+        where: p.id == ^partner.id and r.id == ^id,
         select: r
 
     Repo.one!(query)
   end
 
-  def create_availability_rule(%Scope{user: user}, attrs) when not is_nil(user) do
-    with partner <- Repo.get_by(Partner, user_id: user.id),
-         true <- !is_nil(partner) do
+  def create_availability_rule(%Scope{partner: partner}, attrs) when not is_nil(partner) do
       attrs_with_partner = Map.put(attrs, "partner_id", partner.id)
-
       %AvailabilityRule{}
       |> AvailabilityRule.changeset(attrs_with_partner)
       |> Repo.insert()
-    else
-      false -> {:error, :partner_not_found}
-    end
   end
 
 
@@ -92,17 +81,17 @@ defmodule SyncMe.Availability do
 
 
 
-  def save_availability_rule( %Scope{user: user} , rules) when not is_nil(user) do
+  def save_availability_rule( %Scope{partner: partner} , rules) when not is_nil(partner) do
     IO.inspect(rules)
-    partner = Repo.get_by(Partner, user_id: user.id)
-    partner_id = partner.id
+
     availability_rules =
       rules
       |> Enum.map( fn rule ->  Map.put( rule,  :partner_id , partner.id) end)
       |> Enum.map( fn rule ->  Map.delete(rule, :enabled) end)
       |> Enum.map( fn rule ->   AvailabilityRule.changeset(%AvailabilityRule{}, rule)  end)
     IO.inspect(availability_rules)
-    queryable = from p in AvailabilityRule, where: p.partner_id == ^partner_id
+
+    queryable = from p in AvailabilityRule, where: p.partner_id == ^partner.id
 
     multi =
       Multi.new()
@@ -149,17 +138,13 @@ defmodule SyncMe.Availability do
     Repo.one!(query)
   end
 
-  def create_availability_override(%Scope{user: user}, attrs) when not is_nil(user) do
-    with partner <- Repo.get_by(Partner, user_id: user.id),
-         true <- !is_nil(partner) do
-      attrs_with_partner_id = Map.put(attrs, "partner_id", partner.id)
+  def create_availability_override(%Scope{partner: partner}, attrs) when not is_nil(partner) do
 
-      %AvailabilityOverride{}
-      |> AvailabilityOverride.changeset(attrs_with_partner_id)
-      |> Repo.insert()
-    else
-      false -> {:error, :partner_not_found}
-    end
+    attrs_with_partner_id = Map.put(attrs, "partner_id", partner.id)
+    %AvailabilityOverride{}
+    |> AvailabilityOverride.changeset(attrs_with_partner_id)
+    |> Repo.insert()
+
   end
 
   def update_availability_override(
@@ -195,17 +180,16 @@ defmodule SyncMe.Availability do
     []
   end
 
-  defp verify_override_ownership(%Scope{user: user}, override) when not is_nil(user) do
-    partner = Repo.get_by(Partner, user_id: user.id)
-
-    if partner && partner.id == override.partner_id do
+  defp verify_override_ownership(%Scope{partner: partner}, override) when not is_nil(partner) do
+    if partner.id == override.partner_id do
       :ok
     else
       {:error, :not_found_or_unauthorized}
     end
   end
 
-  defp verify_override_ownership(%Scope{user: nil}, _rule) do
+  defp verify_override_ownership(%Scope{partner: nil}, _rule) do
     {:error, :user_not_authenticated}
   end
+
 end

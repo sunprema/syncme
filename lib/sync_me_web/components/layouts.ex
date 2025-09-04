@@ -57,7 +57,7 @@ defmodule SyncMeWeb.Layouts do
         {render_slot(@inner_block)}
       </div>
     </main>
-    <footer class="footer fixed left-50 right-50 mx-auto bottom-4 text-center footer-center  text-base-content p-4">
+    <footer class="footer fixed mx-auto bottom-4 text-center footer-center  text-base-content p-4">
           <aside>
             <p class="text-xs text-center">
               By continuing, you agree to SyncMe.Link's

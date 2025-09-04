@@ -64,4 +64,10 @@ defmodule SyncMe.Partners do
   def change_partner(%Scope{} = scope, %Partner{} = partner, attrs \\ %{}) do
     Partner.changeset(partner, attrs, scope)
   end
+
+  def load_partner(%Scope{user: user}) when not is_nil(user) do
+    user = Repo.preload(user, [:partner])
+    user.partner
+  end
+
 end
