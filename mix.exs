@@ -61,7 +61,8 @@ defmodule SyncMe.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       # This is for Google auth
-      {:ueberauth_google, "~> 0.10"}
+      {:ueberauth_google, "~> 0.10"},
+      {:live_debugger, "~> 0.4.0", only: :dev}
     ]
   end
 

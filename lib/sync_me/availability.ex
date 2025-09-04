@@ -174,11 +174,6 @@ defmodule SyncMe.Availability do
     end
   end
 
-  def get_partner_availability(, date) do
-    # returns list of available [start, end] slots
-    IO.puts("Get the list of slots for #{partner_id} , #{date}")
-    []
-  end
 
   defp verify_override_ownership(%Scope{partner: partner}, override) when not is_nil(partner) do
     if partner.id == override.partner_id do

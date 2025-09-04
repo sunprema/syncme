@@ -70,4 +70,14 @@ defmodule SyncMe.Partners do
     user.partner
   end
 
+  def get_partner_by_syncme_link(syncme_link) do
+
+    case Repo.get_by(Partner, syncme_link: syncme_link) do
+      nil -> nil
+      %Partner{} = partner ->
+        Repo.preload(partner, :event_types)
+    end
+
+  end
+
 end

@@ -1,1 +1,21 @@
 <h1>Hello Guest User - {@syncme_link}</h1>
+<div :if={not is_nil(@partner)}>
+ Hello {@partner.bio}
+
+<div class="space-y-2">
+ <div :for={event_type <- @partner.event_types} >
+    <div class="card w-96 bg-base-100 card-xs shadow-sm">
+  <div class="card-body">
+    <h2 class="card-title">{event_type.name}</h2>
+    
+    <p>{event_type.description}</p>
+    <div class="justify-end card-actions">
+      <button class="btn btn-outline">Book</button>
+    </div>
+  </div>
+</div>
+
+   
+ </div>
+</div> 
+</div>
