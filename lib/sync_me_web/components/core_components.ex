@@ -780,7 +780,4 @@ defmodule SyncMeWeb.CoreComponents do
   end
 
 
-  def modal(assigns) do
-
-  end
 end

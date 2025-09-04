@@ -1,4 +1,4 @@
-defmodule SyncMeWeb.AvailabilityLive do
+defmodule SyncMeWeb.AvailabilityLive.Show do
   use SyncMeWeb, :live_view
   alias SyncMe.Availability
   alias SyncMe.Availability.AvailabilityRule
@@ -32,7 +32,6 @@ defmodule SyncMeWeb.AvailabilityLive do
       socket
       |> assign(:days, days)
       |> assign(partner: partner)
-      |> assign(:changeset, AvailabilityRule.changeset(%AvailabilityRule{}, %{}))
       |> assign(:time_options, generate_time_options())
 
     {:ok, socket}
@@ -86,110 +85,6 @@ defmodule SyncMeWeb.AvailabilityLive do
     {:noreply, socket}
   end
 
-
-  @impl true
-  def handle_event("save2", _params, socket) do
-    days = socket.assigns.days
-    partner_id = socket.assigns.partner_id
-    scope = socket.assigns.current_scope
-
-    results =
-      days
-      |> Enum.filter(& &1.enabled)
-      |> Enum.map(fn day ->
-        attrs = %{
-          day_of_week: day.day_of_week,
-          start_time: day.start_time,
-          end_time: day.end_time,
-          partner_id: partner_id
-        }
-        Availability.create_availability_rule(scope, attrs)
-      end)
-
-    case Enum.all?(results, fn {:ok, _} -> true; _ -> false end) do
-      true ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Availability rules saved successfully!")
-         |> redirect(to: ~p"/some_success_path")}
-
-      false ->
-        {:noreply, put_flash(socket, :error, "Failed to save some availability rules.")}
-    end
-  end
-
-  @impl true
-  def render(assigns) do
-    ~H"""
-    <Layouts.partner_layout flash={@flash} current_scope={@current_scope} tab="availability">
-    <.header>
-    Availability
-    <:subtitle>Manage your availability</:subtitle>
-    </.header>
-    <div class="">
-            <form phx-submit="save" class="space-y-2">
-        <%= for day <- @days do %>
-          <div class="p-4">
-            <div class="flex items-baseline">
-            <label class="label w-[180px] min-h-[40px]">
-              <input type="checkbox" checked={day.enabled}  phx-click="toggle_day" phx-value-day={day.day_of_week} class="toggle" />
-              <span class="label-text ml-2 font-semibold"><%= day_name(day.day_of_week) %></span>
-            </label>
-
-
-              <%= if day.enabled do %>
-                <div class="flex space-x-4">
-                  <div class="form-control">
-
-                    <select
-                      phx-change={JS.push("update_time", value: %{"day" => day.day_of_week, "field" => "start_time"})}
-                      name="time"
-                      class="select overflow-y-auto"
-                    >
-                      <%= for {display, value} <- @time_options do %>
-                        <option value={value} selected={value == format_time(day.start_time)}>
-                          <%= display %>
-                        </option>
-                      <% end %>
-                    </select>
-                  </div>
-
-                  <div>
-                  -
-                  </div>
-
-                  <div class="form-control">
-                    <select
-                      name="time"
-                      phx-change={JS.push("update_time", value: %{"day" => day.day_of_week, "field" => "end_time"})}
-                      class="select"
-                    >
-                      <%= for {display, value} <- @time_options do %>
-                        <option value={value} selected={value == format_time(day.end_time)}>
-                          <%= display %>
-                        </option>
-                      <% end %>
-                    </select>
-                  </div>
-                </div>
-              <% end %>
-            </div>
-          </div>
-
-        <% end %>
-
-        <div class="mt-6">
-          <button type="submit" class="btn btn-neutral">Save Availability</button>
-        </div>
-
-      </form>
-    </div>
-
-
-
-    </Layouts.partner_layout>
-    """
-  end
   @impl true
   def handle_params(_unsigned_params, _uri, socket) do
     {:noreply, socket}

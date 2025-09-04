@@ -75,7 +75,7 @@ defmodule SyncMeWeb.Router do
         live "/partner/event_types/new", EventTypesLive.Show, :new
         live "/partner/event_types/:id/edit", EventTypesLive.Show, :edit
         live "/partner/settings", SettingsLive
-        live "/partner/availability", AvailabilityLive
+        live "/partner/availability", AvailabilityLive.Show, :show
 
         #all bookings
         live "/partner/bookings", BookingsLive.Index, :index

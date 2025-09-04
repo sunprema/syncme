@@ -1,0 +1,69 @@
+ 
+    <Layouts.partner_layout flash={@flash} current_scope={@current_scope} tab="availability">
+    <.header>
+    Availability
+    <:subtitle>Manage your availability</:subtitle>
+    </.header>
+    <div class="">
+            <form phx-submit="save" class="space-y-2">
+        <%= for day <- @days do %>
+          <div class="py-2">
+            <div class="flex align-middle items-baseline min-h-[40px] ">
+            <label class="label w-[160px]  min-h-[40px]">
+              <input type="checkbox" checked={day.enabled}  phx-click="toggle_day" phx-value-day={day.day_of_week} class="toggle" />
+              <span class="ml-2 font-normal text-black text-sm"><%= day_name(day.day_of_week) %></span>
+            </label>
+
+
+              <%= if day.enabled do %>
+                <div class="flex space-x-4">
+                  <div class="form-control">
+
+                    <select
+                      phx-change={JS.push("update_time", value: %{"day" => day.day_of_week, "field" => "start_time"})}
+                      name="time"
+                      class="select overflow-y-auto"
+                    >
+                      <%= for {display, value} <- @time_options do %>
+                        <option value={value} selected={value == format_time(day.start_time)}>
+                          <%= display %>
+                        </option>
+                      <% end %>
+                    </select>
+                  </div>
+
+                  <div>
+                  -
+                  </div>
+
+                  <div class="form-control">
+                    <select
+                      name="time"
+                      phx-change={JS.push("update_time", value: %{"day" => day.day_of_week, "field" => "end_time"})}
+                      class="select"
+                    >
+                      <%= for {display, value} <- @time_options do %>
+                        <option value={value} selected={value == format_time(day.end_time)}>
+                          <%= display %>
+                        </option>
+                      <% end %>
+                    </select>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+
+        <% end %>
+
+        <div class="mt-6">
+          <button type="submit" class="btn btn-neutral">Save Availability</button>
+        </div>
+
+      </form>
+    </div>
+
+
+
+    </Layouts.partner_layout>
+    

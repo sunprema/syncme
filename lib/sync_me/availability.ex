@@ -1,5 +1,6 @@
 defmodule SyncMe.Availability do
   import Ecto.Query, warn: false
+  require Logger
   alias SyncMe.Repo
   alias Ecto.Multi
   alias SyncMe.Partners.Partner
@@ -89,6 +90,8 @@ defmodule SyncMe.Availability do
     end
   end
 
+
+
   def save_availability_rule( %Scope{user: user} , rules) when not is_nil(user) do
     IO.inspect(rules)
     partner = Repo.get_by(Partner, user_id: user.id)
@@ -98,17 +101,23 @@ defmodule SyncMe.Availability do
       |> Enum.map( fn rule ->  Map.put( rule,  :partner_id , partner.id) end)
       |> Enum.map( fn rule ->  Map.delete(rule, :enabled) end)
       |> Enum.map( fn rule ->   AvailabilityRule.changeset(%AvailabilityRule{}, rule)  end)
-
-
-
     IO.inspect(availability_rules)
     queryable = from p in AvailabilityRule, where: p.partner_id == ^partner_id
-    #Repo.delete_all(queryable)
 
-    Repo.transact( fn ->
-      Repo.delete_all( queryable)
-      Repo.insert(Enum.at(availability_rules,0))
-    end)
+    multi =
+      Multi.new()
+      |> Multi.delete_all(:delete_existing_rules, queryable)
+
+    multi = Enum.reduce(availability_rules, multi, fn changeset, acc ->
+                Multi.insert(acc, Ecto.Changeset.fetch_field(changeset, :day_of_week), changeset) # :some_key should be unique for each operation
+            end)
+
+    case Repo.transaction(multi) do
+      {:ok, results} -> {:ok, results}
+      {:error, failed_operation_key, failed_value, changes_so_far} ->
+        Logger.info("The keys that failed #{inspect(failed_operation_key)} - #{inspect(changes_so_far)}")
+        {:error, "Failed to insert changesets: #{inspect(failed_value)}"}
+    end
 
 
   end

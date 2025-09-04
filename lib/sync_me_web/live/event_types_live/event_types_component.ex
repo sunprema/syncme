@@ -48,7 +48,7 @@ alias SyncMe.Events.EventType
           <.input
             field={@form[:price]}
             label="Minimum fee"
-            type="currency"
+            type="number"
             placeholder=" in USD"
             required
           />
