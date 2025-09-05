@@ -31,6 +31,7 @@ defmodule SyncMeWeb.Router do
     get "/privacy", PrivacyAndTOSController, :privacy
     get "/terms_of_service", PrivacyAndTOSController, :tos
     get "/:syncme_link", GuestUserHomeController, :home
+    live "/book_event/new/:event_type_id", BookingEvent , :new
   end
 
   # Other scopes may use custom stacks.

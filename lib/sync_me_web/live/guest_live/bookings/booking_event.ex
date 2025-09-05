@@ -1,0 +1,35 @@
+defmodule SyncMeWeb.BookingEvent do
+  use SyncMeWeb, :live_view
+
+  alias SyncMe.Events
+
+  @impl true
+  def mount(_params, _session, socket) do
+    {:ok, socket}
+  end
+
+  @impl true
+  def handle_params(%{"event_type_id" => event_type_id }, _uri, socket) do
+    IO.inspect(event_type_id, label: "Event Type ID received")
+    #Check the event_type_id, If its available and active, so that users can book.
+    event_type = Events.get_event_type(event_type_id)
+
+    {:noreply,
+      socket
+      |> assign(event_type: event_type)
+    }
+  end
+
+  @impl true
+  def handle_event("book", _unsigned_params, socket) do
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({:event_booked, slot}, socket) do
+    IO.inspect(" #{inspect(slot)}", label: "Events already booked")
+    {:noreply, socket}
+  end
+
+
+end

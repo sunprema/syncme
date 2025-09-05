@@ -10,7 +10,11 @@
     
     <p>{event_type.description}</p>
     <div class="justify-end card-actions">
-      <button class="btn btn-outline">Book</button>
+      <.link 
+        navigate={~p"/book_event/new/#{event_type.id}"} 
+        class="btn btn-outline">
+        Book
+      </.link>
     </div>
   </div>
 </div>

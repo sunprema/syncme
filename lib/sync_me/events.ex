@@ -84,4 +84,13 @@ defmodule SyncMe.Events do
       EventType.changeset(event_type, attrs)
   end
 
+
+  def get_event_type(event_type_id) do
+    event_type =
+      Repo.get(EventType, event_type_id)
+      |> Repo.preload([partner: [:user, :availability_rules]])
+
+    event_type
+  end
+
 end
