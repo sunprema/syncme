@@ -27,7 +27,6 @@ import "cally";
 
 let CalendarHook = {
   mounted() {
-    alert("Hello");
     this.el.addEventListener("change", (e) => {
       let selectedDate = e.target.value;
       alert(selectedDate);
