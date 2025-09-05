@@ -1,6 +1,6 @@
 
 <div class="mx-auto min-w-2xl flex flex-col">
-    <div class="flex gap-4 p-8 ">
+    <div class="flex gap-4 pt-8 ">
         <div class="avatar avatar-placeholder">
             <div class="bg-neutral text-neutral-content w-24 rounded-full">
                 <span class="text-3xl">S</span>    
@@ -33,7 +33,14 @@
                     </calendar-month>
                 </calendar-date>  
 
-                <div class="w-full "> 
+                <div class="w-full  "> 
+                    <div>
+                        <%= if @selected_date do %>
+                        <h6 class="text-xs py-2 text-center"> {format_date_for_display(@selected_date)} </h6>
+                        <% else %>
+                        <h6 class="text-xs py-2 text-center font-light"> No date selected yet </h6>
+                        <% end %>
+                    </div>
                     <div class="flex flex-col gap-2 h-[500px] overflow-auto items-center">
                     
                     <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>

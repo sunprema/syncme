@@ -2,10 +2,11 @@ defmodule SyncMeWeb.BookingEvent do
   use SyncMeWeb, :live_view
 
   alias SyncMe.Events
+  require Timex
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    {:ok, socket |> assign(selected_date: nil)}
   end
 
   @impl true
@@ -28,8 +29,15 @@ defmodule SyncMeWeb.BookingEvent do
   end
 
   def handle_event("date-selected", %{ "selected_date" => selected_date}, socket ) do
-    IO.inspect( "#{inspect(selected_date)}", label: "Selected Date!")
-    {:noreply, socket}
+    IO.inspect( "#{selected_date}", label: "Selected Date!")
+
+    case Timex.parse(selected_date, "%Y-%m-%d", :strftime) do
+      {:ok, date} ->
+        {:noreply, assign(socket, :selected_date, date)}
+      {:error, _reason} ->
+        {:noreply, put_flash(socket, :error, "Invalid Date selected")}
+    end
+
   end
 
 
@@ -39,5 +47,8 @@ defmodule SyncMeWeb.BookingEvent do
     {:noreply, socket}
   end
 
+  defp format_date_for_display(timex_date_or_datetime) do
+    Timex.format!(timex_date_or_datetime, "%B-%A-%Y", :strftime)
+  end
 
 end
