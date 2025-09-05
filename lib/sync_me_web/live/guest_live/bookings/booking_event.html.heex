@@ -1,6 +1,6 @@
 
 <.header>
-    New Booking - {@event_type.name}
+    New Booking
     <:subtitle>
     {@event_type.description}
     </:subtitle>
@@ -9,7 +9,7 @@
 <div class="mx-auto card">
     <h1 class="text-4xl"> Host: {@event_type.partner.user.email}  {@event_type.partner.bio} </h1>
     <h2 class="text-2xl font-semibold">  {@event_type.partner.syncme_link} </h2>
-
+    <h2 class="text-2xl font-semibold">  {@event_type.duration_in_minutes}m </h2>
     <div :for={ar <- @event_type.partner.availability_rules}>
         {ar.day_of_week} - {ar.start_time}
     </div>

@@ -1,25 +1,40 @@
-<h1>Hello Guest User - {@syncme_link}</h1>
-<div :if={not is_nil(@partner)}>
- Hello {@partner.bio}
+<div class="mx-auto min-w-2xl flex flex-col">
+  <div class="flex gap-4 p-8 ">
+    <div class="avatar avatar-placeholder">
+      <div class="bg-neutral text-neutral-content w-24 rounded-full">
+        <span class="text-3xl">S</span>    
+      </div>
+    </div>
+    <div class="flex flex-col space-y-4">
+      <h2 class="text-2xl">{@partner.syncme_link}</h2>
+      <h3 class="text-sm text-gray-800">{@partner.bio}</h3>
 
-<div class="space-y-2">
- <div :for={event_type <- @partner.event_types} >
-    <div class="card w-96 bg-base-100 card-xs shadow-sm">
-  <div class="card-body">
-    <h2 class="card-title">{event_type.name}</h2>
-    
-    <p>{event_type.description}</p>
-    <div class="justify-end card-actions">
-      <.link 
-        navigate={~p"/book_event/new/#{event_type.id}"} 
-        class="btn btn-outline">
-        Book
-      </.link>
+
     </div>
   </div>
+
+
+  <div class="grid place-content-center space-y-4 flex-1">
+    <div :for={event_type <- @partner.event_types} >
+      <div class="group card w-96 bg-white card-xs border border-gray-200 p-4 min-w-2xl hover:bg-base-200 ">
+        <div class="card-body">
+          <h2 class="card-title text-sm ">{event_type.name}</h2>    
+          <p class="text-sm text-gray-600/80 ">{event_type.description}</p>
+          <span class="badge bg-base-300 text-xs px-1 rounded"><.icon name="hero-clock" />{event_type.duration_in_minutes}m</span>          
+          <div class="justify-end card-actions py-0">
+            <.link 
+              navigate={~p"/book_event/new/#{event_type.id}"} 
+              class="btn btn-outline border-gray-800/20 text-gray-800/80 hover:text-white group-hover:btn-neutral">
+              Book
+            </.link>
+          </div>
+        </div>
+      </div>   
+    </div>
+  </div>   
 </div>
 
-   
- </div>
-</div> 
-</div>
+
+
+ 
+
