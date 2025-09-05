@@ -22,6 +22,7 @@ defmodule SyncMeWeb.BookingEvent do
       |> assign(partner: event_type.partner)
       |> assign(availabilty_rules: event_type.partner.availability_rules)
       |> assign(available_days: available_days )
+      |> assign(available_slots: [] )
     }
   end
 
