@@ -27,6 +27,12 @@ defmodule SyncMeWeb.BookingEvent do
     {:noreply, socket}
   end
 
+  def handle_event("date-selected", %{ "selected_date" => selected_date}, socket ) do
+    IO.inspect( "#{inspect(selected_date)}", label: "Selected Date!")
+    {:noreply, socket}
+  end
+
+
   @impl true
   def handle_info({:event_booked, slot}, socket) do
     IO.inspect(" #{inspect(slot)}", label: "Events already booked")
