@@ -1,17 +1,72 @@
 
-<.header>
-    New Booking
-    <:subtitle>
-    {@event_type.description}
-    </:subtitle>
-</.header>
-
-<div class="mx-auto card">
-    <h1 class="text-4xl"> Host: {@event_type.partner.user.email}  {@event_type.partner.bio} </h1>
-    <h2 class="text-2xl font-semibold">  {@event_type.partner.syncme_link} </h2>
-    <h2 class="text-2xl font-semibold">  {@event_type.duration_in_minutes}m </h2>
-    <div :for={ar <- @event_type.partner.availability_rules}>
-        {ar.day_of_week} - {ar.start_time}
+<div class="mx-auto min-w-2xl flex flex-col">
+    <div class="flex gap-4 p-8 ">
+        <div class="avatar avatar-placeholder">
+            <div class="bg-neutral text-neutral-content w-24 rounded-full">
+                <span class="text-3xl">S</span>    
+            </div>
+        </div>
+        <div class="flex flex-col space-y-4">
+            <h2 class="text-2xl">{@partner.syncme_link}</h2>
+            <h3 class="text-sm text-gray-800">{@partner.bio}</h3>
+        </div>
     </div>
 
+    <div class="mx-auto space-y-4">
+        <.header>
+            New Booking    
+        </.header>
+        <div class="card w-96 bg-white card-xs border border-gray-200 p-4 md:min-w-2xl">
+            <div class="card-body">
+                <h2 class="card-title text-sm ">{@event_type.name} - <span class="badge bg-base-300 font-light text-xs px-1 rounded"><.icon name="hero-clock" />{@event_type.duration_in_minutes}m</span></h2>    
+                <p class="text-sm text-gray-600/80 ">{@event_type.description}</p>
+                <span class="badge text-xs px-1 rounded"><.icon name="hero-credit-card" />{@event_type.price}$</span>   
+            </div>
+        </div>
+
+        <div class=" card text-xl">
+            <div class="flex gap-2 h-1/2">
+                <calendar-date class="cally bg-base-100 border border-base-300 shadow-lg p-8 rounded-box h-[500px]">
+                    <svg aria-label="Previous" class="fill-current size-4" slot="previous" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg>
+                    <svg aria-label="Next" class="fill-current size-4" slot="next" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg>
+                    <calendar-month class="font-semibold text-lg">                
+                    </calendar-month>
+                </calendar-date>  
+
+                <div class="w-full "> 
+                    <div class="flex flex-col gap-2 h-[500px] overflow-auto items-center">
+                    
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+
+                    </div>
+
+                </div>  
+
+
+            </div>
+        </div>
+    </div>
 </div>
+
+

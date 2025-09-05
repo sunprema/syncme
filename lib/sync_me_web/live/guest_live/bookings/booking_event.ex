@@ -17,6 +17,8 @@ defmodule SyncMeWeb.BookingEvent do
     {:noreply,
       socket
       |> assign(event_type: event_type)
+      |> assign(partner: event_type.partner)
+      |> assign(availabilty_rules: event_type.partner.availability_rules)
     }
   end
 
