@@ -66,7 +66,7 @@ defmodule SyncMe.Partners do
   end
 
   def load_partner(%Scope{user: user}) when not is_nil(user) do
-    user = Repo.preload(user, [:partner])
+    user = Repo.preload(user, [partner: [:event_types, :availability_rules]])
     user.partner
   end
 
@@ -75,7 +75,7 @@ defmodule SyncMe.Partners do
     case Repo.get_by(Partner, syncme_link: syncme_link) do
       nil -> nil
       %Partner{} = partner ->
-        Repo.preload(partner, :event_types)
+        Repo.preload(partner, [:event_types, :availability_rules])
     end
 
   end

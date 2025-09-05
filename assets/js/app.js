@@ -29,10 +29,16 @@ let CalendarHook = {
   mounted() {
     this.el.addEventListener("change", (e) => {
       let selectedDate = e.target.value;
-      alert(selectedDate);
       this.pushEvent("date-selected", { selected_date: selectedDate });
     });
-  },
+
+    const availableDays = this.el.dataset.available_days.split(",").map(Number);
+    this.el.isDateDisallowed = (date) => {
+      let jsDay = date.getDay();
+      let targetDay = jsDay === 0 ? 7 : jsDay; // Convert JS weekday (0-6, where 0 is Sunday) to our format (1-7, where 1 is Monday)
+      return !availableDays.includes(targetDay) ;
+    }
+    },
   // You can add other callbacks here if needed
 };
 

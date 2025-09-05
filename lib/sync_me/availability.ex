@@ -187,4 +187,14 @@ defmodule SyncMe.Availability do
     {:error, :user_not_authenticated}
   end
 
+  # Fetch availability rules for a partner on a specific day
+  def get_partner_availability(partner_id, selected_date) do
+    day_of_week = Date.day_of_week(selected_date)
+    from(r in AvailabilityRule,
+      where: r.partner_id == ^partner_id and r.day_of_week == ^day_of_week,
+      select: %{start_time: r.start_time, end_time: r.end_time}
+    )
+    |> Repo.all()
+  end
+
 end

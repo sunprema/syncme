@@ -14,7 +14,7 @@
 
     <div class="mx-auto space-y-4">
         <.header>
-            New Booking    
+            Request Meeting   
         </.header>
         <div class="card w-96 bg-white card-xs border border-gray-200 p-4 md:min-w-2xl">
             <div class="card-body">
@@ -26,24 +26,23 @@
 
         <div class=" card text-xl">
             <div class="flex flex-col mx-auto md:flex-row md:mx-0  gap-2 h-1/2">
-                <calendar-date class="cally bg-white border border-base-300 shadow-lg p-8 rounded-box h-[500px]" phx-hook="CalendarHook" id="booking_calendar">
+                <calendar-date class="cally bg-white border border-base-300 p-8 h-[500px]" phx-hook="CalendarHook" id="booking_calendar" data-available_days={Enum.join(@available_days, ",")}>
                     <svg aria-label="Previous" class="fill-current size-4" slot="previous" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg>
                     <svg aria-label="Next" class="fill-current size-4" slot="next" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg>
                     <calendar-month class="font-semibold text-lg">                
                     </calendar-month>
                 </calendar-date>  
 
-                <div class="w-full  "> 
-                    <div>
-                        <%= if @selected_date do %>
-                        <h6 class="text-xs py-2 text-center"> {format_date_for_display(@selected_date)} </h6>
+                <div class="w-full bg-white "> 
+                    <div class="relative flex flex-col gap-2 h-[500px] overflow-auto items-center">
+                    <div class="sticky top-0 z-10 bg-white w-full">
+                     <%= if @selected_date do %>
+                        <h6 class="text-sm py-2 font-semibold ml-4 "> {format_date_for_display(@selected_date)} </h6>
                         <% else %>
                         <h6 class="text-xs py-2 text-center font-light"> No date selected yet </h6>
                         <% end %>
                     </div>
-                    <div class="flex flex-col gap-2 h-[500px] overflow-auto items-center">
-                    
-                    <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
+                    <button class="btn btn-outline border-gray-500/60 btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
                     <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
                     <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>
                     <button class="btn btn-outline btn-sm w-[12rem] hover:btn-neutral"> 9:00 am </button>

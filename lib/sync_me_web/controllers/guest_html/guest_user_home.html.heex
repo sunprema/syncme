@@ -15,7 +15,7 @@
 
 
   <div class="mx-auto space-y-4">
-    <div :for={event_type <- @partner.event_types} >
+    <div :for={event_type <- Enum.filter(@partner.event_types, fn et -> et.is_active end)} >
       <div class="group card w-96 bg-white card-xs border border-gray-200 p-4 md:min-w-2xl hover:bg-base-200 ">
         <div class="card-body">
           <h2 class="card-title text-sm ">{event_type.name} - <span class="badge bg-base-300 font-light text-xs px-1 rounded"><.icon name="hero-clock" />{event_type.duration_in_minutes}m</span></h2>    
