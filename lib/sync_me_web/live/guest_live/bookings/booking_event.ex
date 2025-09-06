@@ -13,7 +13,7 @@ defmodule SyncMeWeb.BookingEvent do
      |> assign(time_selected: nil)
      |> assign(available_slots: [])
      |> assign(selected_date_str: "")
-     |> assign(meeting_start_time_formatted_str: "Friday, September 12, 2025")}
+     |> assign(meeting_start_time_formatted_str: "Friday, September 12, 2025"), layout: false}
   end
 
   @impl true

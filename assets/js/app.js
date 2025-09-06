@@ -32,9 +32,13 @@ let CalendarHook = {
       this.pushEvent("date-selected", { selected_date: selectedDate });
     });
 
+    current_day = new Date();
+
     let availableDays = this.el.dataset.available_days.split(",").map(Number);
     this.el.isDateDisallowed = (datey) => {
-      
+      if (datey < current_day){
+        return true ;
+      }
       let jsDay = datey.getDay() + 1; //TODO: There is a weird behaviour with this logic, I had to add 1, otherwise the date disabling if off.
       let targetDay = jsDay; // === 0 ? 7 : jsDay; // Convert JS weekday (0-6, where 0 is Sunday) to our format (1-7, where 1 is Monday)
       console.log(`${targetDay} - ${datey} - ${availableDays.includes(targetDay)}`);
