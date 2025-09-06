@@ -23,10 +23,12 @@
                 <span class="badge text-xs px-1 rounded"><.icon name="hero-credit-card" />{@event_type.price}$</span>   
             </div>
         </div>
-
+        <%= if @live_action == :new do %>    
         <div class=" card text-xl">
             <div class="flex flex-col mx-auto md:flex-row md:mx-0  gap-2 h-1/2">
-                <calendar-date class="cally bg-white border border-base-300 p-8 h-[500px]" phx-hook="CalendarHook" id="booking_calendar" 
+                <calendar-date class="cally bg-white border border-base-300 p-8 h-[500px]" 
+                    value={ @selected_date_str || "" } #TODO: just dummy date for now
+                    phx-hook="CalendarHook" id="booking_calendar" 
                     data-available_days={Enum.join(@available_days, ",")}>
                     <svg aria-label="Previous" class="fill-current size-4" slot="previous" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg>
                     <svg aria-label="Next" class="fill-current size-4" slot="next" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg>
@@ -44,13 +46,14 @@
                         <% end %>
                     </div>
                     
-                    <button class="btn btn-outline border-gray-500/60 btn-sm w-[12rem] hover:btn-neutral"  
-                    :for={ {a, available_slot} <- @available_slots }
-                    phx-click={JS.push("slot_selected", value: %{selected_datetime_slot: a} )} 
+                    <%= for {{dt, available_slot}, index} <- Enum.with_index(@available_slots) do %>
+                    <button 
+                        class="btn btn-outline border-gray-500/60 btn-sm w-[12rem] hover:btn-neutral"  
+                        phx-click={JS.push("slot_selected", value: %{selected_datetime_index: index} )} 
                     > 
-                        {available_slot}                    
+                    {available_slot}                    
                     </button>
-                    
+                    <% end  %>
                     
                     </div>
 
@@ -59,6 +62,27 @@
 
             </div>
         </div>
+        <% end %> 
+
+        <%= if @live_action == :details do %>    
+            <h2> Welcome  to the booking screen - {inspect(@time_selected)} </h2>
+            <div class=" card text-xl">
+            <div class="flex w-full flex-col gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="skeleton h-16 w-16 shrink-0 rounded-full"></div>
+                    <div class="flex flex-col gap-4">
+                    <div class="skeleton h-4 w-20"></div>
+                    <div class="skeleton h-4 w-28"></div>
+                    </div>
+                </div>
+                <div class="skeleton h-32 w-full"></div>
+
+                </div>
+
+            </div>
+            <.link class=".btn .btn-outline" patch={~p"/book_event/new/#{@event_type.id}"} > Back </.link>
+        <% end  %> 
+
     </div>
 </div>
 

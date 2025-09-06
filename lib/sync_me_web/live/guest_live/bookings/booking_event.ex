@@ -7,7 +7,14 @@ defmodule SyncMeWeb.BookingEvent do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket |> assign(selected_date: nil)}
+    {:ok,
+      socket
+      |> assign(selected_date: nil)
+      |> assign(time_selected: nil)
+      |> assign(available_slots: [] )
+      |> assign(:time_selected, "")
+      |> assign(selected_date_str: "")
+    }
   end
 
   @impl true
@@ -22,7 +29,8 @@ defmodule SyncMeWeb.BookingEvent do
       |> assign(partner: event_type.partner)
       |> assign(availabilty_rules: event_type.partner.availability_rules)
       |> assign(available_days: available_days )
-      |> assign(available_slots: [] )
+
+
     }
   end
 
@@ -39,6 +47,7 @@ defmodule SyncMeWeb.BookingEvent do
       {:ok, date} ->
         {:noreply,
           socket
+          |> assign(:selected_date_str, selected_date)
           |> assign(:selected_date, date)
           |> assign(:available_slots, format_available_slots( Scheduler.available_slots( partner.id, date, event_type.id )) )
         }
@@ -50,9 +59,17 @@ defmodule SyncMeWeb.BookingEvent do
 
 
   @impl true
-  def handle_event("slot_selected", %{"selected_datetime_slot" => selected_datetime_slot}, socket) do
-    IO.inspect("#{selected_datetime_slot}", label: "Selected time slot")
-    {:noreply, socket}
+  def handle_event("slot_selected", %{"selected_datetime_index" => selected_datetime_index}, socket) do
+    IO.inspect("#{selected_datetime_index}", label: "selected_datetime_index")
+    available_slots = socket.assigns.available_slots
+    time_selected = Enum.at(available_slots,selected_datetime_index )
+    IO.inspect("#{inspect(time_selected)}", label: "time_selected")
+
+    {:noreply,
+      socket
+       |> assign(:time_selected, time_selected)
+       |> push_patch(to: ~p"/book_event/details/#{socket.assigns.event_type.id}")
+      }
   end
 
   @impl true
