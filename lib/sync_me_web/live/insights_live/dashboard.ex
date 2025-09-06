@@ -10,5 +10,4 @@ defmodule SyncMeWeb.InsightsLive.Dashboard do
   def handle_params(_unsigned_params, _uri, socket) do
     {:noreply, socket}
   end
-
 end

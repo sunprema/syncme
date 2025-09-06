@@ -13,18 +13,14 @@ defmodule SyncMeWeb.BookingsLive.Index do
   end
 
   defp apply_action(socket, :upcoming, _params) do
-      filters = %{"upcoming" => true }
-      bookings = Bookings.list_bookings(socket.assigns.current_scope, filters)
+    filters = %{"upcoming" => true}
+    bookings = Bookings.list_bookings(socket.assigns.current_scope, filters)
 
-      socket
-      |> stream(:bookings, bookings)
+    socket
+    |> stream(:bookings, bookings)
   end
 
   defp apply_action(socket, _, params) do
-
-      apply_action(socket, :upcoming, params)
-
+    apply_action(socket, :upcoming, params)
   end
-
-
 end

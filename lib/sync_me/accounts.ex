@@ -301,7 +301,6 @@ defmodule SyncMe.Accounts do
     |> Repo.insert()
   end
 
-
   def preload_partner(user) do
     Repo.preload(user, [:partner])
   end

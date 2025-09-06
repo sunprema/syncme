@@ -27,13 +27,12 @@ defmodule SyncMe.Availability do
   end
 
   def create_availability_rule(%Scope{partner: partner}, attrs) when not is_nil(partner) do
-      attrs_with_partner = Map.put(attrs, "partner_id", partner.id)
-      %AvailabilityRule{}
-      |> AvailabilityRule.changeset(attrs_with_partner)
-      |> Repo.insert()
+    attrs_with_partner = Map.put(attrs, "partner_id", partner.id)
+
+    %AvailabilityRule{}
+    |> AvailabilityRule.changeset(attrs_with_partner)
+    |> Repo.insert()
   end
-
-
 
   @doc """
   Updates an availability rule.
@@ -79,16 +78,15 @@ defmodule SyncMe.Availability do
     end
   end
 
-
-
-  def save_availability_rule( %Scope{partner: partner} , rules) when not is_nil(partner) do
+  def save_availability_rule(%Scope{partner: partner}, rules) when not is_nil(partner) do
     IO.inspect(rules)
 
     availability_rules =
       rules
-      |> Enum.map( fn rule ->  Map.put( rule,  :partner_id , partner.id) end)
-      |> Enum.map( fn rule ->  Map.delete(rule, :enabled) end)
-      |> Enum.map( fn rule ->   AvailabilityRule.changeset(%AvailabilityRule{}, rule)  end)
+      |> Enum.map(fn rule -> Map.put(rule, :partner_id, partner.id) end)
+      |> Enum.map(fn rule -> Map.delete(rule, :enabled) end)
+      |> Enum.map(fn rule -> AvailabilityRule.changeset(%AvailabilityRule{}, rule) end)
+
     IO.inspect(availability_rules)
 
     queryable = from p in AvailabilityRule, where: p.partner_id == ^partner.id
@@ -97,18 +95,23 @@ defmodule SyncMe.Availability do
       Multi.new()
       |> Multi.delete_all(:delete_existing_rules, queryable)
 
-    multi = Enum.reduce(availability_rules, multi, fn changeset, acc ->
-                Multi.insert(acc, Ecto.Changeset.fetch_field(changeset, :day_of_week), changeset) # :some_key should be unique for each operation
-            end)
+    multi =
+      Enum.reduce(availability_rules, multi, fn changeset, acc ->
+        # :some_key should be unique for each operation
+        Multi.insert(acc, Ecto.Changeset.fetch_field(changeset, :day_of_week), changeset)
+      end)
 
     case Repo.transaction(multi) do
-      {:ok, results} -> {:ok, results}
+      {:ok, results} ->
+        {:ok, results}
+
       {:error, failed_operation_key, failed_value, changes_so_far} ->
-        Logger.info("The keys that failed #{inspect(failed_operation_key)} - #{inspect(changes_so_far)}")
+        Logger.info(
+          "The keys that failed #{inspect(failed_operation_key)} - #{inspect(changes_so_far)}"
+        )
+
         {:error, "Failed to insert changesets: #{inspect(failed_value)}"}
     end
-
-
   end
 
   alias SyncMe.Availability.AvailabilityOverride
@@ -139,12 +142,11 @@ defmodule SyncMe.Availability do
   end
 
   def create_availability_override(%Scope{partner: partner}, attrs) when not is_nil(partner) do
-
     attrs_with_partner_id = Map.put(attrs, "partner_id", partner.id)
+
     %AvailabilityOverride{}
     |> AvailabilityOverride.changeset(attrs_with_partner_id)
     |> Repo.insert()
-
   end
 
   def update_availability_override(
@@ -174,7 +176,6 @@ defmodule SyncMe.Availability do
     end
   end
 
-
   defp verify_override_ownership(%Scope{partner: partner}, override) when not is_nil(partner) do
     if partner.id == override.partner_id do
       :ok
@@ -190,11 +191,11 @@ defmodule SyncMe.Availability do
   # Fetch availability rules for a partner on a specific day
   def get_partner_availability(partner_id, selected_date) do
     day_of_week = Date.day_of_week(selected_date)
+
     from(r in AvailabilityRule,
       where: r.partner_id == ^partner_id and r.day_of_week == ^day_of_week,
       select: %{start_time: r.start_time, end_time: r.end_time}
     )
     |> Repo.all()
   end
-
 end

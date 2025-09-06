@@ -93,7 +93,12 @@ defmodule SyncMeWeb.CoreComponents do
   slot :inner_block, required: true
 
   def button(%{rest: rest} = assigns) do
-    variants = %{"primary" => "btn-neutral", "neutral" => "btn-neutral", nil => "btn-neutral btn-soft"}
+    variants = %{
+      "primary" => "btn-neutral",
+      "neutral" => "btn-neutral",
+      nil => "btn-neutral btn-soft"
+    }
+
     assigns = assign(assigns, :class, Map.fetch!(variants, assigns[:variant]))
 
     if rest[:href] || rest[:navigate] || rest[:patch] do
@@ -459,7 +464,6 @@ defmodule SyncMeWeb.CoreComponents do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
 
-
   @doc """
   Renders a message notice.
 
@@ -506,7 +510,6 @@ defmodule SyncMeWeb.CoreComponents do
     """
   end
 
-
   @doc """
   Renders a text content skeleton.
   """
@@ -528,8 +531,6 @@ defmodule SyncMeWeb.CoreComponents do
     <% end %>
     """
   end
-
-
 
   @doc """
   Renders text with a tiny label.
@@ -565,7 +566,6 @@ defmodule SyncMeWeb.CoreComponents do
     </div>
     """
   end
-
 
   @doc """
   Renders a choice button that is either active or not.
@@ -604,8 +604,7 @@ defmodule SyncMeWeb.CoreComponents do
     """
   end
 
-
-   @doc """
+  @doc """
   Renders an status indicator circle.
   """
   attr :variant, :string,
@@ -726,17 +725,22 @@ defmodule SyncMeWeb.CoreComponents do
   end
 
   def tabs(assigns) do
-
     variants = %{"border" => "tabs-border", "box" => "tabs-box", "lift" => "tabs-lift"}
     assigns = assign(assigns, :tab_class, Map.fetch!(variants, assigns[:variant]))
 
-    sizes = %{"xs" => "tabs-xs" , "sm" => "tabs-sm" , "md" => "", "l" => "tabs-lg", "xl" => "tabs-xl"}
-    assigns = assign(assigns, :tab_size, Map.fetch!(sizes, assigns[:size]))
+    sizes = %{
+      "xs" => "tabs-xs",
+      "sm" => "tabs-sm",
+      "md" => "",
+      "l" => "tabs-lg",
+      "xl" => "tabs-xl"
+    }
 
+    assigns = assign(assigns, :tab_size, Map.fetch!(sizes, assigns[:size]))
 
     ~H"""
     <div id={@id} class="flex flex-col gap-4">
-      <div class={["tabs" , @tab_class , @tab_size]} >
+      <div class={["tabs", @tab_class, @tab_size]}>
         <button
           :for={tab <- @tab}
           class={["tab", @default == tab.id && "active tab-active"]}
@@ -760,24 +764,22 @@ defmodule SyncMeWeb.CoreComponents do
     """
   end
 
-
   attr :title, :string, required: true
   attr :class, :string, default: ""
-  slot :inner_block, required: true , doc: "card body inner block"
+  slot :inner_block, required: true, doc: "card body inner block"
   slot :actions
+
   def card(assigns) do
     ~H"""
     <div class={["card bg-base-100 border overflow-auto", @class]}>
-    <div class="card-body">
-      <h2 class="card-title">{@title}</h2>
-      {render_slot(@inner_block)}
-      <div class="card-actions justify-end">
-        {render_slot(@actions)}
+      <div class="card-body">
+        <h2 class="card-title">{@title}</h2>
+        {render_slot(@inner_block)}
+        <div class="card-actions justify-end">
+          {render_slot(@actions)}
+        </div>
       </div>
-    </div>
     </div>
     """
   end
-
-
 end

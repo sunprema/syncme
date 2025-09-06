@@ -1,28 +1,23 @@
 <Layouts.partner_layout flash={@flash} current_scope={@current_scope} tab="bookings">
- <.header>
-  Bookings
-  <:subtitle>Manage your Bookings.</:subtitle>
-  <:actions>
-    <.link patch={~p"/partner/bookings"}>
-      <button class="btn btn-neutral">Calendar view</button>
-    </.link>
-  </:actions>
-</.header>
+  <.header>
+    Bookings
+    <:subtitle>Manage your Bookings.</:subtitle>
+    <:actions>
+      <.link patch={~p"/partner/bookings"}>
+        <button class="btn btn-neutral">Calendar view</button>
+      </.link>
+    </:actions>
+  </.header>
 
-
-<.table
-  id="event_types"
-  rows={@streams.bookings} 
->
-  <:col :let={{_id, booking}} label="Event">{booking.event_type.name}</:col>
-  <:col :let={{_id, booking}} label="Guest">{booking.guest_user.email}</:col>
-  <:col :let={{_id, booking}} label="Status">{booking.status}</:col>
-  <:col :let={{_id, booking}} label="Duration">{booking.duration_at_booking}</:col>
-  <:col :let={{_id, booking}} label="Link">{booking.video_conference_link}</:col>
-  <:col :let={{_id, booking}} label="Price">{booking.price_at_booking}</:col>
-  
-  
-</.table>
-
-
+  <.table
+    id="event_types"
+    rows={@streams.bookings}
+  >
+    <:col :let={{_id, booking}} label="Event">{booking.event_type.name}</:col>
+    <:col :let={{_id, booking}} label="Guest">{booking.guest_user.email}</:col>
+    <:col :let={{_id, booking}} label="Status">{booking.status}</:col>
+    <:col :let={{_id, booking}} label="Duration">{booking.duration_at_booking}</:col>
+    <:col :let={{_id, booking}} label="Link">{booking.video_conference_link}</:col>
+    <:col :let={{_id, booking}} label="Price">{booking.price_at_booking}</:col>
+  </.table>
 </Layouts.partner_layout>

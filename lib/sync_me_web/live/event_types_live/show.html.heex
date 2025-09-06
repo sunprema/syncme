@@ -1,31 +1,27 @@
 <Layouts.partner_layout flash={@flash} current_scope={@current_scope} tab="event_types">
-  <div :if={@live_action == :edit}>    
+  <div :if={@live_action == :edit}>
     <.header>
-    
-    <.link patch={~p"/partner/event_types"} class="btn btn-ghost btn-square -ml-8 btn-xs" >
-    <.icon name="hero-arrow-left-micro" class="size-4 " />
-    </.link>
-    Event Type (Edit)
-    <:subtitle>Events that can be booked on your calendar.</:subtitle>  
+      <.link patch={~p"/partner/event_types"} class="btn btn-ghost btn-square -ml-8 btn-xs">
+        <.icon name="hero-arrow-left-micro" class="size-4 " />
+      </.link>
+      Event Type (Edit)
+      <:subtitle>Events that can be booked on your calendar.</:subtitle>
     </.header>
   </div>
 
-  <div :if={@live_action == :new}>    
+  <div :if={@live_action == :new}>
     <.header>
-    Event Type
-    <:subtitle>Create Events that can be booked on your calendar.</:subtitle>  
+      Event Type
+      <:subtitle>Create Events that can be booked on your calendar.</:subtitle>
     </.header>
   </div>
 
-    
- <.live_component 
-    module={SyncMeWeb.PartnerLive.EventTypesComponent} 
+  <.live_component
+    module={SyncMeWeb.PartnerLive.EventTypesComponent}
     id={@event_type.id || :new}
     event_type={@event_type}
     action={@live_action}
     current_scope={@current_scope}
-    patch={~p"/partner/event_types"} 
-    
- />
-
+    patch={~p"/partner/event_types"}
+  />
 </Layouts.partner_layout>

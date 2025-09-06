@@ -1,5 +1,4 @@
 defmodule SyncMe.AvailabilityRule.Schedule do
-
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -16,7 +15,6 @@ defmodule SyncMe.AvailabilityRule.Schedule do
     |> validate_required([:day, :checked])
     |> validate_time_order()
   end
-
 
   # Custom validation function to compare start and end times
   defp validate_time_order(changeset) do

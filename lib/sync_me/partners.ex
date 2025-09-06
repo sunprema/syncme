@@ -12,28 +12,25 @@ defmodule SyncMe.Partners do
   def list_partners(%Scope{} = scope) do
     Repo.all_by(Partner, user_id: scope.user.id)
   end
+
   def get_partner(%Scope{user: user}) when not is_nil(user) do
     Repo.get_by(Partner, user_id: user.id)
   end
-
-
 
   def create_partner(%Scope{} = scope, attrs) do
     with {:ok, partner = %Partner{}} <-
            %Partner{}
            |> Partner.changeset(attrs, scope)
            |> Repo.insert() do
-        {:ok, partner}
+      {:ok, partner}
     end
   end
 
   def update_partner(%Scope{} = scope, %Partner{} = partner, attrs) do
-
     with {:ok, partner = %Partner{}} <-
            partner
            |> Partner.changeset(attrs, scope)
            |> Repo.update() do
-
       {:ok, partner}
     end
   end
@@ -55,29 +52,26 @@ defmodule SyncMe.Partners do
 
     with {:ok, partner = %Partner{}} <-
            Repo.delete(partner) do
-
       {:ok, partner}
     end
   end
-
 
   def change_partner(%Scope{} = scope, %Partner{} = partner, attrs \\ %{}) do
     Partner.changeset(partner, attrs, scope)
   end
 
   def load_partner(%Scope{user: user}) when not is_nil(user) do
-    user = Repo.preload(user, [partner: [:event_types, :availability_rules]])
+    user = Repo.preload(user, partner: [:event_types, :availability_rules])
     user.partner
   end
 
   def get_partner_by_syncme_link(syncme_link) do
-
     case Repo.get_by(Partner, syncme_link: syncme_link) do
-      nil -> nil
+      nil ->
+        nil
+
       %Partner{} = partner ->
         Repo.preload(partner, [:event_types, :availability_rules])
     end
-
   end
-
 end

@@ -6,6 +6,7 @@ defmodule SyncMeWeb.GuestUserHomeController do
   def home(conn, %{"syncme_link" => syncme_link}) do
     IO.inspect(syncme_link)
     partner = Partners.get_partner_by_syncme_link(syncme_link)
+
     conn =
       conn
       |> assign(:syncme_link, syncme_link)

@@ -22,9 +22,11 @@ defmodule SyncMe.Partners.Partner do
     partner
     |> cast(attrs, [:bio, :syncme_link])
     |> validate_required([:bio, :syncme_link])
-    |> validate_length(:bio, min: 12, max: 160 )
+    |> validate_length(:bio, min: 12, max: 160)
     |> unique_constraint(:user_id, message: "Partner exists already.")
-    |> unique_constraint(:syncme_link, message: "This syncme link is already in use, Try a different one.")
+    |> unique_constraint(:syncme_link,
+      message: "This syncme link is already in use, Try a different one."
+    )
     |> put_change(:user_id, user_scope.user.id)
   end
 end

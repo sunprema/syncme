@@ -1,68 +1,82 @@
-
 <Layouts.partner_layout flash={@flash} current_scope={@current_scope} tab="event_types">
-  <div :if={@live_action == :index}>    
- <.header>
-  Event Types
-  <:subtitle>Events that can be booked on your calendar.</:subtitle>
-  <:actions>
-    <.link patch={~p"/partner/event_types/new"}>
-      <button class="btn btn-neutral">New Event Type</button>
-      
-    </.link>
-  </:actions>
-</.header>
+  <div :if={@live_action == :index}>
+    <.header>
+      Event Types
+      <:subtitle>Events that can be booked on your calendar.</:subtitle>
+      <:actions>
+        <.link patch={~p"/partner/event_types/new"}>
+          <button class="btn btn-neutral">New Event Type</button>
+        </.link>
+      </:actions>
+    </.header>
 
-
-<.table
-  id="event_types"
-  rows={@streams.event_types}
-  row_click={fn {_id, event_type} -> JS.navigate(~p"/partner/event_types/#{event_type.id}/edit") end}
->
-  <:col :let={{_id, event_type}} label="Title">{event_type.name}</:col>
-  <:col :let={{_id, event_type}} label="Description">{event_type.description}</:col>
-  <:col :let={{_id, event_type}} label="Slug">{event_type.slug}</:col>
-  <:col :let={{_id, event_type}} label="Duration">{event_type.duration_in_minutes}</:col>
-  
-</.table>
+    <.table
+      id="event_types"
+      rows={@streams.event_types}
+      row_click={
+        fn {_id, event_type} -> JS.navigate(~p"/partner/event_types/#{event_type.id}/edit") end
+      }
+    >
+      <:col :let={{_id, event_type}} label="Title">{event_type.name}</:col>
+      <:col :let={{_id, event_type}} label="Description">{event_type.description}</:col>
+      <:col :let={{_id, event_type}} label="Slug">{event_type.slug}</:col>
+      <:col :let={{_id, event_type}} label="Duration">{event_type.duration_in_minutes}</:col>
+    </.table>
   </div>
 
+  <div :if={@live_action == :new}>
+    <.live_component
+      module={SyncMeWeb.PartnerLive.EventTypesComponent}
+      id={@current_scope.user.id}
+      current_scope={@current_scope}
+    />
+  </div>
 
-<div :if={@live_action == :new}>    
- <.live_component module={SyncMeWeb.PartnerLive.EventTypesComponent} id={@current_scope.user.id} current_scope={@current_scope}/>
+  <.tabs id="animals" default="cat" variant="border" size="sm">
+    <:tab id="cat" label="Cat">
+      This is a cat.
+    </:tab>
+    <:tab id="dog" label="Dog">
+      This is a dog.
+    </:tab>
+  </.tabs>
 
-</div>
+  <div class="mockup-code w-full">
+    <pre data-prefix="$"><code>npm i daisyui</code></pre>
+  </div>
 
-<.tabs id="animals" default="cat" variant="border" size="sm">
-        <:tab id="cat" label="Cat">
-          This is a cat.
-        </:tab>
-        <:tab id="dog" label="Dog">
-          This is a dog.
-        </:tab>
-</.tabs>
+  <calendar-date class="cally bg-base-100 border border-base-300 shadow-lg rounded-box">
+    <svg
+      aria-label="Previous"
+      class="fill-current size-4"
+      slot="previous"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+    >
+      <path fill="currentColor" d="M15.75 19.5 8.25 12l7.5-7.5"></path>
+    </svg>
+    <svg
+      aria-label="Next"
+      class="fill-current size-4"
+      slot="next"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+    >
+      <path fill="currentColor" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+    </svg>
+    <calendar-month></calendar-month>
+  </calendar-date>
 
-<div class="mockup-code w-full">
-  <pre data-prefix="$"><code>npm i daisyui</code></pre>
-</div> 
-
-<calendar-date class="cally bg-base-100 border border-base-300 shadow-lg rounded-box">
-  <svg aria-label="Previous" class="fill-current size-4" slot="previous" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg>
-  <svg aria-label="Next" class="fill-current size-4" slot="next" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg>
-  <calendar-month></calendar-month>
-</calendar-date>
-
-
-<button class="btn" onclick="my_modal_1.showModal()">open modal</button>
-<dialog id="my_modal_1" class="modal">
-  <div class="modal-box">
-    <h3 class="text-lg font-bold">Hello!</h3>
-    <p class="py-4">Press ESC key or click the button below to close</p>
-    <div class="modal-action">
-      <form method="dialog">
-        <button class="btn">Close</button>
-      </form>
+  <button class="btn" onclick="my_modal_1.showModal()">open modal</button>
+  <dialog id="my_modal_1" class="modal">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold">Hello!</h3>
+      <p class="py-4">Press ESC key or click the button below to close</p>
+      <div class="modal-action">
+        <form method="dialog">
+          <button class="btn">Close</button>
+        </form>
+      </div>
     </div>
-  </div>
-</dialog>
-
+  </dialog>
 </Layouts.partner_layout>

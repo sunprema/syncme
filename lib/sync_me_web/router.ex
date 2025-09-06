@@ -31,8 +31,8 @@ defmodule SyncMeWeb.Router do
     get "/privacy", PrivacyAndTOSController, :privacy
     get "/terms_of_service", PrivacyAndTOSController, :tos
     get "/:syncme_link", GuestUserHomeController, :home
-    live "/book_event/new/:event_type_id", BookingEvent , :new
-    live "/book_event/details/:event_type_id", BookingEvent , :details
+    live "/book_event/new/:event_type_id", BookingEvent, :new
+    live "/book_event/details/:event_type_id", BookingEvent, :details
   end
 
   # Other scopes may use custom stacks.
@@ -67,26 +67,28 @@ defmodule SyncMeWeb.Router do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
       live "/user/home", UserHome, :index
-      live "/partner/signup" , PartnerLive.Signup, :new
-
+      live "/partner/signup", PartnerLive.Signup, :new
     end
 
     live_session :partner_flow,
-      on_mount: [{SyncMeWeb.UserAuth, :require_authenticated}, {SyncMeWeb.PartnerCheck, :assign_partner_to_scope}] do
-        live "/partner/home" , EventTypesLive.Index, :index
-        live "/partner/event_types", EventTypesLive.Index, :index
-        live "/partner/event_types/new", EventTypesLive.Show, :new
-        live "/partner/event_types/:id/edit", EventTypesLive.Show, :edit
-        live "/partner/settings", SettingsLive
-        live "/partner/availability", AvailabilityLive.Show, :show
+      on_mount: [
+        {SyncMeWeb.UserAuth, :require_authenticated},
+        {SyncMeWeb.PartnerCheck, :assign_partner_to_scope}
+      ] do
+      live "/partner/home", EventTypesLive.Index, :index
+      live "/partner/event_types", EventTypesLive.Index, :index
+      live "/partner/event_types/new", EventTypesLive.Show, :new
+      live "/partner/event_types/:id/edit", EventTypesLive.Show, :edit
+      live "/partner/settings", SettingsLive
+      live "/partner/availability", AvailabilityLive.Show, :show
 
-        #all bookings
-        live "/partner/bookings", BookingsLive.Index, :index
-        live "/partner/bookings/upcoming", BookingsLive.Index, :upcoming
-        live "/partner/bookings/unconfirmed", BookingsLive.Index, :unconfirmed
-        live "/partner/bookings/cancelled", BookingsLive.Index, :cancelled
-        live "/partner/insights", InsightsLive.Dashboard, :dashboard
-      end
+      # all bookings
+      live "/partner/bookings", BookingsLive.Index, :index
+      live "/partner/bookings/upcoming", BookingsLive.Index, :upcoming
+      live "/partner/bookings/unconfirmed", BookingsLive.Index, :unconfirmed
+      live "/partner/bookings/cancelled", BookingsLive.Index, :cancelled
+      live "/partner/insights", InsightsLive.Dashboard, :dashboard
+    end
 
     post "/users/update-password", UserSessionController, :update_password
   end

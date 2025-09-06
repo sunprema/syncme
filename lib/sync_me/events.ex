@@ -78,19 +78,16 @@ defmodule SyncMe.Events do
     {:error, :user_not_authenticated}
   end
 
-
-
-  def change_event_type(%Scope{user: user}, %EventType{} = event_type, attrs \\ %{}) when not is_nil(user) do
-      EventType.changeset(event_type, attrs)
+  def change_event_type(%Scope{user: user}, %EventType{} = event_type, attrs \\ %{})
+      when not is_nil(user) do
+    EventType.changeset(event_type, attrs)
   end
-
 
   def get_event_type(event_type_id) do
     event_type =
       Repo.get(EventType, event_type_id)
-      |> Repo.preload([partner: [:user, :availability_rules]])
+      |> Repo.preload(partner: [:user, :availability_rules])
 
     event_type
   end
-
 end
