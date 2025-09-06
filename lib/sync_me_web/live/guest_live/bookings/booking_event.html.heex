@@ -27,7 +27,6 @@
         <div class=" card text-xl">
             <div class="flex flex-col mx-auto md:flex-row md:mx-0  gap-2 h-1/2">
                 <calendar-date class="cally bg-white border border-base-300 p-8 h-[500px]" phx-hook="CalendarHook" id="booking_calendar" 
-                    
                     data-available_days={Enum.join(@available_days, ",")}>
                     <svg aria-label="Previous" class="fill-current size-4" slot="previous" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg>
                     <svg aria-label="Next" class="fill-current size-4" slot="next" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg>
@@ -46,7 +45,10 @@
                     </div>
                     
                     <button class="btn btn-outline border-gray-500/60 btn-sm w-[12rem] hover:btn-neutral"  
-                    :for={available_slot <- @available_slots }> {available_slot} 
+                    :for={ {a, available_slot} <- @available_slots }
+                    phx-click={JS.push("slot_selected", value: %{selected_datetime_slot: a} )} 
+                    > 
+                        {available_slot}                    
                     </button>
                     
                     

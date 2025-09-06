@@ -50,17 +50,25 @@ defmodule SyncMeWeb.BookingEvent do
 
 
   @impl true
+  def handle_event("slot_selected", %{"selected_datetime_slot" => selected_datetime_slot}, socket) do
+    IO.inspect("#{selected_datetime_slot}", label: "Selected time slot")
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info({:event_booked, slot}, socket) do
     IO.inspect(" #{inspect(slot)}", label: "Events already booked")
     {:noreply, socket}
   end
+
+
 
   defp format_date_for_display(timex_date_or_datetime) do
     Timex.format!(timex_date_or_datetime, "%a %d", :strftime)
   end
 
   defp format_available_slots(available_slots) do
-    Enum.map( available_slots, fn dt -> Timex.format!( dt, "{h12}:{0m} {am}") end )
+    Enum.map( available_slots, fn dt -> { dt, Timex.format!( dt, "{h12}:{0m} {am}") } end )
   end
 
   # Returns a list of days for the calendar component
