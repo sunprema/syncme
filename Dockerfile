@@ -22,7 +22,9 @@ FROM ${BUILDER_IMAGE} AS builder
 
 # install build dependencies
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends build-essential git \
+  && apt-get install -y --no-install-recommends build-essential git curl\
+  && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+  && apt-get install -y nodejs \
   && rm -rf /var/lib/apt/lists/*
 
 # prepare build dir
@@ -56,6 +58,7 @@ COPY lib lib
 RUN mix compile
 
 COPY assets assets
+RUN npm install --prefix ./assets
 
 # compile assets
 RUN mix assets.deploy
