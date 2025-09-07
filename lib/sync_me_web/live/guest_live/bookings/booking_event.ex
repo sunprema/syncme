@@ -34,17 +34,26 @@ defmodule SyncMeWeb.BookingEvent do
   @impl true
   def handle_event("save_booking", _unsigned_params, socket) do
     IO.inspect("Booking is being confirmed")
+    current_scope = Map.get(socket.assigns, :current_scope, nil)
+    socket = case current_scope do
 
-    Scheduler.create_booking( socket.assigns.current_scope,
-      socket.assigns.event_type,
-      socket.assigns.time_selected,
-      100.0
-      )
+      nil ->
+        socket
+        |> redirect(to: ~p"/book_event/new/login/#{socket.assigns.event_type.id}")
 
-    {:noreply,
-    socket
-    |> put_flash(:info, "Meeting is booked.")
-  }
+      scope ->
+        Scheduler.create_booking( scope,
+          socket.assigns.event_type,
+          socket.assigns.time_selected,
+          100.0
+        )
+        socket
+        |> put_flash(:info, "Meeting is booked.")
+
+    end
+
+
+    {:noreply,socket}
   end
 
   def handle_event("date-selected", %{"selected_date" => selected_date}, socket) do

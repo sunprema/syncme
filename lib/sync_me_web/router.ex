@@ -31,6 +31,7 @@ defmodule SyncMeWeb.Router do
     get "/privacy", PrivacyAndTOSController, :privacy
     get "/terms_of_service", PrivacyAndTOSController, :tos
     get "/:syncme_link", GuestUserHomeController, :home
+    get "/book_event/new/login/:event_type_id", BookingEventController, :new_session
     live "/book_event/new/:event_type_id", BookingEvent, :new
     live "/book_event/details/:event_type_id", BookingEvent, :details
   end
@@ -68,6 +69,10 @@ defmodule SyncMeWeb.Router do
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
       live "/user/home", UserHome, :index
       live "/partner/signup", PartnerLive.Signup, :new
+
+      get "/book_event/return/login/:event_type_id", BookingEventController, :return_session
+      live "/book_event/auth/details/:event_type_id", BookingEvent, :details
+
     end
 
     live_session :partner_flow,
