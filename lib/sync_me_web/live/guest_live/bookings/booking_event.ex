@@ -6,14 +6,41 @@ defmodule SyncMeWeb.BookingEvent do
   require Timex
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
+    IO.inspect("REGULAR MOUNT CALLED #{inspect(session)}", label: "REGULAR MOUNT")
     {:ok,
      socket
      |> assign(selected_date: nil)
      |> assign(time_selected: nil)
      |> assign(available_slots: [])
      |> assign(selected_date_str: "")
-     |> assign(meeting_start_time_formatted_str: "Friday, September 12, 2025"), layout: false}
+     |> assign(meeting_start_date_formatted_str: "Friday, September 12, 2025")
+     |> assign(meeting_start_end_time_formatted_str: "")  ,
+
+     layout: false}
+
+  end
+
+  @impl true
+  def handle_params(%{"event_type_id" => event_type_id, "encodedTimeSelected" => encodedTimeSelected}, _uri, socket) do
+    iso_string = URI.decode(encodedTimeSelected)
+    selected_date = DateTime.from_iso8601(iso_string)
+    IO.inspect(event_type_id, label: "Event Type ID received")
+    # Check the event_type_id, If its available and active, so that users can book.
+    event_type = Events.get_event_type(event_type_id)
+    available_days = get_available_days(event_type.partner.availability_rules)
+
+    {:noreply,
+     socket
+     |> assign(event_type: event_type)
+     |> assign(partner: event_type.partner)
+     |> assign(availabilty_rules: event_type.partner.availability_rules)
+     |> assign(available_days: available_days)
+     |> assign(time_selected: nil)
+     |> assign(:selected_date, selected_date)
+    }
+
+
   end
 
   @impl true
@@ -30,6 +57,8 @@ defmodule SyncMeWeb.BookingEvent do
      |> assign(availabilty_rules: event_type.partner.availability_rules)
      |> assign(available_days: available_days)}
   end
+
+
 
   @impl true
   def handle_event("save_booking", _unsigned_params, socket) do
@@ -99,17 +128,24 @@ defmodule SyncMeWeb.BookingEvent do
 
     {meeting_start_time, _} = time_selected
 
-    meeting_start_time_formatted_str =
+    meeting_end_time = Timex.add(meeting_start_time, Timex.Duration.from_minutes( socket.assigns.event_type.duration_in_minutes))
+
+    meeting_start_date_formatted_str =
       Timex.format!(meeting_start_time, "%A, %B %d, %Y", :strftime)
 
-    IO.inspect("#{inspect(time_selected)} - #{meeting_start_time_formatted_str}",
+    start_time =  Timex.format!(meeting_start_time,  "%l:%M %P", :strftime)
+    end_time = Timex.format!(meeting_end_time, "%l:%M %P", :strftime)
+    meeting_start_end_time_formatted_str = "#{start_time} - #{end_time}"
+
+    IO.inspect("#{inspect(time_selected)} - #{meeting_start_date_formatted_str} = #{meeting_start_end_time_formatted_str}",
       label: "time_selected"
     )
 
     {:noreply,
      socket
      |> assign(:time_selected, time_selected)
-     |> assign(meeting_start_time_formatted_str: meeting_start_time_formatted_str)
+     |> assign(meeting_start_time_formatted_str: meeting_start_date_formatted_str)
+     |> assign(meeting_start_end_time_formatted_str: meeting_start_end_time_formatted_str)
      |> push_patch(to: ~p"/book_event/details/#{socket.assigns.event_type.id}")}
   end
 
@@ -136,4 +172,17 @@ defmodule SyncMeWeb.BookingEvent do
   defp get_available_days(availability_rules) do
     Enum.map(availability_rules, fn rule -> rule.day_of_week end)
   end
+
+  defp assign_meeting_times( assigns, meeting_start_time, event_type) do
+      meeting_end_time = Timex.add(meeting_start_time, Timex.Duration.from_minutes( event_type.duration_in_minutes))
+      meeting_start_date_formatted_str =  Timex.format!(meeting_start_time, "%A, %B %d, %Y", :strftime)
+      start_time =  Timex.format!(meeting_start_time,  "%l:%M %P", :strftime)
+      end_time = Timex.format!(meeting_end_time, "%l:%M %P", :strftime)
+      meeting_start_end_time_formatted_str = "#{start_time} - #{end_time}"
+
+      assigns
+      |> assign( )
+
+  end
+
 end
