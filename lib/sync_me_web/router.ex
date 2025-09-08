@@ -31,7 +31,7 @@ defmodule SyncMeWeb.Router do
     get "/privacy", PrivacyAndTOSController, :privacy
     get "/terms_of_service", PrivacyAndTOSController, :tos
     get "/:syncme_link", GuestUserHomeController, :home
-    get "/book_event/new/login/:event_type_id", BookingEventController, :new_session
+    get "/book_event/new/login/:event_type_id/:encodedTimeSelected", BookingEventController, :new_session
     live "/book_event/new/:event_type_id", BookingEvent, :new
     live "/book_event/details/:event_type_id", BookingEvent, :details
   end

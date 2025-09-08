@@ -38,8 +38,11 @@ defmodule SyncMeWeb.BookingEvent do
     socket = case current_scope do
 
       nil ->
+        {time_selected, _} = socket.assigns.time_selected
+        iso_string = DateTime.to_iso8601(time_selected)
+        encodedTimeSelected = URI.encode(iso_string)
         socket
-        |> redirect(to: ~p"/book_event/new/login/#{socket.assigns.event_type.id}")
+        |> redirect(to: ~p"/book_event/new/login/#{socket.assigns.event_type.id}/#{encodedTimeSelected}")
 
       scope ->
         Scheduler.create_booking( scope,
@@ -49,6 +52,7 @@ defmodule SyncMeWeb.BookingEvent do
         )
         socket
         |> put_flash(:info, "Meeting is booked.")
+        |>
 
     end
 

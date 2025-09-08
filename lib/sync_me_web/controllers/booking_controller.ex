@@ -1,9 +1,15 @@
 defmodule SyncMeWeb.BookingEventController do
   use SyncMeWeb, :controller
 
-  def new_session(conn, %{"event_type_id" => event_type_id} ) do
+  def new_session(conn,
+    %{"event_type_id" => event_type_id,
+      "encodedTimeSelected" => encodedTimeSelected
+    } ) do
 
-    booking_details = %{ event_type_id: event_type_id }
+    booking_details = %{
+      event_type_id: event_type_id,
+      encodedTimeSelected: encodedTimeSelected,
+    }
 
     conn
     |> put_session( :booking_details, booking_details)
