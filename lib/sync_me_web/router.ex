@@ -31,9 +31,20 @@ defmodule SyncMeWeb.Router do
     get "/privacy", PrivacyAndTOSController, :privacy
     get "/terms_of_service", PrivacyAndTOSController, :tos
     get "/:syncme_link", GuestUserHomeController, :home
-    get "/book_event/new/login/:event_type_id/:encodedTimeSelected", BookingEventController, :new_session
-    live "/book_event/new/:event_type_id", BookingEvent, :new
-    live "/book_event/details/:event_type_id", BookingEvent, :details
+  end
+
+  scope "/book_event", SyncMeWeb do
+    pipe_through [:browser, :maybe_authenticated_user]
+
+    get "/new/login/:event_type_id/:encodedTimeSelected",
+        BookingEventController,
+        :new_session
+
+    live_session :maybe_authenticated_user,
+      on_mount: [{SyncMeWeb.UserAuth, :maybe_authenticated}] do
+      live "/new/:event_type_id", BookingEvent, :new
+      live "/details/:event_type_id", BookingEvent, :details
+    end
   end
 
   # Other scopes may use custom stacks.
@@ -72,7 +83,6 @@ defmodule SyncMeWeb.Router do
 
       get "/book_event/return/login/:event_type_id", BookingEventController, :return_session
       live "/book_event/auth/details/:event_type_id", BookingEvent, :details
-
     end
 
     live_session :partner_flow,

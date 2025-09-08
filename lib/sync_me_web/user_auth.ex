@@ -230,6 +230,12 @@ defmodule SyncMeWeb.UserAuth do
     end
   end
 
+  def on_mount(:maybe_authenticated, _params, session, socket) do
+    socket = mount_current_scope(socket, session)
+    {:cont, socket}
+  end
+
+
   def on_mount(:require_sudo_mode, _params, session, socket) do
     socket = mount_current_scope(socket, session)
 
@@ -276,6 +282,18 @@ defmodule SyncMeWeb.UserAuth do
       |> maybe_store_return_to()
       |> redirect(to: ~p"/users/log-in")
       |> halt()
+    end
+  end
+
+  @doc """
+  Plug for routes that adds scope if user is authenticated already.
+  It doesnt error out if the user is not authenticated.
+  """
+  def maybe_authenticated_user(conn, _opts) do
+    if conn.assigns.current_scope && conn.assigns.current_scope.user do
+      conn
+    else
+      conn
     end
   end
 

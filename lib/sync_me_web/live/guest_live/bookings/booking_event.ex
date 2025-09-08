@@ -35,29 +35,35 @@ defmodule SyncMeWeb.BookingEvent do
   def handle_event("save_booking", _unsigned_params, socket) do
     IO.inspect("Booking is being confirmed")
     current_scope = Map.get(socket.assigns, :current_scope, nil)
-    socket = case current_scope do
 
-      nil ->
-        {time_selected, _} = socket.assigns.time_selected
-        iso_string = DateTime.to_iso8601(time_selected)
-        encodedTimeSelected = URI.encode(iso_string)
-        socket
-        |> redirect(to: ~p"/book_event/new/login/#{socket.assigns.event_type.id}/#{encodedTimeSelected}")
+    socket =
+      case current_scope do
+        nil ->
+          IO.inspect("CURRENT SCOPE IS NULL", label: "SAVE BOOKING NULL SCOPE")
+          {time_selected, _} = socket.assigns.time_selected
+          iso_string = DateTime.to_iso8601(time_selected)
+          encodedTimeSelected = URI.encode(iso_string)
 
-      scope ->
-        Scheduler.create_booking( scope,
-          socket.assigns.event_type,
-          socket.assigns.time_selected,
-          100.0
-        )
-        socket
-        |> put_flash(:info, "Meeting is booked.")
-        |>
+          socket
+          |> redirect(
+            to: ~p"/book_event/new/login/#{socket.assigns.event_type.id}/#{encodedTimeSelected}"
+          )
 
-    end
+        scope ->
+          IO.inspect("CURRENT SCOPE IS AVAILABLE", label: "SAVE BOOKING WITH SCOPE")
 
+          Scheduler.create_booking(
+            scope,
+            socket.assigns.event_type,
+            socket.assigns.time_selected,
+            100.0
+          )
 
-    {:noreply,socket}
+          socket
+          |> put_flash(:info, "Meeting is booked.")
+      end
+
+    {:noreply, socket}
   end
 
   def handle_event("date-selected", %{"selected_date" => selected_date}, socket) do

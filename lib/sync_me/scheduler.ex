@@ -13,7 +13,6 @@ defmodule SyncMe.Scheduler do
 
   alias SyncMe.Accounts.Scope
 
-
   import Ecto.Query, warn: false
 
   @spec get_availability_for_partner(any(), %{
@@ -105,15 +104,14 @@ defmodule SyncMe.Scheduler do
         price_at_booking
       )
       when not is_nil(user) do
-
-        IO.inspect("""
-                    Event Type: #{inspect(eventType)}
-                    Meeting Start Time: #{inspect(meetingStartTime)}
-                    Price at Booking: #{inspect(price_at_booking)}
-                    """,
-                  label: "SCHEDULER.CREATE_BOOKING")
-
-
+    IO.inspect(
+      """
+      Event Type: #{inspect(eventType)}
+      Meeting Start Time: #{inspect(meetingStartTime)}
+      Price at Booking: #{inspect(price_at_booking)}
+      """,
+      label: "SCHEDULER.CREATE_BOOKING"
+    )
   end
 
   defp slot_overlaps_booking?(slot_start, slot_end, bookings) do
