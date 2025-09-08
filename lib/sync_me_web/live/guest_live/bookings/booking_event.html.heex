@@ -34,7 +34,7 @@
       <div class="flex flex-col mx-auto md:flex-row md:mx-0  gap-2 h-1/2">
         <calendar-date
           class="cally bg-white border border-base-300 p-8 h-[500px]"
-          value={@selected_date_str || ""}
+          value = { format_date(@selected_date, "%Y-%m-%d") }
           #TODO:
           just
           dummy
@@ -71,7 +71,7 @@
             <div class="sticky top-0 z-10 bg-white w-full">
               <%= if @selected_date do %>
                 <h6 class="text-sm py-2 font-semibold ml-4 ">
-                  {format_date_for_display(@selected_date)}
+                  <%= format_date(@selected_date, "%a %d" ) %>                  
                 </h6>
               <% else %>
                 <h6 class="text-xs py-2 text-center font-light">No date selected yet</h6>
@@ -82,9 +82,7 @@
               <button
                 class="btn btn-outline border-gray-500/60 btn-sm w-[12rem] hover:btn-neutral"
                 phx-click={JS.push("slot_selected", 
-                value: %{selected_datetime_index: index, 
-                        selected_datetime: dt
-                  })}
+                value: %{ meeting_start_time: dt})}
               >
                 {available_slot}
               </button>
@@ -101,10 +99,10 @@
         <.icon name="hero-calendar" />
         <div class="space-y-1">
           <h4 class="text-sm font-semibold">
-            {@meeting_start_date_formatted_str}
+            <%= format_date(@meeting_start_time, "%A, %B %d, %Y") %>
           </h4>
           <h4 class="text-sm font-semibold">
-            {@meeting_start_end_time_formatted_str}
+            <%= format_date(@meeting_start_time, "%l:%M %P" ) %> - <%= format_date(@meeting_end_time, "%l:%M %P" ) %>            
           </h4>
         </div>
         <.icon name="hero-clock" />
