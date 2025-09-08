@@ -22,9 +22,10 @@ defmodule SyncMeWeb.BookingEvent do
   end
 
   @impl true
-  def handle_params(%{"event_type_id" => event_type_id, "encodedTimeSelected" => encodedTimeSelected}, _uri, socket) do
+  def handle_params(%{"event_type_id" => event_type_id,
+  "encodedTimeSelected" => encodedTimeSelected}, _uri, socket) do
     iso_string = URI.decode(encodedTimeSelected)
-    selected_date = DateTime.from_iso8601(iso_string)
+    {:ok,selected_date,_} = DateTime.from_iso8601(iso_string)
     IO.inspect(event_type_id, label: "Event Type ID received")
     # Check the event_type_id, If its available and active, so that users can book.
     event_type = Events.get_event_type(event_type_id)
@@ -36,8 +37,9 @@ defmodule SyncMeWeb.BookingEvent do
      |> assign(partner: event_type.partner)
      |> assign(availabilty_rules: event_type.partner.availability_rules)
      |> assign(available_days: available_days)
-     |> assign(time_selected: nil)
+     |> assign_meeting_times(selected_date, event_type)
      |> assign(:selected_date, selected_date)
+     |> assign(time_selected: selected_date)
     }
 
 
@@ -69,7 +71,7 @@ defmodule SyncMeWeb.BookingEvent do
       case current_scope do
         nil ->
           IO.inspect("CURRENT SCOPE IS NULL", label: "SAVE BOOKING NULL SCOPE")
-          {time_selected, _} = socket.assigns.time_selected
+          time_selected = socket.assigns.time_selected
           iso_string = DateTime.to_iso8601(time_selected)
           encodedTimeSelected = URI.encode(iso_string)
 
@@ -119,38 +121,25 @@ defmodule SyncMeWeb.BookingEvent do
   @impl true
   def handle_event(
         "slot_selected",
-        %{"selected_datetime_index" => selected_datetime_index},
+        %{"selected_datetime_index" => selected_datetime_index,
+          "selected_datetime" => selected_datetime
+        },
         socket
       ) do
     IO.inspect("#{selected_datetime_index}", label: "selected_datetime_index")
-    available_slots = socket.assigns.available_slots
-    time_selected = Enum.at(available_slots, selected_datetime_index)
+    {:ok, selected_datetime, _} = DateTime.from_iso8601(URI.decode(selected_datetime))
 
-    {meeting_start_time, _} = time_selected
-
-    meeting_end_time = Timex.add(meeting_start_time, Timex.Duration.from_minutes( socket.assigns.event_type.duration_in_minutes))
-
-    meeting_start_date_formatted_str =
-      Timex.format!(meeting_start_time, "%A, %B %d, %Y", :strftime)
-
-    start_time =  Timex.format!(meeting_start_time,  "%l:%M %P", :strftime)
-    end_time = Timex.format!(meeting_end_time, "%l:%M %P", :strftime)
-    meeting_start_end_time_formatted_str = "#{start_time} - #{end_time}"
-
-    IO.inspect("#{inspect(time_selected)} - #{meeting_start_date_formatted_str} = #{meeting_start_end_time_formatted_str}",
-      label: "time_selected"
-    )
-
+    #{meeting_start_time, _} = time_selected
     {:noreply,
      socket
-     |> assign(:time_selected, time_selected)
-     |> assign(meeting_start_time_formatted_str: meeting_start_date_formatted_str)
-     |> assign(meeting_start_end_time_formatted_str: meeting_start_end_time_formatted_str)
+     |> assign_meeting_times(selected_datetime, socket.assigns.event_type)
+     |> assign(:time_selected, selected_datetime)
      |> push_patch(to: ~p"/book_event/details/#{socket.assigns.event_type.id}")}
+
   end
 
   @impl true
-  def handle_event("booking_confirmed", _params, socket) do
+  def handle_event("booking_confirmed", _params, _socket) do
     # Will get the event_type,time_selected,
   end
 
@@ -173,15 +162,18 @@ defmodule SyncMeWeb.BookingEvent do
     Enum.map(availability_rules, fn rule -> rule.day_of_week end)
   end
 
-  defp assign_meeting_times( assigns, meeting_start_time, event_type) do
-      meeting_end_time = Timex.add(meeting_start_time, Timex.Duration.from_minutes( event_type.duration_in_minutes))
-      meeting_start_date_formatted_str =  Timex.format!(meeting_start_time, "%A, %B %d, %Y", :strftime)
-      start_time =  Timex.format!(meeting_start_time,  "%l:%M %P", :strftime)
-      end_time = Timex.format!(meeting_end_time, "%l:%M %P", :strftime)
-      meeting_start_end_time_formatted_str = "#{start_time} - #{end_time}"
+  defp assign_meeting_times( socket, meeting_start_time, event_type) do
+    meeting_end_time = Timex.add(meeting_start_time, Timex.Duration.from_minutes( event_type.duration_in_minutes))
+    meeting_start_date_formatted_str =  Timex.format!(meeting_start_time, "%A, %B %d, %Y", :strftime)
+    start_time =  Timex.format!(meeting_start_time,  "%l:%M %P", :strftime)
+    end_time = Timex.format!(meeting_end_time, "%l:%M %P", :strftime)
+    meeting_start_end_time_formatted_str = "#{start_time} - #{end_time}"
 
-      assigns
-      |> assign( )
+    socket
+      |> assign(
+        meeting_start_date_formatted_str: meeting_start_date_formatted_str,
+        meeting_start_end_time_formatted_str: meeting_start_end_time_formatted_str
+      )
 
   end
 

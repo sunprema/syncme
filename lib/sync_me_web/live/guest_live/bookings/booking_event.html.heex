@@ -81,7 +81,10 @@
             <%= for {{dt, available_slot}, index} <- Enum.with_index(@available_slots) do %>
               <button
                 class="btn btn-outline border-gray-500/60 btn-sm w-[12rem] hover:btn-neutral"
-                phx-click={JS.push("slot_selected", value: %{selected_datetime_index: index})}
+                phx-click={JS.push("slot_selected", 
+                value: %{selected_datetime_index: index, 
+                        selected_datetime: dt
+                  })}
               >
                 {available_slot}
               </button>
@@ -134,22 +137,7 @@
           Confirm
         </button>
       </div>
-      <div role="alert" class="alert alert-success transi">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6 shrink-0 stroke-current"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <span>Your purchase has been confirmed!</span>
-      </div>
+      
     </div>
   <% end %>
 </div>
