@@ -78,7 +78,7 @@ defmodule SyncMeWeb.Router do
       on_mount: [{SyncMeWeb.UserAuth, :require_authenticated}] do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
-      live "/user/home", UserHome, :index
+      live "/user/home", UserHome.Index, :index
       live "/partner/signup", PartnerLive.Signup, :new
 
       get "/book_event/return/login/:event_type_id/:encodedTimeSelected", BookingEventController, :return_session

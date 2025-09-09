@@ -11,9 +11,7 @@ defmodule SyncMe.Bookings do
   alias SyncMe.Bookings.Booking
   alias SyncMe.Accounts.Scope
 
-  def list_bookings(%Scope{user: user}, filters \\ %{}) when not is_nil(user) do
-    partner = Repo.get_by(Partner, user_id: user.id)
-
+  def list_bookings(%Scope{user: user, partner: partner}, filters \\ %{}) when not is_nil(user) do
     base_query =
       cond do
         !is_nil(partner) ->
@@ -31,10 +29,8 @@ defmodule SyncMe.Bookings do
     Repo.all(query_with_filters)
   end
 
-  def get_booking!(%Scope{user: user}, id) when not is_nil(user) do
+  def get_booking!(%Scope{user: user, partner: partner}, id) when not is_nil(user) do
     # Booking can be obtained by Guest user or Partner
-    partner = Repo.get_by(Partner, user_id: user.id)
-
     base_query =
       cond do
         !is_nil(partner) ->

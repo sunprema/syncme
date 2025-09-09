@@ -88,6 +88,7 @@ defmodule SyncMeWeb.BookingEvent do
             {:ok, booking} ->
               socket
               |> put_flash(:info, "Meeting is booked. #{booking.id}")
+              |> redirect(to: ~p"/user/home")
             {:error,  reason} ->
               socket
                 |> put_flash(:error, "Meeting cant be booked. #{inspect(reason)}")
