@@ -57,7 +57,7 @@ defmodule SyncMeWeb.Layouts do
         {render_slot(@inner_block)}
       </div>
     </main>
-    <footer class="footer fixed mx-auto bottom-4 text-center footer-center  text-base-content p-4">
+    <footer class="footer invisible md:visible fixed mx-auto bottom-4 text-center footer-center  text-base-content p-4">
       <aside>
         <p class="text-xs text-center">
           By continuing, you agree to SyncMe.Link's
@@ -116,7 +116,7 @@ defmodule SyncMeWeb.Layouts do
       </div>
     </div>
 
-    <footer class="footer fixed mx-auto bottom-4 text-center footer-center  text-base-content p-4">
+    <footer class="footer invisible md:visible fixed mx-auto bottom-4 text-center footer-center  text-base-content p-4">
       <aside>
         <p class="text-xs text-center">
           By continuing, you agree to SyncMe.Link's
@@ -130,6 +130,44 @@ defmodule SyncMeWeb.Layouts do
         </p>
       </aside>
     </footer>
+    <.flash_group flash={@flash} />
+    """
+  end
+
+
+  def guest_layout(assigns) do
+    ~H"""
+    <div class="drawer md:drawer-open">
+      <input id="my-drawer" type="checkbox" class="drawer-toggle " />
+      <div class="drawer-content px-4 ">
+        <label for="my-drawer" class="btn btn-primary drawer-button md:hidden">Open drawer</label>
+
+        <main class="">
+          <div class="mx-auto w-full space-y-4 px-4 pb-16 sm:px-6 lg:px-8 sm:mt-8">
+            {render_slot(@inner_block)}
+          </div>
+        </main>
+      </div>
+      <div class="drawer-side z-10">
+        <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+        <ul class="menu bg-base-200 text-base-content min-h-full w-80 p-4">
+          <!-- Sidebar content here -->
+          <li>
+            <.link patch={~p"/partner/event_types"} class={[@tab == "upcoming_meetings" && "menu-active"]}>
+              <.icon name="hero-calendar-mini" class="size-4 shrink-0" /> Upcoming Meetings
+            </.link>
+          </li>
+          <li>
+            <.link patch={~p"/partner/bookings"} class={[@tab == "past_meetings" && "menu-active"]}>
+              <.icon name="hero-calendar-mini" class=" text-amber-400 size-4 shrink-0" /> Past Meetings
+            </.link>
+          </li>
+
+
+        </ul>
+      </div>
+    </div>
+
     <.flash_group flash={@flash} />
     """
   end

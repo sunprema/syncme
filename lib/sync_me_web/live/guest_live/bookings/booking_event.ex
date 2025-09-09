@@ -6,6 +6,7 @@ defmodule SyncMeWeb.BookingEvent do
   require Timex
 
 
+
   @impl true
   def mount(_params, session, socket) do
 

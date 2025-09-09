@@ -1,8 +1,9 @@
-<div class="mx-auto min-w-2xl flex flex-col">
-  <div class="flex gap-4 p-8 ">
-    <div class="avatar avatar-placeholder">
-      <div class="bg-neutral text-neutral-content w-24 rounded-full">
-        <span class="text-3xl">S</span>
+<Layouts.app flash={@flash} current_scope={@current_scope}>
+<div class="mx-auto w-full md:min-w-2xl flex flex-col">
+  <div class="flex gap-4 p-4 md:p-8 ">
+    <div class="avatar avatar-placeholder self-center">
+      <div class="bg-neutral text-neutral-content w-12 md:w-24 rounded-full">
+        <span class="text-sm md:text-3xl">S</span>
       </div>
     </div>
     <div class="flex flex-col space-y-4">
@@ -39,3 +40,4 @@
     </div>
   </div>
 </div>
+</Layouts.app>
