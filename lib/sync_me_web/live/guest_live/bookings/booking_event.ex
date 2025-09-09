@@ -78,15 +78,20 @@ defmodule SyncMeWeb.BookingEvent do
         scope ->
           IO.inspect("CURRENT SCOPE IS AVAILABLE", label: "SAVE BOOKING WITH SCOPE")
 
-          Scheduler.create_booking(
+          socket = case Scheduler.create_booking(
             scope,
             socket.assigns.event_type,
             socket.assigns.meeting_start_time,
-            100.0
-          )
-
+            socket.assigns.meeting_end_time
+            ) do
+            {:ok, booking} ->
+              socket
+              |> put_flash(:info, "Meeting is booked. #{booking.id}")
+            {:error,  reason} ->
+              socket
+                |> put_flash(:error, "Meeting cant be booked. #{inspect(reason)}")
+          end
           socket
-          |> put_flash(:info, "Meeting is booked.")
       end
 
     {:noreply, socket}
@@ -139,10 +144,6 @@ defmodule SyncMeWeb.BookingEvent do
     {:noreply, socket}
   end
 
-  defp format_date_for_display(timex_date_or_datetime) do
-    Timex.format!(timex_date_or_datetime, "%a %d", :strftime)
-  end
-
   defp format_available_slots(available_slots) do
     Enum.map(available_slots, fn dt -> {dt, Timex.format!(dt, "{h12}:{0m} {am}")} end)
   end
@@ -154,10 +155,6 @@ defmodule SyncMeWeb.BookingEvent do
 
   defp assign_meeting_times( socket, meeting_start_time, event_type) do
     meeting_end_time = Timex.add(meeting_start_time, Timex.Duration.from_minutes( event_type.duration_in_minutes))
-    #meeting_start_date_formatted_str =  Timex.format!(meeting_start_time, "%A, %B %d, %Y", :strftime)
-    #start_time =  Timex.format!(meeting_start_time,  "%l:%M %P", :strftime)
-    #end_time = Timex.format!(meeting_end_time, "%l:%M %P", :strftime)
-    #meeting_start_end_time_formatted_str = "#{start_time} - #{end_time}"
 
     socket
       |> assign(

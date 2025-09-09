@@ -101,17 +101,25 @@ defmodule SyncMe.Scheduler do
         %Scope{user: user},
         %EventType{} = eventType,
         meetingStartTime,
-        price_at_booking
+        meetingEndTime
+
       )
       when not is_nil(user) do
-    IO.inspect(
-      """
-      Event Type: #{inspect(eventType)}
-      Meeting Start Time: #{inspect(meetingStartTime)}
-      Price at Booking: #{inspect(price_at_booking)}
-      """,
-      label: "SCHEDULER.CREATE_BOOKING"
-    )
+      new_booking_cs = Booking.changeset(%Booking{}, %{
+        "start_time" => meetingStartTime,
+        "end_time" => meetingEndTime,
+        "status" => "confirmed",
+        "video_conference_link" => "http://meet.google.com",
+        "duration_at_booking" => eventType.duration_in_minutes,
+        "event_type_id" => eventType.id,
+        "partner_id" => eventType.partner_id,
+        "guest_user_id" => user.id,
+        "price_at_booking" => eventType.price
+
+      })
+
+      Repo.insert(new_booking_cs)
+
   end
 
   defp slot_overlaps_booking?(slot_start, slot_end, bookings) do
