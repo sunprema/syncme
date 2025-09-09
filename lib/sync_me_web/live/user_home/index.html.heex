@@ -9,13 +9,22 @@
     <.table
        id="upcoming_bookings"
        rows={@streams.upcoming_bookings}
+       row_click={
+        fn {_id, booking} -> JS.navigate(~p"/") end
+       }
        
     >
+      <:action :let={{_id, booking}} >
+        <button :if={ booking.status == "confirmed"} class="btn btn-outline btn-sm opacity-60" phx-click="cancel_booking_by_user" phx-value-booking_id={booking.id}>Cancel</button>
+      </:action>  
       <:col :let={{_id, booking}} label="Title">{booking.event_type.name}</:col>
       <:col :let={{_id, booking}} label="Description">{booking.event_type.description}</:col>
       <:col :let={{_id, booking}} label="Start Time">{booking.start_time}</:col>
       <:col :let={{_id, booking}} label="End Time">{booking.end_time}</:col>
       <:col :let={{_id, booking}} label="Price">{booking.price_at_booking}</:col>
       <:col :let={{_id, booking}} label="Status">{booking.status}</:col>
+      
+      
+    
     </.table>
 </Layouts.guest_layout>
