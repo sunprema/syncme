@@ -15,7 +15,7 @@
        
     >
       <:action :let={{_id, booking}} >
-        <button :if={ booking.status == "confirmed"} class="btn btn-outline btn-sm opacity-60" phx-click="cancel_booking_by_user" phx-value-booking_id={booking.id}>Cancel</button>
+        <button :if={ booking.status == :confirmed } class="btn btn-outline btn-sm opacity-60" phx-click="cancel_booking_by_user" phx-value-booking_id={booking.id}>Cancel</button>
       </:action>  
       <:col :let={{_id, booking}} label="Title">{booking.event_type.name}</:col>
       <:col :let={{_id, booking}} label="Description">{booking.event_type.description}</:col>
