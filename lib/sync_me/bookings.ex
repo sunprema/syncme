@@ -96,7 +96,7 @@ defmodule SyncMe.Bookings do
 
   def cancel_booking_by_user(%Scope{} = scope, %Booking{} = booking) do
     with :ok <- verify_booking_ownership(scope, booking) do
-      cs = Booking.changeset( booking, %{"status" => "cancelled_by_guest"})
+      cs = Booking.changeset(booking, %{"status" => "cancelled_by_guest"})
       Repo.update(cs)
     else
       {:error, reason} -> {:error, reason}
@@ -105,7 +105,7 @@ defmodule SyncMe.Bookings do
 
   def cancel_booking_by_partner(%Scope{} = scope, %Booking{} = booking) do
     with :ok <- verify_booking_ownership(scope, booking) do
-      cs = Booking.changeset( booking, %{"status" => "cancelled_by_partner"})
+      cs = Booking.changeset(booking, %{"status" => "cancelled_by_partner"})
       Repo.update(cs)
     else
       {:error, reason} -> {:error, reason}

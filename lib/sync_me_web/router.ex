@@ -81,7 +81,10 @@ defmodule SyncMeWeb.Router do
       live "/user/home", UserHome.Index, :index
       live "/partner/signup", PartnerLive.Signup, :new
 
-      get "/book_event/return/login/:event_type_id/:encodedTimeSelected", BookingEventController, :return_session
+      get "/book_event/return/login/:event_type_id/:encodedTimeSelected",
+          BookingEventController,
+          :return_session
+
       live "/book_event/auth/details/:event_type_id/:encodedTimeSelected", BookingEvent, :details
     end
 

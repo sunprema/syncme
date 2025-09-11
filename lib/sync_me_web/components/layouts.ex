@@ -134,7 +134,6 @@ defmodule SyncMeWeb.Layouts do
     """
   end
 
-
   def guest_layout(assigns) do
     ~H"""
     <div class="drawer md:drawer-open">
@@ -153,17 +152,19 @@ defmodule SyncMeWeb.Layouts do
         <ul class="menu bg-base-200 text-base-content min-h-full w-80 p-4">
           <!-- Sidebar content here -->
           <li>
-            <.link patch={~p"/partner/event_types"} class={[@tab == "upcoming_meetings" && "menu-active"]}>
+            <.link
+              patch={~p"/partner/event_types"}
+              class={[@tab == "upcoming_meetings" && "menu-active"]}
+            >
               <.icon name="hero-calendar-mini" class="size-4 shrink-0" /> Upcoming Meetings
             </.link>
           </li>
           <li>
             <.link patch={~p"/partner/bookings"} class={[@tab == "past_meetings" && "menu-active"]}>
-              <.icon name="hero-calendar-mini" class=" text-amber-400 size-4 shrink-0" /> Past Meetings
+              <.icon name="hero-calendar-mini" class=" text-amber-400 size-4 shrink-0" />
+              Past Meetings
             </.link>
           </li>
-
-
         </ul>
       </div>
     </div>

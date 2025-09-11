@@ -235,7 +235,6 @@ defmodule SyncMeWeb.UserAuth do
     {:cont, socket}
   end
 
-
   def on_mount(:require_sudo_mode, _params, session, socket) do
     socket = mount_current_scope(socket, session)
 

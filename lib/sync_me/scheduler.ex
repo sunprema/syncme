@@ -102,10 +102,10 @@ defmodule SyncMe.Scheduler do
         %EventType{} = eventType,
         meetingStartTime,
         meetingEndTime
-
       )
       when not is_nil(user) do
-      new_booking_cs = Booking.changeset(%Booking{}, %{
+    new_booking_cs =
+      Booking.changeset(%Booking{}, %{
         "start_time" => meetingStartTime,
         "end_time" => meetingEndTime,
         "status" => "confirmed",
@@ -115,11 +115,9 @@ defmodule SyncMe.Scheduler do
         "partner_id" => eventType.partner_id,
         "guest_user_id" => user.id,
         "price_at_booking" => eventType.price
-
       })
 
-      Repo.insert(new_booking_cs)
-
+    Repo.insert(new_booking_cs)
   end
 
   defp slot_overlaps_booking?(slot_start, slot_end, bookings) do

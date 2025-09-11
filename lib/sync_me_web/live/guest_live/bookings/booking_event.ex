@@ -1,15 +1,12 @@
 defmodule SyncMeWeb.BookingEvent do
-
   use SyncMeWeb, :live_view
 
   alias SyncMe.Events
   alias SyncMe.Scheduler
   require Timex
 
-
-
   @impl true
-  def mount(%{"event_type_id" => event_type_id}= _params, _session, socket) do
+  def mount(%{"event_type_id" => event_type_id} = _params, _session, socket) do
     IO.inspect("Event Type ID : #{event_type_id}", label: "INSIDE MOUNT")
 
     if connected?(socket) do
@@ -21,17 +18,17 @@ defmodule SyncMeWeb.BookingEvent do
      |> assign(selected_date: nil)
      |> assign(meeting_start_time: nil)
      |> assign(meeting_end_time: nil)
-     |> assign(available_slots: []),
-
-     layout: false}
-
+     |> assign(available_slots: []), layout: false}
   end
 
   @impl true
-  def handle_params(%{"event_type_id" => event_type_id,
-    "encodedTimeSelected" => encodedTimeSelected}, _uri, socket) do
+  def handle_params(
+        %{"event_type_id" => event_type_id, "encodedTimeSelected" => encodedTimeSelected},
+        _uri,
+        socket
+      ) do
     iso_string = URI.decode(encodedTimeSelected)
-    {:ok,meeting_start_time,_} = DateTime.from_iso8601(iso_string)
+    {:ok, meeting_start_time, _} = DateTime.from_iso8601(iso_string)
     event_type = Events.get_event_type(event_type_id)
     available_days = get_available_days(event_type.partner.availability_rules)
 
@@ -41,11 +38,7 @@ defmodule SyncMeWeb.BookingEvent do
      |> assign(partner: event_type.partner)
      |> assign(availabilty_rules: event_type.partner.availability_rules)
      |> assign(available_days: available_days)
-     |> assign_meeting_times(meeting_start_time, event_type)
-
-    }
-
-
+     |> assign_meeting_times(meeting_start_time, event_type)}
   end
 
   @impl true
@@ -63,8 +56,6 @@ defmodule SyncMeWeb.BookingEvent do
      |> assign(available_days: available_days)}
   end
 
-
-
   @impl true
   def handle_event("save_booking", _unsigned_params, socket) do
     IO.inspect("Booking is being confirmed")
@@ -79,34 +70,37 @@ defmodule SyncMeWeb.BookingEvent do
 
           socket
           |> redirect(
-            to: ~p"/book_event/new/login/#{socket.assigns.event_type.id}/#{encodedMeetingStartTime}"
+            to:
+              ~p"/book_event/new/login/#{socket.assigns.event_type.id}/#{encodedMeetingStartTime}"
           )
 
         scope ->
-          IO.inspect("CURRENT SCOPE IS AVAILABLE", label: "SAVE BOOKING WITH SCOPE")
-          publish_topic =   "#{socket.assigns.event_type.id}:#{socket.assigns.selected_date}"
-          IO.inspect(publish_topic, label: "PUBLISH TOPIC")
-
-          socket = case Scheduler.create_booking(
-            scope,
-            socket.assigns.event_type,
-            socket.assigns.meeting_start_time,
-            socket.assigns.meeting_end_time
-            ) do
-
-            {:ok, booking} ->
-
-              Phoenix.PubSub.broadcast(SyncMe.PubSub, "event_type_id:#{socket.assigns.event_type.id}", {:event_booked, socket.assigns.selected_date})
+          socket =
+            case Scheduler.create_booking(
+                   scope,
+                   socket.assigns.event_type,
+                   socket.assigns.meeting_start_time,
+                   socket.assigns.meeting_end_time
+                 ) do
+              {:ok, booking} ->
 
 
-              socket
-              |> put_flash(:info, "Meeting is booked. #{booking.id}")
-              |> put_flash(:info, "Pub Sub will send to to #{publish_topic}")
-              #|> redirect(to: ~p"/user/home")
-            {:error,  reason} ->
-              socket
+                Phoenix.PubSub.broadcast_from(
+                  SyncMe.PubSub,
+                  self(),
+                  "event_type_id:#{socket.assigns.event_type.id}",
+                  {:event_booked, socket.assigns.selected_date}
+                )
+
+                socket
+                |> put_flash(:info, "Meeting is booked. #{booking.id}")
+                |> redirect(to: ~p"/user/home")
+
+              {:error, reason} ->
+                socket
                 |> put_flash(:error, "Meeting cant be booked. #{inspect(reason)}")
-          end
+            end
+
           socket
       end
 
@@ -118,12 +112,10 @@ defmodule SyncMeWeb.BookingEvent do
     partner = socket.assigns.partner
     event_type = socket.assigns.event_type
 
-
     case Timex.parse(selected_date, "%Y-%m-%d", :strftime) do
       {:ok, date} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Pub Sub subscribed to #{event_type.id}:#{selected_date}")
          |> assign(:selected_date, date)
          |> assign(
            :available_slots,
@@ -138,17 +130,15 @@ defmodule SyncMeWeb.BookingEvent do
   @impl true
   def handle_event(
         "slot_selected",
-        %{ "meeting_start_time" => meeting_start_time},
-         socket
+        %{"meeting_start_time" => meeting_start_time},
+        socket
       ) do
-
     {:ok, meeting_start_time, _} = DateTime.from_iso8601(URI.decode(meeting_start_time))
 
     {:noreply,
      socket
      |> assign_meeting_times(meeting_start_time, socket.assigns.event_type)
      |> push_patch(to: ~p"/book_event/details/#{socket.assigns.event_type.id}")}
-
   end
 
   @impl true
@@ -156,15 +146,34 @@ defmodule SyncMeWeb.BookingEvent do
     # Will get the event_type,time_selected,
   end
 
-
-
   @impl true
-  def handle_info( {:event_booked, selected_date}, socket) do
-    IO.inspect("Message received from PUB SUB #{selected_date}", label: "HELLO PUBSUB")
-    {:noreply,
-    socket
-     |> put_flash(:info, "Booking is confirmed for #{selected_date}")
-    }
+  def handle_info({:event_booked, selected_date}, socket) do
+    partner = socket.assigns.partner
+
+    socket =
+      case Date.compare(socket.assigns.selected_date, selected_date) do
+        :eq ->
+          socket
+          |> put_flash(
+            :info,
+            "One of the available slots is booked now, refreshing remaining slots"
+          )
+          |> assign(
+            available_slots:
+              format_available_slots(
+                Scheduler.available_slots(
+                  partner.id,
+                  socket.assigns.selected_date,
+                  socket.assigns.event_type.id
+                )
+              )
+          )
+
+        _ ->
+          socket
+      end
+
+    {:noreply, socket}
   end
 
   defp format_available_slots(available_slots) do
@@ -176,19 +185,18 @@ defmodule SyncMeWeb.BookingEvent do
     Enum.map(availability_rules, fn rule -> rule.day_of_week end)
   end
 
-  defp assign_meeting_times( socket, meeting_start_time, event_type) do
-    meeting_end_time = Timex.add(meeting_start_time, Timex.Duration.from_minutes( event_type.duration_in_minutes))
+  defp assign_meeting_times(socket, meeting_start_time, event_type) do
+    meeting_end_time =
+      Timex.add(meeting_start_time, Timex.Duration.from_minutes(event_type.duration_in_minutes))
 
     socket
-      |> assign(
-        meeting_start_time: meeting_start_time,
-        meeting_end_time: meeting_end_time
-      )
+    |> assign(
+      meeting_start_time: meeting_start_time,
+      meeting_end_time: meeting_end_time
+    )
   end
-
 
   def format_date(date, format) do
     date && Timex.format!(date, format, :strftime)
   end
-
 end
