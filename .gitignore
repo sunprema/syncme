@@ -35,3 +35,4 @@ sync_me-*.tar
 npm-debug.log
 /assets/node_modules/
 
+env.sh

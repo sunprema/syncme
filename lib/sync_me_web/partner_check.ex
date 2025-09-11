@@ -1,8 +1,6 @@
 defmodule SyncMeWeb.PartnerCheck do
   use SyncMeWeb, :verified_routes
 
-  import Plug.Conn
-  import Phoenix.Controller
   alias SyncMe.Partners
   alias SyncMe.Accounts.Scope
 

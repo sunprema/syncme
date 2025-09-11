@@ -63,7 +63,8 @@ defmodule SyncMe.MixProject do
       # This is for Google auth
       {:ueberauth_google, "~> 0.10"},
       {:live_debugger, "~> 0.4.0", only: :dev},
-      {:timex, "~> 3.0"}
+      {:timex, "~> 3.0"},
+      {:stripity_stripe, "~> 2.0"}
     ]
   end
 
