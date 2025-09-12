@@ -77,9 +77,9 @@
   --color-info-content: oklch(97% 0.014 254.604);
   --color-success: oklch(70% 0.14 182.503);
   --color-success-content: oklch(98% 0.014 180.72);
-  --color-warning: oklch(66% 0.179 58.318);
+  --color-warning: oklch(0.7 0.2129 42.88);
   --color-warning-content: oklch(98% 0.022 95.277);
-  --color-error: oklch(65% 0.241 354.308);
+  --color-error: oklch(0.7 0.2129 42.88);
   --color-error-content: oklch(97% 0.014 343.198);
   --radius-selector: 0.25rem;
   --radius-field: 0.25rem;
@@ -125,4 +125,4 @@ html[data-theme="dark"]  #wordmark text {
     gap: 1em;
     justify-content: center;
     flex-wrap: wrap;
-  }
+}
