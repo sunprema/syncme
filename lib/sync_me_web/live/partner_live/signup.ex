@@ -40,13 +40,13 @@ defmodule SyncMeWeb.PartnerLive.Signup do
           />
 
           <.input
+            type="path"
             field={@form[:syncme_link]}
             label="Your syncme link"
             required
             phx-debounce="200"
             phx-mounted={JS.focus()}
           />
-
           <button phx-disable-with="Creating account..." class="btn btn-neutral w-full font-normal">
             Sign up as partner
           </button>
