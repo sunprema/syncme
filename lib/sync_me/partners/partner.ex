@@ -7,7 +7,7 @@ defmodule SyncMe.Partners.Partner do
   schema "partners" do
     field :bio, :string
     field :syncme_link, :string
-
+    field :stripe_account_id, :string
     belongs_to :user, SyncMe.Accounts.User
     has_many :event_types, SyncMe.Events.EventType
     has_many :availability_rules, SyncMe.Availability.AvailabilityRule
@@ -29,4 +29,13 @@ defmodule SyncMe.Partners.Partner do
     )
     |> put_change(:user_id, user_scope.user.id)
   end
+
+
+  def stripe_changeset(partner, attrs) do
+    partner
+    |> cast(attrs, [:stripe_account_id])
+    |> validate_required([:stripe_account_id])
+
+  end
+
 end

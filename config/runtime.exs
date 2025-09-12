@@ -119,6 +119,7 @@ if config_env() == :prod do
     client_id: System.get_env("GOOGLE_CLIENT_ID"),
     client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
 
-  config :stripity_stripe, api_key: System.get_env("STRIPE_SECRET")
-
+  config :stripity_stripe,
+    api_key: System.get_env("STRIPE_SECRET_KEY"),
+    client_id: System.get_env("STRIPE_CLIENT_ID")
 end

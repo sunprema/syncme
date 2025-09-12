@@ -9,7 +9,8 @@ defmodule SyncMe.Events.EventType do
     field :slug, :string
     field :description, :string
     field :duration_in_minutes, :integer
-    field :price, :decimal
+    field :price, :integer
+    field :currency, :string, default: "usd"
     field :is_active, :boolean, default: true
 
     belongs_to :partner, SyncMe.Partners.Partner

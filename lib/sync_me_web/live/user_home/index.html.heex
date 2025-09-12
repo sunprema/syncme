@@ -9,7 +9,7 @@
   <.table
     id="upcoming_bookings"
     rows={@streams.upcoming_bookings}
-    row_click={fn {_id, booking} -> JS.navigate(~p"/") end}
+    row_click={fn {_id, booking} -> JS.navigate(~p"/booking/view/#{booking.id}") end}
   >
     <:action :let={{_id, booking}}>
       <button

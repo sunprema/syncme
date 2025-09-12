@@ -3,6 +3,8 @@ defmodule SyncMeWeb.BookingEvent do
 
   alias SyncMe.Events
   alias SyncMe.Scheduler
+  alias SyncMe.Payments
+
   require Timex
 
   @impl true
@@ -58,50 +60,42 @@ defmodule SyncMeWeb.BookingEvent do
 
   @impl true
   def handle_event("save_booking", _unsigned_params, socket) do
-    IO.inspect("Booking is being confirmed")
-    current_scope = Map.get(socket.assigns, :current_scope, nil)
-
     socket =
-      case current_scope do
+      case Map.get(socket.assigns, :current_scope) do
         nil ->
-          IO.inspect("CURRENT SCOPE IS NULL", label: "SAVE BOOKING NULL SCOPE")
+          # If user is not logged in, redirect to login page first
           iso_string = DateTime.to_iso8601(socket.assigns.meeting_start_time)
-          encodedMeetingStartTime = URI.encode(iso_string)
+          encoded_time = URI.encode(iso_string)
 
           socket
           |> redirect(
-            to:
-              ~p"/book_event/new/login/#{socket.assigns.event_type.id}/#{encodedMeetingStartTime}"
+            to: ~p"/book_event/new/login/#{socket.assigns.event_type.id}/#{encoded_time}"
           )
 
-        scope ->
-          socket =
-            case Scheduler.create_booking(
-                   scope,
-                   socket.assigns.event_type,
-                   socket.assigns.meeting_start_time,
-                   socket.assigns.meeting_end_time
-                 ) do
-              {:ok, booking} ->
+        _scope ->
+          # If user is logged in, create a Stripe Checkout session
+          base_url = SyncMeWeb.Endpoint.url()
 
+          success_url = base_url <> ~p"/booking/success?session_id={CHECKOUT_SESSION_ID}"
 
-                Phoenix.PubSub.broadcast_from(
-                  SyncMe.PubSub,
-                  self(),
-                  "event_type_id:#{socket.assigns.event_type.id}",
-                  {:event_booked, socket.assigns.selected_date}
-                )
+          cancel_url = base_url <> ~p"/book_event/new/#{socket.assigns.event_type.id}"
 
-                socket
-                |> put_flash(:info, "Meeting is booked. #{booking.id}")
-                |> redirect(to: ~p"/user/home")
+          case Payments.create_checkout_session(
+                 socket.assigns.event_type,
+                 socket.assigns.meeting_start_time,
+                 success_url,
+                 cancel_url
+               ) do
+            {:ok, session} ->
+              # Redirect user to Stripe to complete payment
+              redirect(socket, external: session.url)
 
-              {:error, reason} ->
-                socket
-                |> put_flash(:error, "Meeting cant be booked. #{inspect(reason)}")
-            end
+            {:error, :partner_not_connected_to_stripe} ->
+              put_flash(socket, :error, "This partner is not configured to accept payments yet.")
 
-          socket
+            {:error, reason} ->
+              put_flash(socket, :error, "Could not proceed to payment: #{inspect(reason)}")
+          end
       end
 
     {:noreply, socket}

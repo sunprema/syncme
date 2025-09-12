@@ -86,6 +86,8 @@ defmodule SyncMeWeb.Router do
           :return_session
 
       live "/book_event/auth/details/:event_type_id/:encodedTimeSelected", BookingEvent, :details
+      live "/booking/success", BookingCompletionLive, :success
+      live "/booking/view/:booking_id", BookingView, :show
     end
 
     live_session :partner_flow,
@@ -106,6 +108,9 @@ defmodule SyncMeWeb.Router do
       live "/partner/bookings/unconfirmed", BookingsLive.Index, :unconfirmed
       live "/partner/bookings/cancelled", BookingsLive.Index, :cancelled
       live "/partner/insights", InsightsLive.Dashboard, :dashboard
+
+      # Stripe Connect
+      live "/partner/stripe/connect", Partner.StripeConnectLive, :new
     end
 
     post "/users/update-password", UserSessionController, :update_password

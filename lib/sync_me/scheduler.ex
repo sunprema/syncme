@@ -2,13 +2,11 @@ defmodule SyncMe.Scheduler do
   require Timex
 
   alias SyncMe.Repo
-  alias SyncMe.{Events, Availability, Bookings, Partners}
 
   alias SyncMe.{
     Availability.AvailabilityRule,
     Events.EventType,
     Bookings.Booking,
-    Partners.Partner
   }
 
   alias SyncMe.Accounts.Scope
@@ -22,6 +20,7 @@ defmodule SyncMe.Scheduler do
           :year => any(),
           optional(any()) => any()
         }) :: any()
+
   def get_availability_for_partner(partner_id, date) do
     day_of_week = Date.day_of_week(date)
 
@@ -117,7 +116,11 @@ defmodule SyncMe.Scheduler do
         "price_at_booking" => eventType.price
       })
 
-    Repo.insert(new_booking_cs)
+    case Repo.insert(new_booking_cs) do
+      {:ok, booking} -> {:ok, Repo.preload(booking, [:event_type])}
+       result -> result
+    end
+
   end
 
   defp slot_overlaps_booking?(slot_start, slot_end, bookings) do

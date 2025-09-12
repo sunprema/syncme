@@ -26,12 +26,21 @@ defmodule SyncMe.Partners do
     end
   end
 
-  def update_partner(%Scope{} = scope, %Partner{} = partner, attrs) do
+  def update_partner(%Scope{partner: partner} = scope, attrs) when not is_nil(partner) do
     with {:ok, partner = %Partner{}} <-
            partner
            |> Partner.changeset(attrs, scope)
            |> Repo.update() do
       {:ok, partner}
+    end
+  end
+
+  def update_stripe_account_id(partner, attrs)  when not is_nil(partner) do
+    with {:ok, partner_updated} <-
+           partner
+           |> Partner.stripe_changeset(attrs)
+           |> Repo.update() do
+      {:ok, partner_updated}
     end
   end
 

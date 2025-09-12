@@ -87,4 +87,12 @@ config :phoenix_live_view,
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
 
-config :stripity_stripe, api_key: System.get_env("STRIPE_SECRET")
+config :ueberauth, Ueberauth.Strategy.Google.OAuth,
+  client_id: System.get_env("GOOGLE_CLIENT_ID"),
+  client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
+
+config :stripity_stripe,
+  api_key: System.get_env("STRIPE_SECRET_KEY"),
+  client_id: System.get_env("STRIPE_CLIENT_ID")
+
+IO.puts("DEV.EXS CALLED")
