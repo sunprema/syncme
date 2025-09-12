@@ -108,6 +108,7 @@ defmodule SyncMeWeb.Router do
       live "/partner/bookings/unconfirmed", BookingsLive.Index, :unconfirmed
       live "/partner/bookings/cancelled", BookingsLive.Index, :cancelled
       live "/partner/insights", InsightsLive.Dashboard, :dashboard
+      live "/partner/booking/view/:booking_id", BookingView, :show
 
       # Stripe Connect
       live "/partner/stripe/connect", Partner.StripeConnectLive, :new

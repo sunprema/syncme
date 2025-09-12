@@ -1,8 +1,6 @@
 defmodule SyncMeWeb.AvailabilityLive.Show do
   use SyncMeWeb, :live_view
   alias SyncMe.Availability
-  alias SyncMe.Availability.AvailabilityRule
-  alias SyncMe.Partners
 
   @impl true
   def mount(_params, _session, socket) do
