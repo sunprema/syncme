@@ -179,8 +179,8 @@ defmodule SyncMeWeb.BookingEvent do
 
     final_slots =
       if partner.google_refresh_token do
-        time_min = DateTime.new!(date, ~T[00:00:00], "Etc/UTC")
-        time_max = DateTime.new!(date, ~T[23:59:59], "Etc/UTC")
+        time_min = DateTime.new!(NaiveDateTime.to_date(date), ~T[00:00:00], "Etc/UTC")
+        time_max = DateTime.new!(NaiveDateTime.to_date(date), ~T[23:59:59], "Etc/UTC")
 
         case GoogleCalendar.get_busy_times(partner, time_min, time_max) do
           {:ok, busy_intervals} ->

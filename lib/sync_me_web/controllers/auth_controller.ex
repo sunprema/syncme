@@ -44,6 +44,7 @@ defmodule SyncMeWeb.AuthController do
           nil ->
             UserAuth.log_in_user(conn, user)
           partner ->
+
               credentials = auth.credentials
               calendar_attrs = %{
                 google_access_token: credentials.token,
@@ -55,12 +56,12 @@ defmodule SyncMeWeb.AuthController do
                 {:ok, _updated_partner} ->
                   conn
                   |> put_flash(:info, "Successfully connected your Google Calendar.")
-                  |> redirect(to: ~p"/partner/home") # Redirect to a relevant page
+                  |> UserAuth.log_in_user( user)
 
                 {:error, _changeset} ->
                   conn
                   |> put_flash(:error, "Could not integrate with your Google Calendar")
-                  |> redirect(to: ~p"/partner/availability")
+                  |> UserAuth.log_in_user( user)
               end
 
 
