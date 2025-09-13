@@ -39,34 +39,32 @@ defmodule SyncMeWeb.AuthController do
 
       user ->
         # User exists, update session or other details if necessary
-        #check If user is a partner as well.
-        case Partners.get_partner_by_user( user ) do
+        # check If user is a partner as well.
+        case Partners.get_partner_by_user(user) do
           nil ->
             UserAuth.log_in_user(conn, user)
+
           partner ->
+            credentials = auth.credentials
 
-              credentials = auth.credentials
-              calendar_attrs = %{
-                google_access_token: credentials.token,
-                google_refresh_token: credentials.refresh_token,
-                google_token_expires_at: DateTime.from_unix!(credentials.expires_at)
-              }
+            calendar_attrs = %{
+              google_access_token: credentials.token,
+              google_refresh_token: credentials.refresh_token,
+              google_token_expires_at: DateTime.from_unix!(credentials.expires_at)
+            }
 
-              case Partners.update_calendar_tokens(partner, calendar_attrs) do
-                {:ok, _updated_partner} ->
-                  conn
-                  |> put_flash(:info, "Successfully connected your Google Calendar.")
-                  |> UserAuth.log_in_user( user)
+            case Partners.update_calendar_tokens(partner, calendar_attrs) do
+              {:ok, _updated_partner} ->
+                conn
+                |> put_flash(:info, "Successfully connected your Google Calendar.")
+                |> UserAuth.log_in_user(user)
 
-                {:error, _changeset} ->
-                  conn
-                  |> put_flash(:error, "Could not integrate with your Google Calendar")
-                  |> UserAuth.log_in_user( user)
-              end
-
-
+              {:error, _changeset} ->
+                conn
+                |> put_flash(:error, "Could not integrate with your Google Calendar")
+                |> UserAuth.log_in_user(user)
+            end
         end
-
     end
   end
 

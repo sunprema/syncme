@@ -8,6 +8,7 @@ defmodule SyncMe.Repo.Migrations.AddGoogleAuthToPartners do
       add :google_token_expires_at, :utc_datetime
     end
   end
+
   def change do
     alter table(:partners) do
       remove :google_access_token
@@ -15,5 +16,4 @@ defmodule SyncMe.Repo.Migrations.AddGoogleAuthToPartners do
       remove :google_token_expires_at
     end
   end
-
 end

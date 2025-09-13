@@ -9,7 +9,7 @@ defmodule SyncMe.Partners.Partner do
     field :syncme_link, :string
     field :stripe_account_id, :string
 
-    #google calendar fields
+    # google calendar fields
     field :google_access_token, :string
     field :google_refresh_token, :string
     field :google_token_expires_at, :utc_datetime
@@ -22,7 +22,6 @@ defmodule SyncMe.Partners.Partner do
 
     timestamps(type: :utc_datetime)
   end
-
 
   def changeset(partner, attrs, user_scope) do
     partner
@@ -45,30 +44,23 @@ defmodule SyncMe.Partners.Partner do
     |> unique_constraint(:syncme_link,
       message: "This syncme link is already in use, Try a different one."
     )
-
   end
-
-
 
   def stripe_changeset(partner, attrs) do
     partner
     |> cast(attrs, [:stripe_account_id])
     |> validate_required([:stripe_account_id])
-
   end
 
   def google_token_changeset(partner, attrs) do
     partner
     |> cast(attrs, [:google_access_token, :google_refresh_token, :google_token_expires_at])
     |> validate_required([:google_access_token, :google_refresh_token, :google_token_expires_at])
-
   end
 
   def google_token_refresh_changeset(partner, attrs) do
     partner
     |> cast(attrs, [:google_access_token, :google_token_expires_at])
     |> validate_required([:google_access_token, :google_token_expires_at])
-
   end
-
 end

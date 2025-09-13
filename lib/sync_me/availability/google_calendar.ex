@@ -5,7 +5,6 @@ defmodule SyncMe.GoogleCalendar do
   alias SyncMe.Partners.Partner
   alias SyncMe.Partners
 
-
   @token_uri "https://oauth2.googleapis.com/token"
   @free_busy_uri "https://www.googleapis.com/calendar/v3/freeBusy"
 
@@ -44,11 +43,15 @@ defmodule SyncMe.GoogleCalendar do
     end
   end
 
-  defp get_valid_access_token(%Partner{google_refresh_token: nil}), do: {:error, :no_refresh_token}
+  defp get_valid_access_token(%Partner{google_refresh_token: nil}),
+    do: {:error, :no_refresh_token}
 
   defp get_valid_access_token(%Partner{} = partner) do
     # Check if token is expired or close to expiring (e.g., within 5 minutes)
-    if DateTime.compare(partner.google_token_expires_at, DateTime.add(DateTime.utc_now(), 300, :second)) == :lt do
+    if DateTime.compare(
+         partner.google_token_expires_at,
+         DateTime.add(DateTime.utc_now(), 300, :second)
+       ) == :lt do
       refresh_access_token(partner)
     else
       {:ok, partner.google_access_token}
@@ -57,7 +60,9 @@ defmodule SyncMe.GoogleCalendar do
 
   defp refresh_access_token(%Partner{} = partner) do
     client_id = Application.get_env(:ueberauth, Ueberauth.Strategy.Google.OAuth)[:client_id]
-    client_secret = Application.get_env(:ueberauth, Ueberauth.Strategy.Google.OAuth)[:client_secret]
+
+    client_secret =
+      Application.get_env(:ueberauth, Ueberauth.Strategy.Google.OAuth)[:client_secret]
 
     params = [
       client_id: client_id,
@@ -69,6 +74,7 @@ defmodule SyncMe.GoogleCalendar do
     case Req.post(@token_uri, form: params) do
       {:ok, %{status: 200, body: %{"access_token" => new_token, "expires_in" => expires_in}}} ->
         expires_at = DateTime.add(DateTime.utc_now(), expires_in, :second)
+
         update_attrs = %{
           google_access_token: new_token,
           google_token_expires_at: expires_at
@@ -80,6 +86,7 @@ defmodule SyncMe.GoogleCalendar do
 
       {:ok, resp} ->
         {:error, {:token_refresh_failed, resp.body}}
+
       {:error, reason} ->
         {:error, {:http_error, reason}}
     end

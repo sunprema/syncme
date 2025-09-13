@@ -17,7 +17,7 @@ defmodule SyncMe.Partners do
     Repo.get_by(Partner, user_id: user.id)
   end
 
-  def get_partner_by_user( user )when not is_nil(user) do
+  def get_partner_by_user(user) when not is_nil(user) do
     Repo.get_by(Partner, user_id: user.id)
   end
 
@@ -52,10 +52,9 @@ defmodule SyncMe.Partners do
     partner
     |> Partner.google_token_changeset(attrs)
     |> Repo.update()
-
   end
 
-  def update_stripe_account_id(partner, attrs)  when not is_nil(partner) do
+  def update_stripe_account_id(partner, attrs) when not is_nil(partner) do
     with {:ok, partner_updated} <-
            partner
            |> Partner.stripe_changeset(attrs)

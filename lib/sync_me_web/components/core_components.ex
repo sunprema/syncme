@@ -178,18 +178,18 @@ defmodule SyncMeWeb.CoreComponents do
   end
 
   def input(%{type: "path"} = assigns) do
-
     ~H"""
-
-     <fieldset class="fieldset mb-2">
+    <fieldset class="fieldset mb-2">
       <label class="input">
-        <span class="text-sm font-semibold text-secondary font-meidum bg-gray-300/30 p-2 -ml-3 rounded">{@path}</span>
+        <span class="text-sm font-semibold text-secondary font-meidum bg-gray-300/30 p-2 -ml-3 rounded">
+          {@path}
+        </span>
         <input
           type={@type}
           name={@name}
           id={@id}
           value={Phoenix.HTML.Form.normalize_value(@type, @value)}
-          class={[ "pl-0", "grow", @errors != [] && "input-error"]}
+          class={["pl-0", "grow", @errors != [] && "input-error"]}
           {@rest}
         />
       </label>

@@ -76,7 +76,7 @@ defmodule SyncMeWeb.SettingsLive.SettingsComponent do
   def handle_event("save", %{"partner" => partner} = _params, socket) do
     scope = socket.assigns.current_scope
 
-    case Partners.update_partner(scope,partner) do
+    case Partners.update_partner(scope, partner) do
       {:ok, _partner} ->
         {:noreply,
          socket

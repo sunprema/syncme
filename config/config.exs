@@ -73,23 +73,22 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-
-
 # Google Auth config
 config :ueberauth, Ueberauth,
   providers: [
-    google: { Ueberauth.Strategy.Google, [
-              default_scope: "email profile https://www.googleapis.com/auth/calendar.readonly",
-              access_type: "offline",
-              prompt: "consent"
-            ]}
+    google:
+      {Ueberauth.Strategy.Google,
+       [
+         default_scope: "email profile https://www.googleapis.com/auth/calendar.readonly",
+         access_type: "offline",
+         prompt: "consent"
+       ]}
   ]
 
 # Stripe integration
 config :stripity_stripe,
   hackney_opts: [{:connect_timeout, 1000}, {:recv_timeout, 5000}],
   retries: [max_attempts: 3, base_backoff: 500, max_backoff: 2_000]
-
 
 # Oban integration
 config :sync_me, Oban,

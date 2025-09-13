@@ -109,15 +109,12 @@ defmodule SyncMeWeb.BookingEvent do
 
     case Timex.parse(selected_date, "%Y-%m-%d", :strftime) do
       {:ok, date} ->
-        {:noreply,
-         assign_available_slots(socket, partner, event_type, date)}
+        {:noreply, assign_available_slots(socket, partner, event_type, date)}
 
       {:error, _reason} ->
         {:noreply, put_flash(socket, :error, "Invalid Date selected")}
     end
   end
-
-
 
   @impl true
   def handle_event(
@@ -132,7 +129,6 @@ defmodule SyncMeWeb.BookingEvent do
      |> assign_meeting_times(meeting_start_time, socket.assigns.event_type)
      |> push_patch(to: ~p"/book_event/details/#{socket.assigns.event_type.id}")}
   end
-
 
   @impl true
   def handle_info({:event_booked, selected_date}, socket) do
@@ -172,7 +168,6 @@ defmodule SyncMeWeb.BookingEvent do
   defp get_available_days(availability_rules) do
     Enum.map(availability_rules, fn rule -> rule.day_of_week end)
   end
-
 
   defp assign_available_slots(socket, partner, event_type, date) do
     base_slots = Scheduler.available_slots(partner.id, date, event_type.id)

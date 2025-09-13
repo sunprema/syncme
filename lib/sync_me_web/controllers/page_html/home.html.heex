@@ -5,7 +5,8 @@
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 520 120"
       role="img"
-      aria-labelledby="title desc">
+      aria-labelledby="title desc"
+    >
       <title id="title">SyncMe.link Logo</title>
       <desc id="desc">
         An S-shaped pair of interlocking links in orange next to the text SyncMe.link
@@ -17,13 +18,13 @@
           <stop offset="0%" stop-color="#FF7A18" />
           <stop offset="100%" stop-color="#FFB347" />
         </linearGradient>
-          
-        <!-- Subtle shadow for the mark -->
+        
+<!-- Subtle shadow for the mark -->
         <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
           <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.18" />
         </filter>
-          
-        <!-- Reusable rounded link shape (a rounded rect path) -->
+        
+<!-- Reusable rounded link shape (a rounded rect path) -->
         <symbol id="link-shape" viewBox="0 0 120 70">
           <rect
             x="5"
@@ -35,29 +36,29 @@
             fill="none"
             stroke="url(#grad-orange)"
             stroke-width="12"
-            stroke-linecap="round"/>
+            stroke-linecap="round"
+          />
         </symbol>
       </defs>
-        
-      <!-- ====== Logo mark (S made of two links) ====== -->
+      
+<!-- ====== Logo mark (S made of two links) ====== -->
       <g id="mark" filter="url(#soft-shadow)" transform="translate(10,10)">
         <!-- Top-right link -->
         <g transform="rotate(-25 60 50)">
           <use href="#link-shape" />
         </g>
         
-        <!-- Bottom-left link (mirrored and overlapped) -->
+<!-- Bottom-left link (mirrored and overlapped) -->
         <g transform="translate(0,0) rotate(155 60 50)">
           <use href="#link-shape" />
         </g>
         
-        <!-- Sync spark (small star) -->
+<!-- Sync spark (small star) -->
         <g transform="translate(96,18)">
           <circle r="3.5" fill="#FF7A18" />
           <path d="M0 -9 L1.8 -1.8 9 0 1.8 1.8 0 9 -1.8 1.8 -9 0 -1.8 -1.8 Z" fill="#FFB347" />
         </g>
       </g>
-        
 
       <g id="wordmark" transform="translate(160,78)">
         <!-- Use system fonts so no webfont required -->
@@ -67,7 +68,8 @@
           font-family="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
           font-size="60"
           font-weight="700"
-          letter-spacing="0.5" >
+          letter-spacing="0.5"
+        >
           SyncMe
           <tspan font-weight="600" fill="url(#grad-orange)">.link</tspan>
         </text>
@@ -94,10 +96,10 @@
   </p>
 
   <p class="mt-4 text-sm leading-7 text-base-content/70 font-intra">
-      We handle the scheduling, payments, and video calls.
-  </p>  
-  <p class="mt-4 text-sm leading-7 text-base-content/70 font-intra">        
-      you focus on what you do best: <span class="font-bold">sharing your expertise.</span>
+    We handle the scheduling, payments, and video calls.
+  </p>
+  <p class="mt-4 text-sm leading-7 text-base-content/70 font-intra">
+    you focus on what you do best: <span class="font-bold">sharing your expertise.</span>
   </p>
 
   <div class="flex">
@@ -105,48 +107,72 @@
       <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">
         <.link
           navigate={~p"/partner/signup"}
-          class="group relative rounded-box px-6 py-4 text-sm font-semibold leading-6 sm:py-6">
+          class="group relative rounded-box px-6 py-4 text-sm font-semibold leading-6 sm:py-6"
+        >
           <span class="absolute inset-0 rounded-box bg-base-200 transition group-hover:bg-base-300 sm:group-hover:scale-105">
           </span>
           <span class="relative flex items-center gap-2 sm:flex-col">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
-            </svg>            
-            <h1>Become a partner.</h1> 
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
+              />
+            </svg>
+            <h1>Become a partner.</h1>
             <p class="text-base-content/60 text-xs">Claim your syncme.link now!</p>
           </span>
         </.link>
 
         <a
           href=""
-          class="group relative rounded-box px-6 py-4 text-sm font-semibold leading-6 sm:py-6">
+          class="group relative rounded-box px-6 py-4 text-sm font-semibold leading-6 sm:py-6"
+        >
           <span class="absolute inset-0 rounded-box bg-base-200 transition group-hover:bg-base-300 sm:group-hover:scale-105">
           </span>
           <span class="relative flex items-center gap-4 sm:flex-col">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
               <path d="M8.5 2C6.567 2 5 3.567 5 5.5C5 5.68016 5.01364 5.85714 5.03993 6.02997C3.32436 6.25523 2 7.72295 2 9.5C2 10.4793 2.40223 11.3647 3.05051 12C2.40223 12.6353 2 13.5207 2 14.5C2 15.9018 2.82359 17.1104 4.01353 17.6693C4.00457 17.7785 4 17.8888 4 18C4 20.2091 5.79086 22 8 22C9.19469 22 10.2671 21.4762 11 20.6458V3.05051C10.3647 2.40223 9.47934 2 8.5 2ZM13 3.05051V20.6458C13.7329 21.4762 14.8053 22 16 22C18.2091 22 20 20.2091 20 18C20 17.8888 19.9954 17.7785 19.9865 17.6693C21.1764 17.1104 22 15.9018 22 14.5C22 13.5207 21.5978 12.6353 20.9495 12C21.5978 11.3647 22 10.4793 22 9.5C22 7.72295 20.6756 6.25523 18.9601 6.02997C18.9864 5.85714 19 5.68016 19 5.5C19 3.567 17.433 2 15.5 2C14.5207 2 13.6353 2.40223 13 3.05051Z">
               </path>
             </svg>
-            <h1>How it works.</h1> 
+            <h1>How it works.</h1>
           </span>
-
         </a>
 
         <.link
           navigate={~p"/partner/signup"}
-          class="group relative rounded-box px-6 py-4 text-sm font-semibold leading-6 sm:py-6" >
+          class="group relative rounded-box px-6 py-4 text-sm font-semibold leading-6 sm:py-6"
+        >
           <span class="absolute inset-0 rounded-box bg-base-200 transition group-hover:bg-base-300 sm:group-hover:scale-105">
           </span>
           <span class="relative flex items-center gap-4 sm:flex-col">
-            <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
               <path d="M6 4V8H18V4H20.0066C20.5552 4 21 4.44495 21 4.9934V21.0066C21 21.5552 20.5551 22 20.0066 22H3.9934C3.44476 22 3 21.5551 3 21.0066V4.9934C3 4.44476 3.44495 4 3.9934 4H6ZM9 17H7V19H9V17ZM9 14H7V16H9V14ZM9 11H7V13H9V11ZM16 2V6H8V2H16Z">
               </path>
             </svg>
             FAQ
           </span>
         </.link>
-
       </div>
     </div>
-  </div>  
+  </div>
 </div>
