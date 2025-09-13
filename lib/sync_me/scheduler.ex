@@ -6,7 +6,7 @@ defmodule SyncMe.Scheduler do
   alias SyncMe.{
     Availability.AvailabilityRule,
     Events.EventType,
-    Bookings.Booking,
+    Bookings.Booking
   }
 
   alias SyncMe.Accounts.Scope
@@ -116,11 +116,13 @@ defmodule SyncMe.Scheduler do
         "price_at_booking" => eventType.price
       })
 
-    case Repo.insert(new_booking_cs) do
-      {:ok, booking} -> {:ok, Repo.preload(booking, [:event_type])}
-       result -> result
+    with {:ok, booking} <- Repo.insert(new_booking_cs),
+         {:ok, _job} <-
+           SyncMe.Workers.SendBookingEmails.new(%{booking_id: booking.id}) |> Oban.insert() do
+      {:ok, Repo.preload(booking, [:event_type])}
+    else
+      error -> error
     end
-
   end
 
   defp slot_overlaps_booking?(slot_start, slot_end, bookings) do
