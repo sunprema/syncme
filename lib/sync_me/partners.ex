@@ -17,6 +17,10 @@ defmodule SyncMe.Partners do
     Repo.get_by(Partner, user_id: user.id)
   end
 
+  def get_partner_by_user( user )when not is_nil(user) do
+    Repo.get_by(Partner, user_id: user.id)
+  end
+
   def create_partner(%Scope{} = scope, attrs) do
     with {:ok, partner = %Partner{}} <-
            %Partner{}
@@ -33,6 +37,22 @@ defmodule SyncMe.Partners do
            |> Repo.update() do
       {:ok, partner}
     end
+  end
+
+  def update_partner(partner, attrs) when not is_nil(partner) do
+    with {:ok, partner = %Partner{}} <-
+           partner
+           |> Partner.changeset(attrs)
+           |> Repo.update() do
+      {:ok, partner}
+    end
+  end
+
+  def update_calendar_tokens(partner, attrs) when not is_nil(partner) do
+    partner
+    |> Partner.google_token_changeset(attrs)
+    |> Repo.update()
+
   end
 
   def update_stripe_account_id(partner, attrs)  when not is_nil(partner) do

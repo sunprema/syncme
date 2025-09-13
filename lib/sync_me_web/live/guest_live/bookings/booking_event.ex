@@ -4,6 +4,7 @@ defmodule SyncMeWeb.BookingEvent do
   alias SyncMe.Events
   alias SyncMe.Scheduler
   alias SyncMe.Payments
+  alias SyncMe.GoogleCalendar
 
   require Timex
 
@@ -109,17 +110,14 @@ defmodule SyncMeWeb.BookingEvent do
     case Timex.parse(selected_date, "%Y-%m-%d", :strftime) do
       {:ok, date} ->
         {:noreply,
-         socket
-         |> assign(:selected_date, date)
-         |> assign(
-           :available_slots,
-           format_available_slots(Scheduler.available_slots(partner.id, date, event_type.id))
-         )}
+         assign_available_slots(socket, partner, event_type, date)}
 
       {:error, _reason} ->
         {:noreply, put_flash(socket, :error, "Invalid Date selected")}
     end
   end
+
+
 
   @impl true
   def handle_event(
@@ -135,10 +133,6 @@ defmodule SyncMeWeb.BookingEvent do
      |> push_patch(to: ~p"/book_event/details/#{socket.assigns.event_type.id}")}
   end
 
-  @impl true
-  def handle_event("booking_confirmed", _params, _socket) do
-    # Will get the event_type,time_selected,
-  end
 
   @impl true
   def handle_info({:event_booked, selected_date}, socket) do
@@ -177,6 +171,45 @@ defmodule SyncMeWeb.BookingEvent do
   # Returns a list of days for the calendar component
   defp get_available_days(availability_rules) do
     Enum.map(availability_rules, fn rule -> rule.day_of_week end)
+  end
+
+
+  defp assign_available_slots(socket, partner, event_type, date) do
+    base_slots = Scheduler.available_slots(partner.id, date, event_type.id)
+
+    final_slots =
+      if partner.google_refresh_token do
+        time_min = DateTime.new!(date, ~T[00:00:00], "Etc/UTC")
+        time_max = DateTime.new!(date, ~T[23:59:59], "Etc/UTC")
+
+        case GoogleCalendar.get_busy_times(partner, time_min, time_max) do
+          {:ok, busy_intervals} ->
+            filter_slots_by_busy_times(base_slots, event_type.duration_in_minutes, busy_intervals)
+
+          {:error, _reason} ->
+            # Log the error but proceed with base availability
+            # so the booking flow doesn't break.
+            base_slots
+        end
+      else
+        base_slots
+      end
+
+    socket
+    |> assign(:selected_date, date)
+    |> assign(:available_slots, format_available_slots(final_slots))
+  end
+
+  defp filter_slots_by_busy_times(slots, duration_minutes, busy_intervals) do
+    Enum.reject(slots, fn slot_start ->
+      slot_end = DateTime.add(slot_start, duration_minutes, :minute)
+
+      Enum.any?(busy_intervals, fn {busy_start, busy_end} ->
+        # Check for overlap: (StartA < EndB) and (EndA > StartB)
+        DateTime.compare(slot_start, busy_end) == :lt and
+          DateTime.compare(slot_end, busy_start) == :gt
+      end)
+    end)
   end
 
   defp assign_meeting_times(socket, meeting_start_time, event_type) do
