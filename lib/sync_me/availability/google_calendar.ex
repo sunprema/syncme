@@ -74,7 +74,7 @@ defmodule SyncMe.GoogleCalendar do
           google_token_expires_at: expires_at
         }
 
-        with {:ok, _updated_partner} <- Partners.google_token_refresh_changeset(partner, update_attrs) do
+        with {:ok, _updated_partner} <- Partners.update_calendar_tokens(partner, update_attrs) do
           {:ok, new_token}
         end
 
