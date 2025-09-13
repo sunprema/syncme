@@ -64,7 +64,8 @@ defmodule SyncMe.MixProject do
       {:ueberauth_google, "~> 0.10"},
       {:live_debugger, "~> 0.4.0", only: :dev},
       {:timex, "~> 3.0"},
-      {:stripity_stripe, "~> 3.2"}
+      {:stripity_stripe, "~> 3.2"},
+      {:oban, "~> 2.19"}
     ]
   end
 

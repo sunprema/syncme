@@ -90,6 +90,13 @@ config :stripity_stripe,
   hackney_opts: [{:connect_timeout, 1000}, {:recv_timeout, 5000}],
   retries: [max_attempts: 3, base_backoff: 500, max_backoff: 2_000]
 
+
+# Oban integration
+config :sync_me, Oban,
+  engine: Oban.Engines.Basic,
+  queues: [default: 10],
+  repo: SyncMe.Repo
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

@@ -12,6 +12,7 @@ defmodule SyncMe.Application do
       SyncMe.Repo,
       {DNSCluster, query: Application.get_env(:sync_me, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: SyncMe.PubSub},
+      {Oban, Application.fetch_env!(:sync_me, Oban)},
       # Start a worker by calling: SyncMe.Worker.start_link(arg)
       # {SyncMe.Worker, arg},
       # Start to serve requests, typically the last entry
