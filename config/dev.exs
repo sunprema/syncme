@@ -95,4 +95,12 @@ config :stripity_stripe,
   api_key: System.get_env("STRIPE_SECRET_KEY"),
   client_id: System.get_env("STRIPE_CLIENT_ID")
 
-IO.puts("DEV.EXS CALLED")
+config :sync_me, SyncMe.Mailer,
+  adapter: Swoosh.Adapters.Local
+
+config :sync_me, SyncMe.BookingMailer,
+  adapter: Swoosh.Adapters.Local
+
+
+
+  IO.puts("DEV.EXS CALLED")

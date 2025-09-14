@@ -19,8 +19,8 @@ defmodule SyncMe.Calendar.ICS do
     BEGIN:VEVENT
     UID:#{uid}@syncme.local
     DTSTAMP:#{now}
-    ORGANIZER;CN=#{partner.user.name}:MAILTO:#{partner.user.email}
-    ATTENDEE;CN=#{guest.name};ROLE=REQ-PARTICIPANT:MAILTO:#{guest.email}
+    ORGANIZER;CN=#{partner.user.first_name}:MAILTO:#{partner.user.email}
+    ATTENDEE;CN=#{guest.first_name};ROLE=REQ-PARTICIPANT:MAILTO:#{guest.email}
     DTSTART:#{format_time(booking.start_time)}
     DTEND:#{format_time(booking.end_time)}
     SUMMARY:#{event_type.name}

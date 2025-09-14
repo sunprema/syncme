@@ -1,6 +1,5 @@
 defmodule SyncMe.Scheduler do
   require Timex
-
   alias SyncMe.Repo
 
   alias SyncMe.{

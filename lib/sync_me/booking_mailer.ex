@@ -2,7 +2,7 @@ defmodule SyncMe.BookingMailer do
   use Swoosh.Mailer, otp_app: :sync_me
 
   alias SyncMe.Bookings.Booking
-  alias SyncMe.Accounts.User
+  import Swoosh.Email
 
   def booking_confirmation_email(
         %Booking{} = booking,
@@ -27,9 +27,9 @@ defmodule SyncMe.BookingMailer do
 
     Please find the calendar invite attached.
     """)
-    |> attachment(%Swoosh.Attachment{content: ics_content, filename: "invite.ics"})
+    |> attachment(%Swoosh.Attachment{data: ics_content, filename: "invite.ics", content_type: "text/calendar"})
   end
 
   defp format_date(datetime),
-    do: Timex.format!(datetime, "{YYYY}-{0M}-{0D} at {h12}:{m} {AM/PM}", :strftime)
+    do: Timex.format!(datetime, "%Y-%m-%d  at %I:%M %p %Z", :strftime)
 end
