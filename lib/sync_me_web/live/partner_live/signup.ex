@@ -47,6 +47,16 @@ defmodule SyncMeWeb.PartnerLive.Signup do
             phx-debounce="200"
             phx-mounted={JS.focus()}
           />
+
+          <.input
+            type="select"
+            label="Your Timezone"
+            field={@form[:timezone]}
+            options={Tzdata.canonical_zone_list()}
+            required
+          />
+
+
           <button phx-disable-with="Creating account..." class="btn btn-neutral w-full font-normal">
             Sign up as partner
           </button>

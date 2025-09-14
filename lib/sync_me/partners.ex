@@ -24,7 +24,7 @@ defmodule SyncMe.Partners do
   def create_partner(%Scope{} = scope, attrs) do
     with {:ok, partner = %Partner{}} <-
            %Partner{}
-           |> Partner.changeset(attrs, scope)
+           |> Partner.changeset(Map.put(attrs, "timezone", attrs["timezone"]), scope)
            |> Repo.insert() do
       {:ok, partner}
     end

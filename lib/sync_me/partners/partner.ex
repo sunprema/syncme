@@ -8,6 +8,7 @@ defmodule SyncMe.Partners.Partner do
     field :bio, :string
     field :syncme_link, :string
     field :stripe_account_id, :string
+    field :timezone, :string, default: "Etc/UTC"
 
     # google calendar fields
     field :google_access_token, :string
@@ -25,10 +26,11 @@ defmodule SyncMe.Partners.Partner do
 
   def changeset(partner, attrs, user_scope) do
     partner
-    |> cast(attrs, [:bio, :syncme_link])
-    |> validate_required([:bio, :syncme_link])
+    |> cast(attrs, [:bio, :syncme_link, :timezone])
+    |> validate_required([:bio, :syncme_link, :timezone])
     |> validate_length(:bio, min: 12, max: 160)
     |> unique_constraint(:user_id, message: "Partner exists already.")
+    |> validate_timezone()
     |> unique_constraint(:syncme_link,
       message: "This syncme link is already in use, Try a different one."
     )
@@ -37,13 +39,23 @@ defmodule SyncMe.Partners.Partner do
 
   def changeset(partner, attrs) do
     partner
-    |> cast(attrs, [:bio, :syncme_link])
-    |> validate_required([:bio, :syncme_link])
+    |> cast(attrs, [:bio, :syncme_link, :timezone])
+    |> validate_required([:bio, :syncme_link, :timezone])
     |> validate_length(:bio, min: 12, max: 160)
     |> unique_constraint(:user_id, message: "Partner exists already.")
+    |> validate_timezone()
     |> unique_constraint(:syncme_link,
       message: "This syncme link is already in use, Try a different one."
     )
+  end
+
+  defp validate_timezone(changeset) do
+    validate_change(changeset, :timezone, fn :timezone, timezone ->
+      case Tzdata.zone_exists?(timezone) do
+        true -> []
+        false -> [timezone: "is not a valid timezone"]
+      end
+    end)
   end
 
   def stripe_changeset(partner, attrs) do
