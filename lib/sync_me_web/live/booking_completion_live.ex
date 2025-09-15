@@ -6,15 +6,21 @@ defmodule SyncMeWeb.BookingCompletionLive do
   alias SyncMe.Events
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, :booking, nil)}
+  def mount(params, session, socket) do
+    IO.inspect("MOUNT IS CALLED with params #{inspect(params)}", label: __MODULE__)
+    if connected?(socket) do
+      handle_stripe_callback(params, session, socket)
+    else
+      {:ok,
+      socket
+      |> assign(booking: nil)
+    }
+    end
   end
 
-  @impl true
-  def handle_params(%{"session_id" => session_id}, _uri, socket) do
-    # Logged in user
+  defp handle_stripe_callback(%{"session_id" => session_id}, _session, socket) do
     scope = socket.assigns.current_scope
-
+    IO.inspect("handle_params IS CALLED with session_id #{inspect(session_id)}", label: __MODULE__)
     with {:ok, session} <- Stripe.Checkout.Session.retrieve(session_id),
          "paid" <- session.payment_status,
          %{"event_type_id" => event_type_id, "meeting_start_time" => start_time_iso} <-
@@ -23,33 +29,42 @@ defmodule SyncMeWeb.BookingCompletionLive do
       booking_attrs = %{"event_type_id" => event_type.id,
                   "start_time" => start_time_iso,
                   }
+      IO.inspect("PAYEMENT SUCCESS", label: "BOOKING COMPLETION LIVE")
       case Bookings.create_booking(scope,booking_attrs) do
+
         {:ok, booking} ->
           # Broadcast that a slot has been booked
-          IO.inspect("BOOKING: #{inspect(booking)}", label: "BOOKING COMPLETION LIVE")
+          IO.inspect("BOOKING SUCCESS: #{inspect(booking)}", label: "BOOKING COMPLETION LIVE")
           Phoenix.PubSub.broadcast(
             SyncMe.PubSub,
             "event_type_id:#{event_type.id}",
             {:event_booked, booking.start_time}
           )
 
-          {:noreply,
+          {:ok,
            socket
            |> assign(:booking, booking)
            |> put_flash(:info, "Your meeting is confirmed!")}
 
-        {:error, _reason} ->
+        {:error, reason} ->
           # This can happen if the slot was taken while user was paying
-          {:noreply,
+           IO.inspect("FAILED #{inspect(reason)}", label: __MODULE__)
+          {:ok,
            put_flash(socket, :error, "Sorry, this time slot was booked while you were paying.")}
       end
     else
       _ ->
-        {:noreply,
+        IO.inspect("PAYEMENT FAILURE", label: "BOOKING COMPLETION LIVE")
+        {:ok,
          socket
          |> put_flash(:error, "There was a problem confirming your payment.")
          |> redirect(to: ~p"/")}
     end
+  end
+
+  @impl true
+  def handle_params(_params, _uri, socket) do
+    {:noreply, socket}
   end
 
   @impl true
