@@ -2,7 +2,7 @@
 defmodule SyncMeWeb.BookingCompletionLive do
   use SyncMeWeb, :live_view
 
-  alias SyncMe.Scheduler
+  alias SyncMe.Bookings
   alias SyncMe.Events
 
   @impl true
@@ -20,14 +20,13 @@ defmodule SyncMeWeb.BookingCompletionLive do
          %{"event_type_id" => event_type_id, "meeting_start_time" => start_time_iso} <-
            session.metadata do
       event_type = Events.get_event_type(event_type_id)
-      {:ok, meeting_start_time, _} = DateTime.from_iso8601(start_time_iso)
-
-      meeting_end_time =
-        Timex.add(meeting_start_time, Timex.Duration.from_minutes(event_type.duration_in_minutes))
-
-      case Scheduler.create_booking(scope, event_type, meeting_start_time, meeting_end_time) do
+      booking_attrs = %{"event_type_id" => event_type.id,
+                  "start_time" => start_time_iso,
+                  }
+      case Bookings.create_booking(scope,booking_attrs) do
         {:ok, booking} ->
           # Broadcast that a slot has been booked
+          IO.inspect("BOOKING: #{inspect(booking)}", label: "BOOKING COMPLETION LIVE")
           Phoenix.PubSub.broadcast(
             SyncMe.PubSub,
             "event_type_id:#{event_type.id}",

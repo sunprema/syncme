@@ -5,11 +5,16 @@ defmodule SyncMe.Bookings do
 
   import Ecto.Query, warn: false
   # alias SyncMe.Billing.Transaction
+  alias SyncMe.Accounts.Scope
+  alias SyncMe.Availability.AvailabilityRule
+  alias SyncMe.Bookings.Booking
+  alias SyncMe.Events.EventType
   alias SyncMe.Partners.Partner
   alias SyncMe.Repo
+  alias SyncMe.Workers.SendBookingEmails
 
-  alias SyncMe.Bookings.Booking
-  alias SyncMe.Accounts.Scope
+  require Timex
+  alias Phoenix.PubSub
 
   def list_bookings(%Scope{user: user, partner: partner}, filters \\ %{}) when not is_nil(user) do
     base_query =
@@ -112,6 +117,18 @@ defmodule SyncMe.Bookings do
     end
   end
 
+  @doc """
+  Generates a video conference link for a booking.
+
+  In a real application, this would integrate with a service like
+  Google Meet or Zoom to generate a unique link. For now, it returns a
+  static placeholder link.
+  """
+  def generate_video_conference_link(_booking_or_attrs \\ %{}) do
+    # TODO: Integrate with a real video conferencing service API
+    "https://meet.google.com/mnd-tpqm-gbb"
+  end
+
   # --- Private Helper for Filtering ---
 
   defp apply_booking_filters(query, %{"status" => status}) when not is_nil(status) do
@@ -149,39 +166,32 @@ defmodule SyncMe.Bookings do
   end
 
   defp do_create_booking(guest_user, event_type, start_time) do
-    Repo.transaction(fn ->
-      # Prepare all the data for the new booking
+    Repo.transact(fn ->
       booking_attrs = %{
         guest_user_id: guest_user.id,
         partner_id: event_type.partner_id,
         event_type_id: event_type.id,
         start_time: start_time,
         end_time: DateTime.add(start_time, event_type.duration_in_minutes, :minute),
+        video_conference_link: generate_video_conference_link(),
         status: :confirmed,
         # Denormalize for historical accuracy
         price_at_booking: event_type.price,
         duration_at_booking: event_type.duration_in_minutes
       }
-
-      # Insert the booking
       with {:ok, booking} <-
              %Booking{}
              |> Booking.changeset(booking_attrs)
              |> Repo.insert() do
         # --- Placeholder for future logic ---
         # In a real app, you would now:
-        # 1. Call the Billing context to create a pending transaction:
-        #    Billing.create_pending_transaction(booking)
-        # 2. Call a Notifier to schedule reminder emails:
-        #    Notifier.schedule_booking_reminders(booking)
-        # 3. Generate and add the video conference link.
-        #
-        # If any of these fail, the transaction will be rolled back.
-        # ------------------------------------
-
-        {:ok, booking}
-      end
-    end)
+        # 1. Call Billing context for transactions.
+        booking = Repo.preload(booking, [:event_type ])
+        SendBookingEmails.new(%{booking_id: booking.id}) |> Oban.insert()
+        PubSub.broadcast(SyncMe.PubSub, "bookings", {:new_booking, booking})
+       {:ok, booking}
+             end
+      end)
   end
 
   # Validation Step 1: Check the EventType
@@ -247,5 +257,77 @@ defmodule SyncMe.Bookings do
     else
       :ok
     end
+  end
+
+  # --- Scheduling and Availability Helpers ---
+
+  @doc """
+  Generates available time slots for a given partner, date, and event type.
+  """
+  def available_slots(partner_id, date, event_type_id) do
+    event_type = Repo.get!(EventType, event_type_id)
+    duration = event_type.duration_in_minutes
+    rules = get_availability_for_partner(partner_id, date)
+    bookings = list_bookings_for_date(partner_id, date)
+
+    rules
+    |> Enum.flat_map(fn rule ->
+      generate_slots_for_rule(rule, date, duration, bookings)
+    end)
+  end
+
+  @doc """
+  Fetches all availability rules for a partner for a given date.
+  """
+  def get_availability_for_partner(partner_id, date) do
+    day_of_week = Date.day_of_week(date)
+
+    from(r in AvailabilityRule,
+      where: r.partner_id == ^partner_id and r.day_of_week == ^day_of_week,
+      select: %{start_time: r.start_time, end_time: r.end_time}
+    )
+    |> Repo.all()
+  end
+
+  @doc """
+  Fetches all bookings for a partner on a specific date.
+  """
+  def list_bookings_for_date(partner_id, date) do
+    start = Timex.beginning_of_day(date)
+    endTime = Timex.end_of_day(date)
+    start_of_day = DateTime.from_naive!(start, "Etc/UTC")
+    end_of_day = DateTime.from_naive!(endTime, "Etc/UTC")
+
+    from(b in Booking,
+      where:
+        b.partner_id == ^partner_id and
+          b.start_time >= ^start_of_day and
+          b.start_time <= ^end_of_day,
+      preload: [:event_type]
+    )
+    |> Repo.all()
+  end
+
+  defp generate_slots_for_rule(rule, date, duration, bookings) do
+    naive_date = NaiveDateTime.to_date(date)
+
+    start_dt = DateTime.new!(naive_date, rule.start_time, "Etc/UTC")
+    end_dt = DateTime.new!(naive_date, rule.end_time, "Etc/UTC")
+    slot_interval = 15 * 60
+
+    Stream.iterate(start_dt, &DateTime.add(&1, slot_interval, :second))
+    |> Stream.take_while(&(DateTime.compare(&1, end_dt) in [:lt, :eq]))
+    |> Enum.filter(fn slot_start ->
+      slot_end = DateTime.add(slot_start, duration * 60, :second)
+
+      DateTime.compare(slot_end, end_dt) != :gt and not slot_overlaps_booking?(slot_start, slot_end, bookings)
+    end)
+  end
+
+  defp slot_overlaps_booking?(slot_start, slot_end, bookings) do
+    Enum.any?(bookings, fn b ->
+      DateTime.compare(slot_start, b.end_time) != :gt and
+        DateTime.compare(slot_end, b.start_time) != :lt
+    end)
   end
 end

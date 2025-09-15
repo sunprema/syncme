@@ -2,7 +2,7 @@ defmodule SyncMeWeb.BookingEvent do
   use SyncMeWeb, :live_view
 
   alias SyncMe.Events
-  alias SyncMe.Scheduler
+  alias SyncMe.Bookings
   alias SyncMe.Payments
   alias SyncMe.GoogleCalendar
 
@@ -145,7 +145,7 @@ defmodule SyncMeWeb.BookingEvent do
           |> assign(
             available_slots:
               format_available_slots(
-                Scheduler.available_slots(
+                Bookings.available_slots(
                   partner.id,
                   socket.assigns.selected_date,
                   socket.assigns.event_type.id
@@ -170,7 +170,7 @@ defmodule SyncMeWeb.BookingEvent do
   end
 
   defp assign_available_slots(socket, partner, event_type, date) do
-    base_slots = Scheduler.available_slots(partner.id, date, event_type.id)
+    base_slots = Bookings.available_slots(partner.id, date, event_type.id)
 
     final_slots =
       if partner.google_refresh_token do
