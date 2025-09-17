@@ -110,10 +110,6 @@ if config_env() == :prod do
     api_key: System.get_env("SENDGRID_API_KEY")
 
   # Google Auth config
-  config :ueberauth, Ueberauth,
-    providers: [
-      google: {Ueberauth.Strategy.Google, [default_scope: "email profile"]}
-    ]
 
   config :ueberauth, Ueberauth.Strategy.Google.OAuth,
     client_id: System.get_env("GOOGLE_CLIENT_ID"),

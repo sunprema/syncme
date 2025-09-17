@@ -79,11 +79,16 @@ config :ueberauth, Ueberauth,
     google:
       {Ueberauth.Strategy.Google,
        [
-         default_scope: "email profile https://www.googleapis.com/auth/calendar.readonly",
+         default_scope: "email profile https://www.googleapis.com/auth/calendar.events",
          access_type: "offline",
          prompt: "consent"
        ]}
   ]
+
+# Configure Ueberauth to use your Google OAuth credentials from environment variables.
+config :ueberauth, Ueberauth.Strategy.Google.OAuth,
+  client_id: System.get_env("GOOGLE_CLIENT_ID"),
+  client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
 
 # Stripe integration
 config :stripity_stripe,

@@ -179,6 +179,7 @@ defmodule SyncMe.Bookings do
         price_at_booking: event_type.price,
         duration_at_booking: event_type.duration_in_minutes
       }
+
       with {:ok, booking} <-
              %Booking{}
              |> Booking.changeset(booking_attrs)
@@ -186,12 +187,12 @@ defmodule SyncMe.Bookings do
         # --- Placeholder for future logic ---
         # In a real app, you would now:
         # 1. Call Billing context for transactions.
-        booking = Repo.preload(booking, [:event_type ])
+        booking = Repo.preload(booking, [:event_type])
         SendBookingEmails.new(%{booking_id: booking.id}) |> Oban.insert()
         PubSub.broadcast(SyncMe.PubSub, "bookings", {:new_booking, booking})
-       {:ok, booking}
-             end
-      end)
+        {:ok, booking}
+      end
+    end)
   end
 
   # Validation Step 1: Check the EventType
@@ -320,7 +321,8 @@ defmodule SyncMe.Bookings do
     |> Enum.filter(fn slot_start ->
       slot_end = DateTime.add(slot_start, duration * 60, :second)
 
-      DateTime.compare(slot_end, end_dt) != :gt and not slot_overlaps_booking?(slot_start, slot_end, bookings)
+      DateTime.compare(slot_end, end_dt) != :gt and
+        not slot_overlaps_booking?(slot_start, slot_end, bookings)
     end)
   end
 

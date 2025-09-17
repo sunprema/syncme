@@ -65,7 +65,9 @@ defmodule SyncMe.MixProject do
       {:live_debugger, "~> 0.4.0", only: :dev},
       {:timex, "~> 3.0"},
       {:stripity_stripe, "~> 3.2"},
-      {:oban, "~> 2.19"}
+      {:oban, "~> 2.19"},
+      {:google_api_calendar, "~> 0.26"},
+      {:uuid, "~> 1.1"}
     ]
   end
 

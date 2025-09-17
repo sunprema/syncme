@@ -56,7 +56,6 @@ defmodule SyncMeWeb.PartnerLive.Signup do
             required
           />
 
-
           <button phx-disable-with="Creating account..." class="btn btn-neutral w-full font-normal">
             Sign up as partner
           </button>

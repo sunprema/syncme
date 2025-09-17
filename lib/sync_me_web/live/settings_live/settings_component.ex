@@ -30,12 +30,12 @@ defmodule SyncMeWeb.SettingsLive.SettingsComponent do
         />
 
         <.input
-            type="select"
-            label="Your Timezone"
-            field={@form[:timezone]}
-            options={Tzdata.canonical_zone_list()}
-            required
-          />
+          type="select"
+          label="Your Timezone"
+          field={@form[:timezone]}
+          options={Tzdata.canonical_zone_list()}
+          required
+        />
 
         <button phx-disable-with="Creating account..." class="btn btn-neutral w-full font-normal">
           Update

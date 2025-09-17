@@ -43,10 +43,10 @@ defmodule SyncMe.GoogleCalendar do
     end
   end
 
-  defp get_valid_access_token(%Partner{google_refresh_token: nil}),
+  def get_valid_access_token(%Partner{google_refresh_token: nil}),
     do: {:error, :no_refresh_token}
 
-  defp get_valid_access_token(%Partner{} = partner) do
+  def get_valid_access_token(%Partner{} = partner) do
     # Check if token is expired or close to expiring (e.g., within 5 minutes)
     if DateTime.compare(
          partner.google_token_expires_at,

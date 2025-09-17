@@ -19,10 +19,8 @@ defmodule SyncMe.BillingFixtures do
       })
 
     case SyncMe.Billing.create_transaction(scope, attrs) do
-
       {:error, _booking_not_authorized} ->
         raise "Booking not authorized"
-
-      end
+    end
   end
 end

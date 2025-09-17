@@ -27,7 +27,11 @@ defmodule SyncMe.BookingMailer do
 
     Please find the calendar invite attached.
     """)
-    |> attachment(%Swoosh.Attachment{data: ics_content, filename: "invite.ics", content_type: "text/calendar"})
+    |> attachment(%Swoosh.Attachment{
+      data: ics_content,
+      filename: "invite.ics",
+      content_type: "text/calendar"
+    })
   end
 
   defp format_date(datetime),
