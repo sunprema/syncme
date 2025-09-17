@@ -81,17 +81,29 @@ defmodule SyncMe.Google.Meet do
       }) do
     with {:ok, token} <- SyncMe.GoogleCalendar.get_valid_access_token(partner) do
       event = %{
-        "summary" =>event_type.name,
+        "summary" => event_type.name,
+        "guestsCanInviteOthers" => false,
         "description" => event_type.description,
         "start" => %{"dateTime" => DateTime.to_iso8601(start_time)},
-        "end" => %{"dateTime" => DateTime.to_iso8601(end_time)}
+        "end" => %{"dateTime" => DateTime.to_iso8601(end_time)},
+        "attendees" => [
+          %{"email" => guest_user.email},
+          %{"email" => partner.user.email, "organizer" => true, "self" => true},
+        ],
+        "conferenceData" => %{"createRequest" => %{
+            "requestId" => UUID.uuid4(),
+            "conferenceSolutionKey" => %{
+              "type" => "hangoutsMeet"
+            }
+          }
+        }
       }
 
       # or use a specific calendar ID
       calendar_id = "primary"
 
 
-      case Req.post("https://www.googleapis.com/calendar/v3/calendars/#{calendar_id}/events",
+      case Req.post("https://www.googleapis.com/calendar/v3/calendars/#{calendar_id}/events?conferenceDataVersion=1",
         headers: [
           {"Authorization", "Bearer #{token}"},
           {"Content-Type", "application/json"}
