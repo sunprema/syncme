@@ -66,7 +66,6 @@ defmodule SyncMe.MixProject do
       {:timex, "~> 3.0"},
       {:stripity_stripe, "~> 3.2"},
       {:oban, "~> 2.19"},
-      {:google_api_calendar, "~> 0.26"},
       {:uuid, "~> 1.1"}
     ]
   end
