@@ -9,11 +9,12 @@ defmodule SyncMeWeb.AuthController do
 
   plug Ueberauth
 
-  def request(conn, _params) do
-    Phoenix.Controller.redirect(conn, to: Helpers.callback_url(conn))
+  def request(conn, params) do
+    redirect(conn, to: Helpers.callback_url(conn, params))
   end
 
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
+    IO.inspect("The info #{inspect(auth)}", label: "FROM GOOGLE AUTH")
     email = auth.info.email
 
     case Accounts.get_user_by_email(email) do

@@ -8,20 +8,7 @@ defmodule SyncMe.Accounts do
 
   alias SyncMe.Accounts.{User, UserToken, UserNotifier}
 
-  ## Database getters
 
-  @doc """
-  Gets a user by email.
-
-  ## Examples
-
-      iex> get_user_by_email("foo@example.com")
-      %User{}
-
-      iex> get_user_by_email("unknown@example.com")
-      nil
-
-  """
   def get_user_by_email(email) when is_binary(email) do
     Repo.get_by(User, email: email)
   end

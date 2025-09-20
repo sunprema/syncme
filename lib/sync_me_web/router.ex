@@ -112,6 +112,7 @@ defmodule SyncMeWeb.Router do
 
       # Stripe Connect
       live "/partner/stripe/connect", Partner.StripeConnectLive, :new
+      get "/calendar/connect", CalendarAuthController, :connect_calendar
     end
 
     post "/users/update-password", UserSessionController, :update_password

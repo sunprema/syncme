@@ -79,10 +79,11 @@ config :ueberauth, Ueberauth,
     google:
       {Ueberauth.Strategy.Google,
        [
-         default_scope: "email profile https://www.googleapis.com/auth/calendar.events",
+         #default_scope: "email profile https://www.googleapis.com/auth/calendar.events",
+         default_scope: "email profile",
          access_type: "offline",
          prompt: "consent"
-       ]}
+       ]},
   ]
 
 # Configure Ueberauth to use your Google OAuth credentials from environment variables.
