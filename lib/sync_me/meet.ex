@@ -55,11 +55,11 @@ defmodule SyncMe.Google.Meet do
            ) do
         {:ok, response} ->
           IO.inspect("#{inspect(response)}")
-          response
+          {:ok, Map.get(response.body, "hangoutLink", "Meeting link not available") }
 
         {:error, reason} ->
           IO.inspect("#{inspect(reason)}")
-          reason
+          {:error, reason }
       end
     end
   end

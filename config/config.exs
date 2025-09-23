@@ -79,10 +79,9 @@ config :ueberauth, Ueberauth,
     google:
       {Ueberauth.Strategy.Google,
        [
-         #default_scope: "email profile https://www.googleapis.com/auth/calendar.events",
-         default_scope: "email profile",
-         access_type: "offline",
-         prompt: "consent"
+        default_scope: "email profile https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.freebusy",
+        access_type: "offline",
+        prompt: "consent"
        ]},
   ]
 

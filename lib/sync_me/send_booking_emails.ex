@@ -15,12 +15,12 @@ defmodule SyncMe.Workers.SendBookingEmails do
 
     booking =
       case Meet.create_event(booking) do
-        {:ok, meet_link} ->
-          IO.inspect("Meeting link #{meet_link}",
+        {:ok, meeting_link} ->
+          IO.inspect("Meeting link #{meeting_link}",
             label: "Generated google meet link successfully"
           )
 
-          changeset = Booking.changeset(booking, %{video_conference_link: meet_link})
+          changeset = Booking.changeset(booking, %{video_conference_link: meeting_link})
           {:ok, updated_booking} = Repo.update(changeset)
           # Preload associations again on the updated struct
           Repo.preload(updated_booking, [:event_type, :guest_user, partner: :user])

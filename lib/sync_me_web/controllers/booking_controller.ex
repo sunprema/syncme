@@ -1,7 +1,7 @@
 defmodule SyncMeWeb.BookingEventController do
   use SyncMeWeb, :controller
 
-  def new_session(
+  def new_session2(
         conn,
         %{"event_type_id" => event_type_id, "encodedTimeSelected" => encodedTimeSelected}
       ) do
@@ -11,6 +11,20 @@ defmodule SyncMeWeb.BookingEventController do
       ~p"/book_event/return/login/#{event_type_id}/#{encodedTimeSelected}"
     )
     |> redirect(to: ~p"/users/log-in")
+  end
+
+  def new_session(
+        conn,
+        %{"event_type_id" => event_type_id, "encodedTimeSelected" => encodedTimeSelected}
+      ) do
+    scope = " email profile"
+
+    conn
+    |> put_session(
+      :user_return_to,
+      ~p"/book_event/return/login/#{event_type_id}/#{encodedTimeSelected}" )
+    |> redirect( to: "/auth/google?scope=#{URI.encode(scope)}&prompt=consent&access_type=offline")
+
   end
 
   def return_session(conn, %{

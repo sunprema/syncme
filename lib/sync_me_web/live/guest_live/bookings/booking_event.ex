@@ -181,9 +181,10 @@ defmodule SyncMeWeb.BookingEvent do
           {:ok, busy_intervals} ->
             filter_slots_by_busy_times(base_slots, event_type.duration_in_minutes, busy_intervals)
 
-          {:error, _reason} ->
+          {:error, reason} ->
             # Log the error but proceed with base availability
             # so the booking flow doesn't break.
+            IO.inspect(inspect(reason), label: "ASSIGN AVAILABLE SLOTS ERROR")
             base_slots
         end
       else

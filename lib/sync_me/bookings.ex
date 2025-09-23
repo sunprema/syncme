@@ -188,7 +188,7 @@ defmodule SyncMe.Bookings do
         # In a real app, you would now:
         # 1. Call Billing context for transactions.
         booking = Repo.preload(booking, [:event_type])
-        SendBookingEmails.new(%{booking_id: booking.id}) |> Oban.insert()
+        SendBookingEmails.new(%{booking_id: booking.id}, max_attempts: 2) |> Oban.insert()
         PubSub.broadcast(SyncMe.PubSub, "bookings", {:new_booking, booking})
         {:ok, booking}
       end
