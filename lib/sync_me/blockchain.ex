@@ -34,10 +34,26 @@ def get_transaction_status(txhash) do
     {:ok, receipt} -> {:ok, Map.get(receipt, "status")}
     _ -> {:error , "unexpected result"}
   end
+end
+#Ethereumex.HttpClient.post_request(Jason.encode!(%\{"method" => "hardhat_impersonateAccount", "params" => [whale], "jsonrpc" => "2.0", "id" => 1\}), [] )\
 
+def impersonate_user(user \\ @whale) do
+  payload = %{ "jsonrpc" => "2.0",
+              "id" => "100",
+              "method" => "hardhat_impersonateAccount",
+              "params" => [user] }
+  Ethereumex.HttpClient.post_request(Jason.encode!(payload), [])
+end
 
+def donate_usdc(to, value) do
+  Ethers.Contracts.ERC20.transfer(to, value)
+  |> Ethers.send_transaction( to: @usdc_coin, from: @whale)
 end
 
 
+def donate_eth_to_whale(from, value) do
+
+  Ethers.send_transaction( %{value: value, to: @whale,}, from: from, max_fee_per_gas: 4995561)
+end
 
 end
