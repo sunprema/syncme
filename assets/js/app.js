@@ -52,6 +52,98 @@ let CalendarHook = {
 let Hooks = {};
 Hooks.CalendarHook = CalendarHook ; 
 
+// Base Account sign-in hook
+let BaseSignInHook = {
+  mounted() {
+    const runSignIn = async () => {
+      try {
+        if (!window.createBaseAccountSDK) {
+          this.pushEvent("base-sign-in-error", { error: "Base SDK not loaded" });
+          return;
+        }
+
+        const provider = window.createBaseAccountSDK({
+          appName: "SyncMe.link",
+          appLogoUrl: "https://base.org/logo.png",
+        }).getProvider();
+
+        const nonce = crypto.randomUUID().replace(/-/g, "");
+
+        const { accounts } = await provider.request({
+          method: "wallet_connect",
+          params: [
+            {
+              version: "1",
+              capabilities: {
+                signInWithEthereum: {
+                  nonce,
+                  chainId: "0x2105", // Base Mainnet (8453)
+                },
+              },
+            },
+          ],
+        });
+
+        const { address } = accounts[0];
+        const { message, signature } = accounts[0].capabilities.signInWithEthereum;
+
+        this.pushEvent("base-signed-in", { address, message, signature });
+      } catch (error) {
+        this.pushEvent("base-sign-in-error", { error: error?.message || String(error) });
+      }
+    };
+
+    // Optional: allow server to trigger sign-in if needed
+    this.handleEvent("start-base-sign-in", () => runSignIn());
+
+    // Primary: run on click
+    this.el.addEventListener("click", () => {
+      runSignIn();
+    });
+
+    // Handle wallet auth submission
+    this.handleEvent("submit-wallet-auth", ({ address, message, signature }) => {
+      // Create a form and submit it to the wallet auth endpoint
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "/wallet/signin";
+      
+      // Add CSRF token
+      const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
+      const csrfInput = document.createElement("input");
+      csrfInput.type = "hidden";
+      csrfInput.name = "_csrf_token";
+      csrfInput.value = csrfToken;
+      form.appendChild(csrfInput);
+      
+      // Add SIWE data
+      const addressInput = document.createElement("input");
+      addressInput.type = "hidden";
+      addressInput.name = "address";
+      addressInput.value = address;
+      form.appendChild(addressInput);
+      
+      const messageInput = document.createElement("input");
+      messageInput.type = "hidden";
+      messageInput.name = "message";
+      messageInput.value = message;
+      form.appendChild(messageInput);
+      
+      const signatureInput = document.createElement("input");
+      signatureInput.type = "hidden";
+      signatureInput.name = "signature";
+      signatureInput.value = signature;
+      form.appendChild(signatureInput);
+      
+      // Submit the form
+      document.body.appendChild(form);
+      form.submit();
+    });
+  },
+};
+
+Hooks.BaseSignInHook = BaseSignInHook;
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,

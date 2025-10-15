@@ -3,6 +3,8 @@ defmodule SyncMeWeb.UserLive.Login do
 
   alias SyncMe.Accounts
 
+   @eth_signed_message_prefix "\x19Ethereum Signed Message:\n"
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -65,6 +67,9 @@ defmodule SyncMeWeb.UserLive.Login do
           </svg>
           Continue with Google
         </.link>
+        <button class="btn btn-outline w-full font-normal" id="base-login" phx-hook="BaseSignInHook">
+          Sign in with Base
+        </button>
       </div>
 
       <footer class="footer sm:footer-horizontal absolute bottom-4 left-0 footer-center  text-base-content p-4">
@@ -113,7 +118,30 @@ defmodule SyncMeWeb.UserLive.Login do
      |> push_navigate(to: ~p"/users/log-in")}
   end
 
+  # Phoenix JS Hook events from BaseSignInHook
+  @impl true
+  def handle_event("base-signed-in", %{"address" => address, "message" => message, "signature" => signature}, socket) do
+    # Send the SIWE data to the wallet authentication endpoint
+    {:noreply,
+     socket
+     |> push_event("submit-wallet-auth", %{
+       address: address,
+       message: message,
+       signature: signature
+     })}
+  end
+
+  @impl true
+  def handle_event("base-sign-in-error", %{"error" => error}, socket) do
+    {:noreply, put_flash(socket, :error, "Base sign-in failed: #{error}")}
+  end
+
   defp local_mail_adapter? do
     Application.get_env(:sync_me, SyncMe.Mailer)[:adapter] == Swoosh.Adapters.Local
   end
+
+
+
+
+
 end

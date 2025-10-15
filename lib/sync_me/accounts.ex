@@ -14,6 +14,13 @@ defmodule SyncMe.Accounts do
   end
 
   @doc """
+  Gets a user by wallet address.
+  """
+  def get_user_by_wallet_address(wallet_address) when is_binary(wallet_address) do
+    Repo.get_by(User, wallet_address: wallet_address)
+  end
+
+  @doc """
   Gets a user by email and password.
 
   ## Examples
@@ -65,6 +72,57 @@ defmodule SyncMe.Accounts do
     %User{}
     |> User.email_changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  Registers a user with wallet authentication.
+
+  ## Examples
+
+      iex> register_wallet_user(%{wallet_address: "0x...", email: "user@example.com"})
+      {:ok, %User{}}
+
+      iex> register_wallet_user(%{wallet_address: "invalid"})
+      {:error, %Ecto.Changeset{}}
+  """
+  def register_wallet_user(attrs) do
+    %User{}
+    |> User.wallet_changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Creates or updates a user based on wallet authentication.
+
+  If a user exists with the wallet address, returns that user.
+  If a user exists with the email but no wallet, updates with wallet.
+  If no user exists, creates a new one.
+  """
+  def create_or_update_wallet_user(%{wallet_address: wallet_address} = attrs) do
+    case get_user_by_wallet_address(wallet_address) do
+      nil ->
+        # Check if user exists with email but no wallet
+        email = Map.get(attrs, :email)
+        if email do
+          case get_user_by_email(email) do
+            nil -> register_wallet_user(attrs)
+            existing_user -> update_user_wallet(existing_user, attrs)
+          end
+        else
+          register_wallet_user(attrs)
+        end
+
+      user -> {:ok, user}
+    end
+  end
+
+  @doc """
+  Updates a user's wallet information.
+  """
+  def update_user_wallet(user, attrs) do
+    user
+    |> User.wallet_changeset(attrs)
+    |> Repo.update()
   end
 
   ## Settings

@@ -24,6 +24,11 @@ defmodule SyncMeWeb.Router do
     delete "/logout", AuthController, :delete
   end
 
+  scope "/wallet", SyncMeWeb do
+    pipe_through :browser
+    post "/signin", WalletAuthController, :signin
+  end
+
   scope "/", SyncMeWeb do
     pipe_through :browser
 

@@ -66,7 +66,9 @@ defmodule SyncMe.MixProject do
       {:timex, "~> 3.0"},
       {:stripity_stripe, "~> 3.2"},
       {:oban, "~> 2.19"},
-      {:uuid, "~> 1.1"}
+      {:uuid, "~> 1.1"},
+      {:ethers, "~> 0.6.7"},
+      {:ex_secp256k1, "~> 0.7.2"}
     ]
   end
 

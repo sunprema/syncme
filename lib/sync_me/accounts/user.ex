@@ -13,6 +13,8 @@ defmodule SyncMe.Accounts.User do
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
     field :is_oauth_user, :boolean
+    field :wallet_address, :string
+    field :wallet_type, :string, default: "base"
     has_one :partner, SyncMe.Partners.Partner
 
     # A User is a guest in many bookings
@@ -94,6 +96,18 @@ defmodule SyncMe.Accounts.User do
     |> put_change(:is_oauth_user, true)
   end
 
+  @doc """
+  A user changeset for wallet-based registration.
+  """
+  def wallet_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:wallet_address, :wallet_type, :email, :first_name, :last_name])
+    |> validate_required([:wallet_address])
+    |> validate_wallet_address()
+    |> validate_email(opts)
+    |> unique_constraint(:wallet_address)
+  end
+
   defp validate_password(changeset, opts) do
     changeset
     |> validate_required([:password])
@@ -142,5 +156,13 @@ defmodule SyncMe.Accounts.User do
   def valid_password?(_, _) do
     Argon2.no_user_verify()
     false
+  end
+
+  defp validate_wallet_address(changeset) do
+    changeset
+    |> validate_format(:wallet_address, ~r/^0x[a-fA-F0-9]{40}$/,
+      message: "must be a valid Ethereum address"
+    )
+    |> validate_length(:wallet_address, is: 42)
   end
 end
