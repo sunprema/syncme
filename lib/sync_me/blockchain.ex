@@ -28,7 +28,15 @@ def create_event_type( slug, title, description, duration_minutes, fee_amount ) 
    |> Ethers.send_transaction(from: @alice)
 end
 
+def get_transaction_status(txhash) do
+  case Ethers.get_transaction_receipt(txhash) do
+    {:ok, nil} ->    {:error, nil}
+    {:ok, receipt} -> {:ok, Map.get(receipt, "status")}
+    _ -> {:error , "unexpected result"}
+  end
 
+
+end
 
 
 
