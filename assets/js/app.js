@@ -86,6 +86,7 @@ let BaseSignInHook = {
 
         const { address } = accounts[0];
         const { message, signature } = accounts[0].capabilities.signInWithEthereum;
+        window.base_account = accounts
 
         this.pushEvent("base-signed-in", { address, message, signature });
       } catch (error) {

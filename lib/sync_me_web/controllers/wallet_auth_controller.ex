@@ -5,7 +5,7 @@ defmodule SyncMeWeb.WalletAuthController do
   alias SyncMeWeb.UserAuth
 
   def signin(conn, %{"address" => address, "message" => message, "signature" => signature}) do
-    case SyncMe.Siwe.verify_signature(message, signature, address) do
+    case SyncMe.Siwe.verify_siwe_signature(message, signature, address) do
       {:ok, verified_address} ->
         case Accounts.create_or_update_wallet_user(%{wallet_address: verified_address}) do
           {:ok, user} ->
@@ -32,4 +32,3 @@ defmodule SyncMeWeb.WalletAuthController do
     |> redirect(to: ~p"/users/log-in")
   end
 end
-
