@@ -69,6 +69,7 @@ defmodule SyncMe.MixProject do
       {:uuid, "~> 1.1"},
       {:ethers, "~> 0.6.7"},
       {:ex_secp256k1, "~> 0.7.2"},
+      {:ex_keccak, "~> 0.7.8"},
       {:rustler, "~> 0.37.1"}
 
     ]

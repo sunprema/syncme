@@ -25,6 +25,15 @@ import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import "cally";
 
+import { createPublicClient, http } from 'viem'
+import { base } from 'viem/chains'
+
+
+const publicClient = createPublicClient({ 
+  chain: base,   
+  transport: http(), 
+});
+
 let CalendarHook = {
   mounted() {
     this.el.addEventListener("change", (e) => {
@@ -87,8 +96,9 @@ let BaseSignInHook = {
         const { address } = accounts[0];
         const { message, signature } = accounts[0].capabilities.signInWithEthereum;
         window.base_account = accounts
-
-        this.pushEvent("base-signed-in", { address, message, signature });
+        const isValidSignature = await publicClient.verifyMessage({address, message, signature})
+        alert(`The signature is valid ? - ${isValidSignature}`);
+        //this.pushEvent("base-signed-in", { address, message, signature });
       } catch (error) {
         this.pushEvent("base-sign-in-error", { error: error?.message || String(error) });
       }
