@@ -61,8 +61,10 @@ let CalendarHook = {
 let Hooks = {};
 Hooks.CalendarHook = CalendarHook ; 
 
+const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
 // Base Account sign-in hook
 let BaseSignInHook = {
+  
   mounted() {
     const runSignIn = async () => {
       try {
@@ -98,7 +100,7 @@ let BaseSignInHook = {
         window.base_account = accounts
         const isValidSignature = await publicClient.verifyMessage({address, message, signature})
         alert(`The signature is valid ? - ${isValidSignature}`);
-        this.pushEvent("base-signed-in", { address, message, signature });
+        this.pushEvent("base-signed-in", { "csrf_token" :csrfToken, address, message, signature });
       } catch (error) {
         this.pushEvent("base-sign-in-error", { error: error?.message || String(error) });
       }
@@ -120,7 +122,7 @@ let BaseSignInHook = {
       form.action = "/wallet/signin";
       
       // Add CSRF token
-      const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
+      
       const csrfInput = document.createElement("input");
       csrfInput.type = "hidden";
       csrfInput.name = "_csrf_token";
@@ -155,7 +157,7 @@ let BaseSignInHook = {
 
 Hooks.BaseSignInHook = BaseSignInHook;
 
-const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},

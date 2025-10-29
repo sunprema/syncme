@@ -71,7 +71,6 @@ defmodule SyncMe.MixProject do
       {:ex_secp256k1, "~> 0.7.2"},
       {:ex_keccak, "~> 0.7.8"},
       {:rustler, "~> 0.37.1"}
-
     ]
   end
 

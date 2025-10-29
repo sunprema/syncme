@@ -5,9 +5,11 @@ defmodule SyncMeWeb.WalletAuthController do
   alias SyncMeWeb.UserAuth
 
   def signin(conn, %{"address" => address, "message" => message, "signature" => signature}) do
-    case SyncMe.Siwe.verify_siwe_signature(message, signature, address) do
-      {:ok, verified_address} ->
-        case Accounts.create_or_update_wallet_user(%{wallet_address: verified_address}) do
+
+    IO.inspect("The values inside ")
+    case SyncMe.Authenticator.authenticated_user?(address, message, signature) do
+      true ->
+        case Accounts.create_or_update_wallet_user(%{wallet_address: address}) do
           {:ok, user} ->
             conn
             |> put_flash(:info, "Successfully signed in with Base!")
@@ -18,6 +20,11 @@ defmodule SyncMeWeb.WalletAuthController do
             |> put_flash(:error, "Failed to create account: #{inspect(changeset.errors)}")
             |> redirect(to: ~p"/users/log-in")
         end
+
+      false ->
+        conn
+        |> put_flash(:error, "Signature verification failed")
+        |> redirect(to: ~p"/users/log-in")
 
       {:error, reason} ->
         conn

@@ -22,9 +22,9 @@ defmodule SyncMeWeb.BookingEventController do
     conn
     |> put_session(
       :user_return_to,
-      ~p"/book_event/return/login/#{event_type_id}/#{encodedTimeSelected}" )
-    |> redirect( to: "/auth/google?scope=#{URI.encode(scope)}&prompt=consent&access_type=offline")
-
+      ~p"/book_event/return/login/#{event_type_id}/#{encodedTimeSelected}"
+    )
+    |> redirect(to: "/auth/google?scope=#{URI.encode(scope)}&prompt=consent&access_type=offline")
   end
 
   def return_session(conn, %{

@@ -133,6 +133,7 @@ defmodule SyncMeWeb.Router do
       live "/users/log-in/:token", UserLive.Confirmation, :new
     end
 
+    post "/wallet/signin", WalletAuthController, :signin
     post "/users/log-in", UserSessionController, :create
     delete "/users/log-out", UserSessionController, :delete
   end

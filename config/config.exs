@@ -79,10 +79,11 @@ config :ueberauth, Ueberauth,
     google:
       {Ueberauth.Strategy.Google,
        [
-        default_scope: "email profile https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.freebusy",
-        access_type: "offline",
-        prompt: "consent"
-       ]},
+         default_scope:
+           "email profile https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.freebusy",
+         access_type: "offline",
+         prompt: "consent"
+       ]}
   ]
 
 # Configure Ueberauth to use your Google OAuth credentials from environment variables.
@@ -109,12 +110,10 @@ config :sync_me, :blockchain,
   counter_contract_address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
   syncme_escrow_contract_address: "0xcD124Ab6d902Ba04006E01F173614544e8270580",
   usdc_coin: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-
   admin: "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
   whale: "0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055",
   alice: "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc",
   bob: "0x90f79bf6eb2c4f870365e785982e1f101e93b906"
-
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

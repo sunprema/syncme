@@ -8,7 +8,6 @@ defmodule SyncMe.Accounts do
 
   alias SyncMe.Accounts.{User, UserToken, UserNotifier}
 
-
   def get_user_by_email(email) when is_binary(email) do
     Repo.get_by(User, email: email)
   end
@@ -103,6 +102,7 @@ defmodule SyncMe.Accounts do
       nil ->
         # Check if user exists with email but no wallet
         email = Map.get(attrs, :email)
+
         if email do
           case get_user_by_email(email) do
             nil -> register_wallet_user(attrs)
@@ -112,7 +112,8 @@ defmodule SyncMe.Accounts do
           register_wallet_user(attrs)
         end
 
-      user -> {:ok, user}
+      user ->
+        {:ok, user}
     end
   end
 

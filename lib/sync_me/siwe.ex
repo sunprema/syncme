@@ -8,5 +8,4 @@ defmodule SyncMe.Siwe do
     IO.inspect("#{address} , #{message}, #{signature}", label: "Input to verify_siwe_signature")
     {:ok, address}
   end
-
 end

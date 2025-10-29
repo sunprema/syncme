@@ -3,8 +3,6 @@ defmodule SyncMeWeb.UserLive.Login do
 
   alias SyncMe.Accounts
 
-   @eth_signed_message_prefix "\x19Ethereum Signed Message:\n"
-
   @impl true
   def render(assigns) do
     ~H"""
@@ -86,14 +84,15 @@ defmodule SyncMeWeb.UserLive.Login do
   end
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(params, _session, socket) do
     email =
       Phoenix.Flash.get(socket.assigns.flash, :email) ||
         get_in(socket.assigns, [:current_scope, Access.key(:user), Access.key(:email)])
 
     form = to_form(%{"email" => email}, as: "user")
+    csrf_token = get_connect_params(socket)["_csrf_token"]
 
-    {:ok, assign(socket, form: form, trigger_submit: false)}
+    {:ok, assign(socket, form: form, trigger_submit: false, csrf_token: csrf_token)}
   end
 
   @impl true
@@ -120,14 +119,30 @@ defmodule SyncMeWeb.UserLive.Login do
 
   # Phoenix JS Hook events from BaseSignInHook
   @impl true
-  def handle_event("base-signed-in", %{"address" => address, "message" => message, "signature" => signature}, socket) do
-
-    socket = case SyncMe.Authenticator.authenticated_user?(address, message, signature) do
-      true -> socket |> put_flash(:info, "Login Successful !")
-      false -> socket |> put_flash(:error, "Login failed !")
+  def handle_event(
+        "base-signed-in",
+        %{
+          "csrf_token" => csrf_token,
+          "address" => address,
+          "message" => message,
+          "signature" => signature
+        },
+        socket
+      ) do
+    IO.inspect("The session token #{socket.assigns[:csrf_token]}, and the token passed #{csrf_token}" , label: "CHECKING TOKENS")
+    if socket.assigns[:csrf_token] == csrf_token do
+      {:noreply,
+       socket
+       |> push_event("submit-wallet-auth", %{
+         "address" => address,
+         "message" => message,
+         "signature" => signature
+       })}
+    else
+      {:noreply,
+       socket
+       |> put_flash(:error, "The form is not from the same live view")}
     end
-    {:noreply, socket}
-
   end
 
   @impl true
@@ -138,9 +153,4 @@ defmodule SyncMeWeb.UserLive.Login do
   defp local_mail_adapter? do
     Application.get_env(:sync_me, SyncMe.Mailer)[:adapter] == Swoosh.Adapters.Local
   end
-
-
-
-
-
 end
