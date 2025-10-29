@@ -109,7 +109,7 @@ config :sync_me, :blockchain,
   counter_contract_address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
   syncme_escrow_contract_address: "0xcD124Ab6d902Ba04006E01F173614544e8270580",
   usdc_coin: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-  erc6492_authenticator: ,
+
   admin: "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
   whale: "0xEe7aE85f2Fe2239E27D9c1E23fFFe168D63b4055",
   alice: "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc",
