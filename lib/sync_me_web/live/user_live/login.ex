@@ -121,14 +121,13 @@ defmodule SyncMeWeb.UserLive.Login do
   # Phoenix JS Hook events from BaseSignInHook
   @impl true
   def handle_event("base-signed-in", %{"address" => address, "message" => message, "signature" => signature}, socket) do
-    # Send the SIWE data to the wallet authentication endpoint
-    {:noreply,
-     socket
-     |> push_event("submit-wallet-auth", %{
-       address: address,
-       message: message,
-       signature: signature
-     })}
+
+    socket = case SyncMe.Authenticator.authenticated_user?(address, message, signature) do
+      true -> socket |> put_flash(:info, "Login Successful !")
+      false -> socket |> put_flash(:error, "Login failed !")
+    end
+    {:noreply, socket}
+
   end
 
   @impl true
