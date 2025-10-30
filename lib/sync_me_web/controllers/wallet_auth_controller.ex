@@ -4,10 +4,21 @@ defmodule SyncMeWeb.WalletAuthController do
   alias SyncMe.Accounts
   alias SyncMeWeb.UserAuth
 
-  def signin(conn, %{"address" => address, "message" => message, "signature" => signature}) do
 
-    IO.inspect("The values inside ")
-    case SyncMe.Authenticator.authenticated_user?(address, message, signature) do
+  defp normalize_newlines(str) do
+    String.replace(str, "\r\n", "\n")
+  end
+
+  def signin(conn, %{"address" => address, "message" => message, "signature" => signature}) do
+    IO.inspect("#######################")
+    IO.inspect(address)
+    IO.inspect("----------------------------")
+    IO.inspect(message)
+    IO.inspect("----------------------------")
+    IO.inspect(signature)
+    IO.inspect("#######################")
+    normalized_message = normalize_newlines(message)
+    case SyncMe.Authenticator.authenticated_user?(address, normalized_message, signature) do
       true ->
         case Accounts.create_or_update_wallet_user(%{wallet_address: address}) do
           {:ok, user} ->
