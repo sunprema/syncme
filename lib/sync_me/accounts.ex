@@ -347,6 +347,12 @@ defmodule SyncMe.Accounts do
     |> Repo.insert()
   end
 
+  def update_user_data_from_google(user, attrs) do
+    user
+    |> User.google_auth_changeset(attrs)
+    |> Repo.update()
+  end
+
   def preload_partner(user) do
     Repo.preload(user, [:partner])
   end

@@ -166,7 +166,9 @@ defmodule SyncMeWeb.Layouts do
             </.link>
           </li>
           <li>
-            <h3>Address - {"#{String.slice(@current_scope.user.wallet_address, 1..8)}...#{String.slice(@current_scope.user.wallet_address, -8..-1)}"}</h3>
+            <h3 :if={not is_nil(@current_scope.user.wallet_address)}>
+              Address - {"#{String.slice(@current_scope.user.wallet_address, 1..8)}...#{String.slice(@current_scope.user.wallet_address, -8..-1)}"}
+            </h3>
           </li>
         </ul>
       </div>

@@ -96,10 +96,17 @@ defmodule SyncMe.Accounts.User do
     |> put_change(:is_oauth_user, true)
   end
 
+  def google_auth_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :first_name, :last_name])
+    |> validate_required([:first_name, :last_name, :email])
+    |> validate_email(opts)
+  end
+
   @doc """
   A user changeset for wallet-based registration.
   """
-  def wallet_changeset(user, attrs, opts \\ []) do
+  def wallet_changeset(user, attrs, _opts \\ []) do
     user
     |> cast(attrs, [:wallet_address, :wallet_type, :email, :first_name, :last_name])
     |> validate_required([:wallet_address])
