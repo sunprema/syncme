@@ -165,6 +165,9 @@ defmodule SyncMeWeb.Layouts do
               Past Meetings
             </.link>
           </li>
+          <li>
+            <h3>Address - {"#{String.slice(@current_scope.user.wallet_address, 1..8)}...#{String.slice(@current_scope.user.wallet_address, -8..-1)}"}</h3>
+          </li>
         </ul>
       </div>
     </div>

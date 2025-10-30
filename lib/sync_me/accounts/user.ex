@@ -104,7 +104,7 @@ defmodule SyncMe.Accounts.User do
     |> cast(attrs, [:wallet_address, :wallet_type, :email, :first_name, :last_name])
     |> validate_required([:wallet_address])
     |> validate_wallet_address()
-    |> validate_email(opts)
+    #|> validate_email(opts)
     |> unique_constraint(:wallet_address)
   end
 
