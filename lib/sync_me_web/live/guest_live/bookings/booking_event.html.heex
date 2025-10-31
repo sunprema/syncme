@@ -97,7 +97,7 @@
       </div>
     <% end %>
 
-    <%= if @live_action == :details do %>
+    <%= if @live_action in [:details, :pay_confirm] do %>
       <div class=" card w-96 text-xl bg-white p-8 gap-2  md:min-w-2xl">
         <div class="grid grid-cols-[10px_auto] items-center gap-x-4 gap-y-2">
           <.icon name="hero-calendar" />
@@ -135,11 +135,23 @@
           </.link>
 
           <button
+            :if={@live_action == :details}
+            id="pay_confirm_btn"
             class="btn btn-neutral"
-            phx-click="save_booking"
+            phx-hook="BaseSignInHook"
           >
-            Confirm
+            Base login
           </button>
+
+          <button
+            :if={@live_action == :pay_confirm}
+            id="pay_confirm_btn"
+            class="btn btn-neutral"
+            phx-hook="BasePaymentHook"
+          >
+            Pay & Confirm
+          </button>
+
         </div>
       </div>
     <% end %>

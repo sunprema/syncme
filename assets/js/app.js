@@ -27,7 +27,7 @@ import "cally";
 
 import { createPublicClient, http } from 'viem'
 import { base } from 'viem/chains'
-
+import { BasePaymentHook } from "./hooks/booking_hook";
 
 const publicClient = createPublicClient({ 
   chain: base,   
@@ -58,8 +58,14 @@ let CalendarHook = {
   // You can add other callbacks here if needed
 };
 
+const provider = window.createBaseAccountSDK({
+          appName: "SyncMe.link",
+          appLogoUrl: "https://base.org/logo.png",
+}).getProvider();
+
 let Hooks = {};
 Hooks.CalendarHook = CalendarHook ; 
+Hooks.BasePaymentHook = BasePaymentHook(provider)
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
 // Base Account sign-in hook
@@ -72,12 +78,6 @@ let BaseSignInHook = {
           this.pushEvent("base-sign-in-error", { error: "Base SDK not loaded" });
           return;
         }
-
-        const provider = window.createBaseAccountSDK({
-          appName: "SyncMe.link",
-          appLogoUrl: "https://base.org/logo.png",
-        }).getProvider();
-
         const nonce = crypto.randomUUID().replace(/-/g, "");
 
         const { accounts } = await provider.request({
@@ -100,7 +100,8 @@ let BaseSignInHook = {
         window.base_account = accounts
         const isValidSignature = await publicClient.verifyMessage({address, message, signature})
         alert(`The signature is valid ? - ${isValidSignature}`);
-        this.pushEvent("base-signed-in", { "csrf_token" :csrfToken, address, message, signature });
+        //this.pushEvent("base-signed-in", { "csrf_token" :csrfToken, address, message, signature });
+        submitWalletAuth({ address, message, signature })
       } catch (error) {
         this.pushEvent("base-sign-in-error", { error: error?.message || String(error) });
       }
@@ -115,7 +116,7 @@ let BaseSignInHook = {
     });
 
     // Handle wallet auth submission
-    this.handleEvent("submit-wallet-auth", ({ address, message, signature }) => {
+    const submitWalletAuth = ({ address, message, signature }) => {
       // Create a form and submit it to the wallet auth endpoint
       const form = document.createElement("form");
       form.method = "POST";
@@ -151,7 +152,7 @@ let BaseSignInHook = {
       // Submit the form
       document.body.appendChild(form);
       form.submit();
-    });
+    };
   },
 };
 

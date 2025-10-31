@@ -61,6 +61,15 @@ defmodule SyncMeWeb.BookingEvent do
 
   @impl true
   def handle_event("save_booking", _unsigned_params, socket) do
+    {:noreply,
+      socket
+      |> put_flash(:info, "Meeting will be booked after making payment")
+    }
+  end
+
+
+  @impl true
+  def handle_event("save_booking_old", _unsigned_params, socket) do
     socket =
       case Map.get(socket.assigns, :current_scope) do
         nil ->

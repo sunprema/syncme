@@ -90,7 +90,7 @@ defmodule SyncMeWeb.Router do
           BookingEventController,
           :return_session
 
-      live "/book_event/auth/details/:event_type_id/:encodedTimeSelected", BookingEvent, :details
+      live "/book_event/auth/details/:event_type_id/:encodedTimeSelected", BookingEvent, :pay_confirm
       live "/booking/success", BookingCompletionLive, :success
       live "/booking/view/:booking_id", BookingView, :show
     end
@@ -126,6 +126,9 @@ defmodule SyncMeWeb.Router do
   scope "/", SyncMeWeb do
     pipe_through [:browser]
 
+    post "/users/log-in", UserSessionController, :create
+    delete "/users/log-out", UserSessionController, :delete
+
     live_session :current_user,
       on_mount: [{SyncMeWeb.UserAuth, :mount_current_scope}] do
       live "/users/register", UserLive.Registration, :new
@@ -133,8 +136,6 @@ defmodule SyncMeWeb.Router do
       live "/users/log-in/:token", UserLive.Confirmation, :new
     end
 
-    post "/wallet/signin", WalletAuthController, :signin
-    post "/users/log-in", UserSessionController, :create
-    delete "/users/log-out", UserSessionController, :delete
+
   end
 end
