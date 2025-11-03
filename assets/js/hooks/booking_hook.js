@@ -20,8 +20,8 @@ export let BasePaymentHook = (sdkProvider) => ({
     
     mounted(){
 
-        const runSignInAndRequestSpendPermission = async () => {
-              try {
+        const payAndBookEvent = async () => {
+            try {
                 if (!window.createBaseAccountSDK) {
                   this.pushEvent("base-sign-in-error", { error: "Base SDK not loaded" });
                   return;
@@ -46,22 +46,6 @@ export let BasePaymentHook = (sdkProvider) => ({
                 const { address } = accounts[0];
                 const { message, signature } = accounts[0].capabilities.signInWithEthereum;
                 
-                /*
-                const permission = await requestSpendPermission({
-                    account: address, //0x2fC4fb89D48B5Dd5e7B7eCC87750660bC6B078C6
-                    spender: syncme_contract,//Approving syncme as the spender
-                    token: "0x036CbD53842c5426634e7929541eC2318f3dCF7e", //USDC in base sepolia
-                    chainId: 84532,
-                    allowance: 1_000_000n,
-                    periodInDays: 1,
-                    provider: provider,
-                    testnet: true,
-                    
-                });                
-                
-                console.log("Spend Permisions", permission);
-                */
-                    
                 const booking_call_data = encodeFunctionData({
                     abi: SyncMeABI,
                     functionName: 'createEventType',
@@ -70,40 +54,31 @@ export let BasePaymentHook = (sdkProvider) => ({
 
                 console.log(booking_call_data);
                 
-                // Make eth_call with your ABI
-                // Switch to Base Sepolia (chain ID: 84532)
-                /*
-                await provider.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0x14a34' }] // 84532 in hex
-                });
-                */
+                
                 //request spend permission
-            approve_spending_call =  {
-                to: base_sepolia_usdc_address,
-                value: '0x0',
-                data: encodeFunctionData({
-                    abi: ERC20ABI,
-                    functionName: 'approve',
-                    args: [syncme_contract, 10_000_000]
-                })
-            }
+                approve_spending_call =  {
+                    to: base_sepolia_usdc_address,
+                    value: '0x0',
+                    data: encodeFunctionData({
+                        abi: ERC20ABI,
+                        functionName: 'approve',
+                        args: [syncme_contract, 10_000_000]
+                    })
+                }
 
-            create_eventtype_call = {
-                    to: syncme_contract,
-                    data: booking_call_data // Encode using your ABI                    
-            }
+                create_eventtype_call = {
+                        to: syncme_contract,
+                        data: booking_call_data // Encode using your ABI                    
+                }
             
-            create_booking_call = {
-                to: syncme_contract,
-                data: encodeFunctionData({
-                    abi: SyncMeABI,
-                    functionName: 'bookEvent',
-                    args: [4, 1763062907]
-                })
-
-            }
-
+                create_booking_call = {
+                    to: syncme_contract,
+                    data: encodeFunctionData({
+                        abi: SyncMeABI,
+                        functionName: 'bookEvent',
+                        args: [4, 1763062907]
+                    })
+                }
                 const calls =[
                     approve_spending_call,
                     //create_eventtype_call
@@ -139,37 +114,22 @@ export let BasePaymentHook = (sdkProvider) => ({
                         }
                 }]
                 });
+
+                this.pushEvent("save_booking", {txhash: result});
+
                 window.provider = provider
                 window.result = result
                 console.log("the result is ", result)
-                /*
-                const result = await provider.request({
-                "id": 190,
-                "jsonrpc": "2.0",
-                method: 'eth_sendTransaction',                
-                params: [{
-                    from: address,
-                    to: syncme_contract,
-                    "gas": "0x76c0",
-                    "gasPrice": "0x9184e72a000",
-                    data: booking_call_data // Encode using your ABI
-                }]
-                });
-                
-                */
-                }
-                
-
-
-                catch (error) {
-                    console.log(error);
-                    this.pushEvent("base-sign-in-error", { error: error?.message || String(error) });
-                }
             }
+            catch (error) {
+                console.log(error);
+                    this.pushEvent("base-sign-in-error", { error: error?.message || String(error) });
+            }
+        }
 
         this.el.addEventListener("click" ,() =>{
             console.log("Will process payment here");
-            runSignInAndRequestSpendPermission();
+            payAndBookEvent();
         })
     }
 
