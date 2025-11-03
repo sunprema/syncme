@@ -68,7 +68,7 @@ defmodule SyncMe.Blockchain do
   def verify_address() do
     payload = %{
       "jsonrpc" => "2.0",
-      "id" => "100",
+      "id" => "101",
       "method" => "eth_call",
       "params" => [
         %{
@@ -81,6 +81,7 @@ defmodule SyncMe.Blockchain do
 
     case Ethereumex.HttpClient.post_request(Jason.encode!(payload),
            url: "https://mainnet.base.org"
+           #url: "http://127.0.0.1:8545"
          ) do
       {:ok, "0x01"} -> true
       _ -> false

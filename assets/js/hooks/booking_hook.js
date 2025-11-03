@@ -1,18 +1,133 @@
-export let BasePaymentHook = (sdkProvider) => ({    
+import { requestSpendPermission } from "@base-org/account/spend-permission";
+import { encodeFunctionData, numberToHex} from 'viem'
+import { SyncMeABI } from "./syncme_abi";
 
+
+
+const provider = window.createBaseAccountSDK({
+          appName: "SyncMe.link",
+          appLogoUrl: "https://base.org/logo.png",
+          appChainIds: [84532]
+    }).getProvider();
+
+const my_addess = "0x652574636c202993d19f99a9a5bac9833787f74b"    
+const syncme_contract = "0xCc8233726f4520b74766dEa8681d2a2f4789FFFA"
+const paymasterServiceUrl = "https://api.developer.coinbase.com/rpc/v1/base-sepolia/C4yrDOwWBAyXUVSpjI97Nntf1XIfmDbW"
+export let BasePaymentHook = (sdkProvider) => ({    
     
-const permission = await requestSpendPermission({
-  account: "0x...",
-  spender: "0x...",
-  token: "0x...",
-  chainId: 8453, // or any other supported chain
-  allowance: 1_000_000n,
-  periodInDays: 1,
-  provider: sdkProvider,
-});
     mounted(){
+
+        const runSignInAndRequestSpendPermission = async () => {
+              try {
+                if (!window.createBaseAccountSDK) {
+                  this.pushEvent("base-sign-in-error", { error: "Base SDK not loaded" });
+                  return;
+                }
+                const nonce = crypto.randomUUID().replace(/-/g, "");
+        
+                const { accounts } = await provider.request({
+                  method: "wallet_connect",
+                  params: [
+                    {
+                        version: "1",
+                        capabilities: {
+                            signInWithEthereum: {
+                                nonce,
+                                chainId: "0x14a34",// "0x2105", // Base Mainnet (8453)
+                            },
+                        },
+                    }
+                  ],
+                });
+
+                const { address } = accounts[0];
+                const { message, signature } = accounts[0].capabilities.signInWithEthereum;
+                
+
+                const permission = await requestSpendPermission({
+                    account: address, //0x2fC4fb89D48B5Dd5e7B7eCC87750660bC6B078C6
+                    spender: syncme_contract,//Approving syncme as the spender
+                    token: "0x036CbD53842c5426634e7929541eC2318f3dCF7e", //USDC in base sepolia
+                    chainId: 84532,
+                    allowance: 1_000_000n,
+                    periodInDays: 1,
+                    provider: provider,
+                    testnet: true,
+                    
+                });                
+                console.log("Spend Permisions", permission);
+                
+                    
+                const booking_call_data = encodeFunctionData({
+                    abi: SyncMeABI,
+                    functionName: 'createEventType',
+                    args: ["intro", "intro", "this is my intro", 60, 1]
+                });
+
+                console.log(booking_call_data);
+                
+                // Make eth_call with your ABI
+                // Switch to Base Sepolia (chain ID: 84532)
+                /*
+                await provider.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x14a34' }] // 84532 in hex
+                });
+                */
+
+                const calls =[
+                    {
+                    to: syncme_contract,
+                    "gas": "0x76c0",
+                    "gasPrice": "0x9184e72a000",
+                    data: booking_call_data // Encode using your ABI                    
+                    }
+                ]
+
+                // Send the transaction with paymaster capabilities
+                const result = await provider.request({
+                    method: 'wallet_sendCalls',
+                    params: [{
+                        version: '1.0',
+                        chainId: numberToHex(base.constants.CHAIN_IDS.baseSepolia),
+                        from: address,
+                        calls: calls,
+                        capabilities: {
+                        paymasterService: {
+                            url: paymasterServiceUrl
+                        }
+                    }
+                }]
+                });
+                console.log("the result is ", result)
+                /*
+                const result = await provider.request({
+                "id": 190,
+                "jsonrpc": "2.0",
+                method: 'eth_sendTransaction',                
+                params: [{
+                    from: address,
+                    to: syncme_contract,
+                    "gas": "0x76c0",
+                    "gasPrice": "0x9184e72a000",
+                    data: booking_call_data // Encode using your ABI
+                }]
+                });
+                
+                */
+                }
+                
+
+
+                catch (error) {
+                    console.log(error);
+                    this.pushEvent("base-sign-in-error", { error: error?.message || String(error) });
+                }
+            }
+
         this.el.addEventListener("click" ,() =>{
             console.log("Will process payment here");
+            runSignInAndRequestSpendPermission();
         })
     }
 
