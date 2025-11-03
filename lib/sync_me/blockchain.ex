@@ -7,6 +7,8 @@ defmodule SyncMe.Blockchain do
   @whale Application.compile_env(:sync_me, [:blockchain, :whale])
   @usdc_coin Application.compile_env(:sync_me, [:blockchain, :usdc_coin])
 
+  @base_sepolia_url "https://sepolia.base.org"
+
   def complete_booking(booking_id) do
     SyncMeEscrow.complete_booking(booking_id)
     |> Ethers.send_transaction(from: @admin)
@@ -65,6 +67,12 @@ defmodule SyncMe.Blockchain do
     Ethers.send_transaction(%{value: value, to: @whale}, from: from, max_fee_per_gas: 4_995_561)
   end
 
+  def get_transaction_status_testnet(txhash) do
+
+    Ethers.get_transaction_receipt(txhash, rpc_opts: [url: "https://sepolia.base.org"])
+
+  end
+
   def verify_address() do
     payload = %{
       "jsonrpc" => "2.0",
@@ -104,4 +112,11 @@ defmodule SyncMe.Blockchain do
 
     Ethereumex.HttpClient.post_request(Jason.encode!(payload), url: "https://mainnet.base.org")
   end
+
+  def get_event_details(eventId) do
+    SyncMeEscrow.event_types(eventId) |> Ethers.call( to: "0xCc8233726f4520b74766dEa8681d2a2f4789FFFA", rpc_opts: [url: @base_sepolia_url ])
+  end
+
+
+
 end

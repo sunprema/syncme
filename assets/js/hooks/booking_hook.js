@@ -1,6 +1,7 @@
 import { requestSpendPermission } from "@base-org/account/spend-permission";
 import { encodeFunctionData, numberToHex} from 'viem'
 import { SyncMeABI } from "./syncme_abi";
+import { ERC20ABI } from "./erc-20_abi";
 
 
 
@@ -13,6 +14,8 @@ const provider = window.createBaseAccountSDK({
 const my_addess = "0x652574636c202993d19f99a9a5bac9833787f74b"    
 const syncme_contract = "0xCc8233726f4520b74766dEa8681d2a2f4789FFFA"
 const paymasterServiceUrl = "https://api.developer.coinbase.com/rpc/v1/base-sepolia/C4yrDOwWBAyXUVSpjI97Nntf1XIfmDbW"
+const base_sepolia_usdc_address = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+
 export let BasePaymentHook = (sdkProvider) => ({    
     
     mounted(){
@@ -25,7 +28,7 @@ export let BasePaymentHook = (sdkProvider) => ({
                 }
                 const nonce = crypto.randomUUID().replace(/-/g, "");
         
-                const { accounts } = await provider.request({
+                const { accounts, chainId, isConnected } = await provider.request({
                   method: "wallet_connect",
                   params: [
                     {
@@ -43,7 +46,7 @@ export let BasePaymentHook = (sdkProvider) => ({
                 const { address } = accounts[0];
                 const { message, signature } = accounts[0].capabilities.signInWithEthereum;
                 
-
+                /*
                 const permission = await requestSpendPermission({
                     account: address, //0x2fC4fb89D48B5Dd5e7B7eCC87750660bC6B078C6
                     spender: syncme_contract,//Approving syncme as the spender
@@ -55,13 +58,14 @@ export let BasePaymentHook = (sdkProvider) => ({
                     testnet: true,
                     
                 });                
-                console.log("Spend Permisions", permission);
                 
+                console.log("Spend Permisions", permission);
+                */
                     
                 const booking_call_data = encodeFunctionData({
                     abi: SyncMeABI,
                     functionName: 'createEventType',
-                    args: ["intro", "intro", "this is my intro", 60, 1]
+                    args: ["Master Solidity", "Master Solidity", "In this meeting, lets discuss about mastering Solidity", 60, 500_000]
                 });
 
                 console.log(booking_call_data);
@@ -74,14 +78,36 @@ export let BasePaymentHook = (sdkProvider) => ({
                     params: [{ chainId: '0x14a34' }] // 84532 in hex
                 });
                 */
+                //request spend permission
+            approve_spending_call =  {
+                to: base_sepolia_usdc_address,
+                value: '0x0',
+                data: encodeFunctionData({
+                    abi: ERC20ABI,
+                    functionName: 'approve',
+                    args: [syncme_contract, 10_000_000]
+                })
+            }
+
+            create_eventtype_call = {
+                    to: syncme_contract,
+                    data: booking_call_data // Encode using your ABI                    
+            }
+            
+            create_booking_call = {
+                to: syncme_contract,
+                data: encodeFunctionData({
+                    abi: SyncMeABI,
+                    functionName: 'bookEvent',
+                    args: [4, 1763062907]
+                })
+
+            }
 
                 const calls =[
-                    {
-                    to: syncme_contract,
-                    "gas": "0x76c0",
-                    "gasPrice": "0x9184e72a000",
-                    data: booking_call_data // Encode using your ABI                    
-                    }
+                    approve_spending_call,
+                    //create_eventtype_call
+                    create_booking_call                    
                 ]
 
                 // Send the transaction with paymaster capabilities
@@ -90,15 +116,31 @@ export let BasePaymentHook = (sdkProvider) => ({
                     params: [{
                         version: '1.0',
                         chainId: numberToHex(base.constants.CHAIN_IDS.baseSepolia),
+                        atomicRequired: true,
                         from: address,
                         calls: calls,
                         capabilities: {
-                        paymasterService: {
-                            url: paymasterServiceUrl
+
+                            paymasterService: {
+                                url: paymasterServiceUrl
+                            },
+                            dataCallback:{
+                                requests:[
+                                    { 
+                                        "type": "email" , 
+                                        "optional" : false 
+                                    },
+                                    { 
+                                        "type": "name" , 
+                                        "optional" : false 
+                                    }
+                                ]
+                            },  
                         }
-                    }
                 }]
                 });
+                window.provider = provider
+                window.result = result
                 console.log("the result is ", result)
                 /*
                 const result = await provider.request({
