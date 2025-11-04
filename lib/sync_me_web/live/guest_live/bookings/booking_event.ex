@@ -64,11 +64,12 @@ defmodule SyncMeWeb.BookingEvent do
     # verify txhash to make sure payment is successful and store the booking details in db
 
     {:noreply,
-      socket
-      |> put_flash(:info, "Transaction hash #{inspect(txhash)} is verified. Meeting will be booked here.")
-    }
+     socket
+     |> put_flash(
+       :info,
+       "Transaction hash #{inspect(txhash)} is verified. Meeting will be booked here."
+     )}
   end
-
 
   @impl true
   def handle_event("save_booking_old", _unsigned_params, socket) do

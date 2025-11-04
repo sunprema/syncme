@@ -38,22 +38,30 @@
       </h1>
       <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4  justify-end">
         <%= if @current_scope do %>
-          <li >
-            <span>{@current_scope.user.email} / <span class="tooltip tooltip-bottom text-xs" data-tip="base chain address">{"#{String.slice(@current_scope.user.wallet_address, 0..4)}...#{String.slice(@current_scope.user.wallet_address, -4..-1)}"}</span></span>
+          <li>
+            <span>
+              {@current_scope.user.email} /
+              <span class="tooltip tooltip-bottom text-xs" data-tip="base chain address">
+                {"#{String.slice(@current_scope.user.wallet_address, 0..4)}...#{String.slice(@current_scope.user.wallet_address, -4..-1)}"}
+              </span>
+            </span>
           </li>
           <li>
             <.link href={~p"/users/settings"}>Settings</.link>
           </li>
-          <li >
+          <li>
             <.link href={~p"/users/log-out"} method="delete">Log out</.link>
           </li>
         <% else %>
           <li>
-          <button class="btn btn-primary w-full font-normal" id="base-login" phx-hook="BaseSignInHook">
-            Sign in with Base
-          </button>
+            <button
+              class="btn btn-primary w-full font-normal"
+              id="base-login"
+              phx-hook="BaseSignInHook"
+            >
+              Sign in with Base
+            </button>
           </li>
-          
         <% end %>
       </ul>
     </div>

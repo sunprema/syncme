@@ -13,28 +13,29 @@ defmodule SyncMeWeb.AuthController do
   end
 
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
-
     IO.inspect("The info #{inspect(auth)}", label: "FROM GOOGLE AUTH")
 
-    case Accounts.get_user_by_session_token( Map.get(get_session(conn), "user_token")) do
-      nil  ->
+    case Accounts.get_user_by_session_token(Map.get(get_session(conn), "user_token")) do
+      nil ->
         conn
-          |> put_flash(:error, "Failed to connect Google calendar.")
-          |> redirect(to: ~p"/")
-      {user,_token_inserted_at} ->
-        #update user profile
+        |> put_flash(:error, "Failed to connect Google calendar.")
+        |> redirect(to: ~p"/")
+
+      {user, _token_inserted_at} ->
+        # update user profile
         user_params = %{
           email: auth.info.email,
           first_name: auth.info.first_name,
           last_name: auth.info.last_name
         }
+
         case Accounts.update_user_data_from_google(user, user_params) do
           {:ok, user} ->
             case Partners.get_partner_by_user(user) do
               nil ->
                 conn
-                  |> put_flash(:error, "Partner is not signed up yet")
-                  |> redirect(to: "/")
+                |> put_flash(:error, "Partner is not signed up yet")
+                |> redirect(to: "/")
 
               partner ->
                 credentials = auth.credentials
@@ -55,18 +56,16 @@ defmodule SyncMeWeb.AuthController do
                     conn
                     |> put_flash(:error, "Could not integrate with your Google Calendar")
                     |> redirect(to: "/")
-
                 end
             end
 
-            {:error, _changeset}->
-                conn
-                  |> put_flash(:error, "Could not integrate with your Google Calendar")
-                  |> redirect(to: "/")
-            end
+          {:error, _changeset} ->
+            conn
+            |> put_flash(:error, "Could not integrate with your Google Calendar")
+            |> redirect(to: "/")
         end
     end
-
+  end
 
   def callback(%{assigns: %{ueberauth_failure: _fails}} = conn, _params) do
     conn

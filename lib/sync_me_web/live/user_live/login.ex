@@ -129,7 +129,11 @@ defmodule SyncMeWeb.UserLive.Login do
         },
         socket
       ) do
-    IO.inspect("The session token #{socket.assigns[:csrf_token]}, and the token passed #{csrf_token}" , label: "CHECKING TOKENS")
+    IO.inspect(
+      "The session token #{socket.assigns[:csrf_token]}, and the token passed #{csrf_token}",
+      label: "CHECKING TOKENS"
+    )
+
     if socket.assigns[:csrf_token] == csrf_token do
       {:noreply,
        socket

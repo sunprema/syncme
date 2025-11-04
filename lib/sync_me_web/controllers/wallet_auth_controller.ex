@@ -4,7 +4,6 @@ defmodule SyncMeWeb.WalletAuthController do
   alias SyncMe.Accounts
   alias SyncMeWeb.UserAuth
 
-
   defp normalize_newlines(str) do
     String.replace(str, "\r\n", "\n")
   end
@@ -18,6 +17,7 @@ defmodule SyncMeWeb.WalletAuthController do
     IO.inspect(signature)
     IO.inspect("#######################")
     normalized_message = normalize_newlines(message)
+
     case SyncMe.Authenticator.authenticated_user?(address, normalized_message, signature) do
       true ->
         case Accounts.create_or_update_wallet_user(%{wallet_address: address}) do

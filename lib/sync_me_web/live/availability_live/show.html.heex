@@ -2,7 +2,7 @@
   <.header>
     Availability
     <:subtitle>Manage your availability</:subtitle>
-    
+
     <:actions>
       <.link href={~p"/calendar/connect"} class="btn btn-outline w-full font-normal">
         <svg
@@ -25,7 +25,7 @@
       </.link>
     </:actions>
   </.header>
-  <h1 class="text-sm font-medium tracking-wider"> Timezone: {@current_scope.partner.timezone}</h1>
+  <h1 class="text-sm font-medium tracking-wider">Timezone: {@current_scope.partner.timezone}</h1>
   <div class="">
     <%= for day <- @days do %>
       <div class="py-2">

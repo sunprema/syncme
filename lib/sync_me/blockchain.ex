@@ -68,9 +68,7 @@ defmodule SyncMe.Blockchain do
   end
 
   def get_transaction_status_testnet(txhash) do
-
     Ethers.get_transaction_receipt(txhash, rpc_opts: [url: "https://sepolia.base.org"])
-
   end
 
   def verify_address() do
@@ -89,7 +87,7 @@ defmodule SyncMe.Blockchain do
 
     case Ethereumex.HttpClient.post_request(Jason.encode!(payload),
            url: "https://mainnet.base.org"
-           #url: "http://127.0.0.1:8545"
+           # url: "http://127.0.0.1:8545"
          ) do
       {:ok, "0x01"} -> true
       _ -> false
@@ -114,9 +112,10 @@ defmodule SyncMe.Blockchain do
   end
 
   def get_event_details(eventId) do
-    SyncMeEscrow.event_types(eventId) |> Ethers.call( to: "0xCc8233726f4520b74766dEa8681d2a2f4789FFFA", rpc_opts: [url: @base_sepolia_url ])
+    SyncMeEscrow.event_types(eventId)
+    |> Ethers.call(
+      to: "0xCc8233726f4520b74766dEa8681d2a2f4789FFFA",
+      rpc_opts: [url: @base_sepolia_url]
+    )
   end
-
-
-
 end
