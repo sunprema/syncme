@@ -99,4 +99,5 @@ config :sync_me, SyncMe.Mailer, adapter: Swoosh.Adapters.Local
 
 config :sync_me, SyncMe.BookingMailer, adapter: Swoosh.Adapters.Local
 
+
 IO.puts("DEV.EXS CALLED")

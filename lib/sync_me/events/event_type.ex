@@ -2,6 +2,7 @@ defmodule SyncMe.Events.EventType do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:name, :slug, :description, :duration_in_minutes, :price]}
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "event_types" do

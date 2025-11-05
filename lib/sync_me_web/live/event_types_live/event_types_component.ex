@@ -3,12 +3,13 @@ defmodule SyncMeWeb.PartnerLive.EventTypesComponent do
   use SyncMeWeb, :live_component
   alias SyncMe.Partners
   alias SyncMe.Events
+  alias SyncMe.Blockchain.Contracts.SyncMeEscrow
 
   @impl true
   @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
-    <div class="mx-auto w-full ">
+    <div class="mx-auto w-full" id="create_event_container" phx-hook="EventTypeHook">
       <.form
         for={@form}
         id="event_type_form"
@@ -109,11 +110,25 @@ defmodule SyncMeWeb.PartnerLive.EventTypesComponent do
     scope = socket.assigns.current_scope
 
     case Events.create_event_type(scope, event_type) do
-      {:ok, _event_type} ->
+      {:ok, %EventType{} = event_type} ->
+        event_type_contract = SyncMeEscrow.create_event_type(
+          event_type.name,
+          event_type.slug,
+          event_type.description,
+          event_type.duration_in_minutes,
+          event_type.price)
+
+          hex_code = Ethers.Utils.hex_encode(event_type_contract.data, include_prefix: false)
+          create_event_call_data = %{
+                "partner_wallet_address" => socket.assigns.current_scope.user.wallet_address,
+                "to" => SyncMeEscrow.contract_address(),
+                "data" => hex_code}
+
         {:noreply,
          socket
-         |> put_flash(:info, "Event Type created.")
-         |> redirect(to: ~p"/partner/event_types")}
+         |> push_event("event_created", create_event_call_data)
+         #|> redirect(to: ~p"/partner/event_types")
+         }
 
       {:error, changeset} ->
         IO.inspect(changeset)

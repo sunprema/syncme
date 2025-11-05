@@ -16,7 +16,7 @@ const syncme_contract = "0xCc8233726f4520b74766dEa8681d2a2f4789FFFA"
 const paymasterServiceUrl = "https://api.developer.coinbase.com/rpc/v1/base-sepolia/C4yrDOwWBAyXUVSpjI97Nntf1XIfmDbW"
 const base_sepolia_usdc_address = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
 
-export let BasePaymentHook = (sdkProvider) => ({    
+export const BasePaymentHook = (sdkProvider) => ({    
     
     mounted(){
 

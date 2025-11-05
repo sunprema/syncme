@@ -118,4 +118,7 @@ if config_env() == :prod do
   config :stripity_stripe,
     api_key: System.get_env("STRIPE_SECRET_KEY"),
     client_id: System.get_env("STRIPE_CLIENT_ID")
+
+
+
 end
