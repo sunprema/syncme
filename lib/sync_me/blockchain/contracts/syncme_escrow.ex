@@ -5,7 +5,6 @@ defmodule SyncMe.Blockchain.Contracts.SyncMeEscrow do
       Application.compile_env(:sync_me, [:blockchain, :syncme_escrow_contract_address])
 
   def contract_address() do
-    "0xCc8233726f4520b74766dEa8681d2a2f4789FFFA"
+    Application.get_env(:sync_me, :blockchain) |> Keyword.get(:syncme_escrow_contract_address)
   end
-
 end

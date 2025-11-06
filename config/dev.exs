@@ -99,5 +99,7 @@ config :sync_me, SyncMe.Mailer, adapter: Swoosh.Adapters.Local
 
 config :sync_me, SyncMe.BookingMailer, adapter: Swoosh.Adapters.Local
 
+config :sync_me, :blockchain,
+  syncme_escrow_contract_address: System.get_env("SYNCME_CONTRACT_ADDRESS")
 
 IO.puts("DEV.EXS CALLED")

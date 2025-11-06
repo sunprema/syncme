@@ -4,7 +4,7 @@ defmodule SyncMeWeb.Router do
   import SyncMeWeb.UserAuth
 
   pipeline :browser do
-    plug :accepts, ["html" ]
+    plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
     plug :put_root_layout, html: {SyncMeWeb.Layouts, :root}
@@ -81,7 +81,6 @@ defmodule SyncMeWeb.Router do
     post "/api/paymaster", PaymasterController, :proxy
   end
 
-
   scope "/", SyncMeWeb do
     pipe_through [:browser, :require_authenticated_user]
 
@@ -96,7 +95,10 @@ defmodule SyncMeWeb.Router do
           BookingEventController,
           :return_session
 
-      live "/book_event/auth/details/:event_type_id/:encodedTimeSelected", BookingEvent, :pay_confirm
+      live "/book_event/auth/details/:event_type_id/:encodedTimeSelected",
+           BookingEvent,
+           :pay_confirm
+
       live "/booking/success", BookingCompletionLive, :success
       live "/booking/view/:booking_id", BookingView, :show
     end
@@ -141,7 +143,5 @@ defmodule SyncMeWeb.Router do
       live "/users/log-in", UserLive.Login, :new
       live "/users/log-in/:token", UserLive.Confirmation, :new
     end
-
-
   end
 end

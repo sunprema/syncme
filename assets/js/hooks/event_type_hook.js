@@ -5,10 +5,8 @@ export const EventTypeHook = (sdkProvider) => ({
     
     mounted(){
 
-        alert("Hello Creating Event");
-
         this.handleEvent("event_created", async (create_event_call_data) => {     
-           const {partner_wallet_address, to, data} = create_event_call_data
+           const {partner_wallet_address, to, data, event_type_id} = create_event_call_data
            const calls = [{ to, data }]
            window.dddata = create_event_call_data
            
@@ -27,16 +25,32 @@ export const EventTypeHook = (sdkProvider) => ({
                                 }] 
             });
 
-            const status = await sdkProvider.request({
-                method: 'wallet_getCallsStatus',
-                params: [callsId]
-            });
-
-            const txHash = status.receipts[0]?.transactionHash;
-            alert(txHash);
-            console.log( txHash );
+            // Poll for status updates
+            const checkStatus = async () => {
+                const status = await sdkProvider.request({
+                    method: 'wallet_getCallsStatus',
+                    params: [callsId]
+                });
             
+                if (status.status === 200 || status.status === "CONFIRMED") {
+                    console.log('Batch completed successfully!');
+                    console.log('Transaction receipts:', status.receipts);
+                    const txHash = status.receipts[0]?.transactionHash;
+                    alert(txHash);
+                    console.log( txHash );
+                    this.pushEventTo( this.el, "txhash_event", {txHash , event_type_id}, (reply, ref) =>  {
+                        alert(JSON.stringify(reply));
+                        window.respy = reply
+                    } );
 
+                } else if (status.status === 100) {
+                    console.log('Batch still pending...');
+                    setTimeout(checkStatus, 2000); // Check again in 2 seconds
+                } else {
+                    console.error('Batch failed with status:', status.status);
+                }
+            };
+            checkStatus();
         });
     }
 

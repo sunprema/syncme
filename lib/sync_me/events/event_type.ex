@@ -11,6 +11,7 @@ defmodule SyncMe.Events.EventType do
     field :description, :string
     field :duration_in_minutes, :integer
     field :price, :integer
+    field :tx_hash, :string
     field :currency, :string, default: "usd"
     field :is_active, :boolean, default: true
 
@@ -40,5 +41,12 @@ defmodule SyncMe.Events.EventType do
     ])
     |> validate_number(:duration_in_minutes, greater_than: 0)
     |> unique_constraint(:slug, name: :event_types_partner_id_slug_index)
+  end
+
+  @doc false
+  def txhash_changeset(event_type, attrs) do
+    event_type
+    |> cast(attrs, [:tx_hash])
+    |> validate_required([:tx_hash])
   end
 end

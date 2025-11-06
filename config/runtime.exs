@@ -119,6 +119,8 @@ if config_env() == :prod do
     api_key: System.get_env("STRIPE_SECRET_KEY"),
     client_id: System.get_env("STRIPE_CLIENT_ID")
 
-
-
+  config :sync_me, :blockchain,
+    syncme_escrow_contract_address: System.get_env("SYNCME_CONTRACT_ADDRESS")
 end
+
+IO.puts("runtime.exs CALLED")

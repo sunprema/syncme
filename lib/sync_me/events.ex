@@ -90,4 +90,12 @@ defmodule SyncMe.Events do
 
     event_type
   end
+
+  def update_tx_hash(%EventType{} = event_type, tx_hash) do
+    attrs = %{"tx_hash" => tx_hash}
+
+    event_type
+    |> EventType.txhash_changeset(attrs)
+    |> Repo.update()
+  end
 end

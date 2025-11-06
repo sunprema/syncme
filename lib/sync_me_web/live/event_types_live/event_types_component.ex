@@ -86,7 +86,16 @@ defmodule SyncMeWeb.PartnerLive.EventTypesComponent do
        |> assign(:current_scope, scope)
        |> put_flash(:error, "No partnerships available")}
     else
-      change_set = Events.change_event_type(scope, assigns.event_type)
+      # TODO:TEMP: Just to make the form easy to test.
+      attrs = %{
+        "name" => "event sample 1",
+        "slug" => "slug1" <> <<Enum.random(?A..?z)>> <> <<Enum.random(?A..?z)>>,
+        "description" => "test description",
+        "duration_in_minutes" => 30,
+        "price" => 1
+      }
+
+      change_set = Events.change_event_type(scope, assigns.event_type, attrs)
       form = to_form(change_set)
 
       {:ok,
@@ -111,24 +120,30 @@ defmodule SyncMeWeb.PartnerLive.EventTypesComponent do
 
     case Events.create_event_type(scope, event_type) do
       {:ok, %EventType{} = event_type} ->
-        event_type_contract = SyncMeEscrow.create_event_type(
-          event_type.name,
-          event_type.slug,
-          event_type.description,
-          event_type.duration_in_minutes,
-          event_type.price)
+        event_type_contract =
+          SyncMeEscrow.create_event_type(
+            event_type.name,
+            event_type.slug,
+            event_type.description,
+            event_type.duration_in_minutes,
+            event_type.price
+          )
 
-          hex_code = Ethers.Utils.hex_encode(event_type_contract.data, include_prefix: false)
-          create_event_call_data = %{
-                "partner_wallet_address" => socket.assigns.current_scope.user.wallet_address,
-                "to" => SyncMeEscrow.contract_address(),
-                "data" => hex_code}
+        hex_code = Ethers.Utils.hex_encode(event_type_contract.data, include_prefix: false)
 
-        {:noreply,
-         socket
-         |> push_event("event_created", create_event_call_data)
-         #|> redirect(to: ~p"/partner/event_types")
-         }
+        create_event_call_data = %{
+          "partner_wallet_address" => socket.assigns.current_scope.user.wallet_address,
+          "event_type_id" => event_type.id,
+          "to" => SyncMeEscrow.contract_address(),
+          "data" => hex_code
+        }
+
+        {
+          :noreply,
+          socket
+          |> push_event("event_created", create_event_call_data)
+          # |> redirect(to: ~p"/partner/event_types")
+        }
 
       {:error, changeset} ->
         IO.inspect(changeset)
@@ -139,5 +154,34 @@ defmodule SyncMeWeb.PartnerLive.EventTypesComponent do
          |> put_flash(:error, "Couldnt change event type.")
          |> assign(form: to_form(changeset))}
     end
+  end
+
+  @impl true
+  def handle_event(
+        "txhash_event",
+        %{"txHash" => tx_hash, "event_type_id" => event_type_id},
+        socket
+      ) do
+    IO.puts("The txHash #{tx_hash} , event_type_id #{event_type_id}")
+    # Double check If the transaction is mined and store it in db
+    {:ok, %{"status" => status}} = SyncMe.Blockchain.get_transaction_status_testnet(tx_hash)
+
+    case status do
+      "0x1" ->
+        IO.inspect("The transaction is mined", label: "TXHASH_EVENT")
+
+        case Events.get_event_type(socket.assigns.current_scope, event_type_id) do
+          nil ->
+            IO.inspect("No event found!")
+
+          event ->
+            Events.update_tx_hash(event, tx_hash)
+        end
+
+      _ ->
+        IO.inspect("The transaction is **NOT** mined", label: "TXHASH_EVENT")
+    end
+
+    {:reply, %{"name" => "sundar"}, socket}
   end
 end
