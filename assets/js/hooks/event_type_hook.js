@@ -1,4 +1,4 @@
-import { encodeFunctionData, numberToHex} from 'viem'
+import { encodeFunctionData, numberToHex, parseEventLogs } from 'viem'
 
 const paymasterServiceUrl = "https://api.developer.coinbase.com/rpc/v1/base-sepolia/C4yrDOwWBAyXUVSpjI97Nntf1XIfmDbW"
 export const EventTypeHook = (sdkProvider) => ({
@@ -8,8 +8,7 @@ export const EventTypeHook = (sdkProvider) => ({
         this.handleEvent("event_created", async (create_event_call_data) => {     
            const {partner_wallet_address, to, data, event_type_id} = create_event_call_data
            const calls = [{ to, data }]
-           window.dddata = create_event_call_data
-           
+
            const callsId = await sdkProvider.request({
                                 method: 'wallet_sendCalls',
                                 params: [{
@@ -36,14 +35,17 @@ export const EventTypeHook = (sdkProvider) => ({
                     console.log('Batch completed successfully!');
                     console.log('Transaction receipts:', status.receipts);
                     const txHash = status.receipts[0]?.transactionHash;
+                    const logs = status.receipts[0]?.logs;
                     alert(txHash);
                     console.log( txHash );
+                    console.log(logs);
+                    window.event_logs = logs;
                     this.pushEventTo( this.el, "txhash_event", {txHash , event_type_id}, (reply, ref) =>  {
                         alert(JSON.stringify(reply));
                         window.respy = reply
                     } );
 
-                } else if (status.status === 100) {
+                } else if (status.status === 100 || status.status === "PENDING") {
                     console.log('Batch still pending...');
                     setTimeout(checkStatus, 2000); // Check again in 2 seconds
                 } else {

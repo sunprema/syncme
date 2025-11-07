@@ -129,7 +129,9 @@ export const BasePaymentHook = (sdkProvider) => ({
 
         this.el.addEventListener("click" ,() =>{
             console.log("Will process payment here");
-            payAndBookEvent();
+            const dataAttributes = this.el.dataset
+            console.log(`The eventId ${dataAttributes.eventId} - address ${dataAttributes.userWalletAddress}`);
+            //payAndBookEvent();
         })
     }
 

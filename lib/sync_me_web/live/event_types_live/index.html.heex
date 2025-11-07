@@ -24,7 +24,7 @@
       
       <:col :let={{_id, event_type}} label="Tx hash">
       
-      <.link href= {"https://sepolia.basescan.org/tx/#{event_type.tx_hash}"} target="_blank" > { "#{String.slice(event_type.tx_hash, 0..4)}...#{String.slice(event_type.tx_hash, -4..-1)}"} </.link>
+      <.link href= {"https://sepolia.basescan.org/tx/#{event_type.tx_hash}"} target="_blank" :if={event_type.tx_hash != nil}> { "#{String.slice(event_type.tx_hash, 0..4)}...#{String.slice(event_type.tx_hash, -4..-1)}"} </.link>
       </:col>
     </.table>
   </div>

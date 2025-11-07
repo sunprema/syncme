@@ -138,19 +138,14 @@
             :if={@live_action == :details}
             id="pay_confirm_btn"
             class="btn btn-neutral"
+            data-event-id={@event_type.id}
+            data-user-wallet-address={ @current_scope.user && @current_scope.user.wallet_address }
             phx-hook="BasePaymentHook"
           >
             Pay & Confirm
           </button>
 
-          <button
-            :if={@live_action == :pay_confirm}
-            id="pay_confirm_btn"
-            class="btn btn-neutral"
-            phx-hook="BasePaymentHook"
-          >
-            Pay & Confirm
-          </button>
+         
         </div>
       </div>
     <% end %>
