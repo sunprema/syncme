@@ -48,7 +48,7 @@ defmodule SyncMeWeb.Router do
     live_session :maybe_authenticated_user,
       on_mount: [{SyncMeWeb.UserAuth, :maybe_authenticated}] do
       live "/book_event/new/:event_type_id", BookingEvent, :new
-      live "/book_event/details/:event_type_id", BookingEvent, :details
+      live "/book_event/details/:event_type_id/:encodedTimeSelected", BookingEvent, :details
     end
   end
 

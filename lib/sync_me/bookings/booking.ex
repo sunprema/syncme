@@ -10,19 +10,26 @@ defmodule SyncMe.Bookings.Booking do
 
     field :status, Ecto.Enum,
       values: [
+        :pending,
         :confirmed,
         :cancelled_by_guest,
         :cancelled_by_partner
       ],
       default: :confirmed
 
+    field :guest_email, :string
+    field :guest_name, :string
     field :video_conference_link, :string
     field :price_at_booking, :decimal
     field :duration_at_booking, :integer
+    field :tx_hash, :string
+    field :contract_booking_id, :decimal
+    field :chain_id, :string
 
     belongs_to :event_type, SyncMe.Events.EventType
     belongs_to :partner, SyncMe.Partners.Partner
     belongs_to :guest_user, SyncMe.Accounts.User, foreign_key: :guest_user_id
+
     has_one :transaction, SyncMe.Billing.Transaction
 
     timestamps(type: :utc_datetime)
@@ -35,7 +42,6 @@ defmodule SyncMe.Bookings.Booking do
       :start_time,
       :end_time,
       :status,
-      :video_conference_link,
       :price_at_booking,
       :duration_at_booking,
       :partner_id,
@@ -45,7 +51,6 @@ defmodule SyncMe.Bookings.Booking do
     |> validate_required([
       :start_time,
       :end_time,
-      :video_conference_link,
       :price_at_booking,
       :duration_at_booking,
       :partner_id,
@@ -53,6 +58,13 @@ defmodule SyncMe.Bookings.Booking do
       :event_type_id
     ])
     |> validate_time_order()
+  end
+
+  @doc false
+  def onchain_changeset(booking, attrs) do
+    booking
+    |> cast(attrs, [:tx_hash, :contract_booking_id])
+    |> validate_required([:tx_hash, :contract_booking_id])
   end
 
   defp validate_time_order(changeset) do

@@ -34,6 +34,7 @@ defmodule SyncMeWeb.UserAuth do
   """
   def log_in_user(conn, user, params \\ %{}) do
     user_return_to = get_session(conn, :user_return_to)
+    IO.inspect("The user return to #{user_return_to}", label: "LOGIN USER RETURN TO")
 
     conn
     |> create_or_extend_session(user, params)

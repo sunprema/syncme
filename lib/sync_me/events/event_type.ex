@@ -11,9 +11,11 @@ defmodule SyncMe.Events.EventType do
     field :description, :string
     field :duration_in_minutes, :integer
     field :price, :integer
-    field :tx_hash, :string
     field :currency, :string, default: "usd"
     field :is_active, :boolean, default: true
+    field :tx_hash, :string
+    field :contract_event_id, :decimal
+    field :chain_id, :string
 
     belongs_to :partner, SyncMe.Partners.Partner
     has_many :bookings, SyncMe.Bookings.Booking
@@ -44,9 +46,9 @@ defmodule SyncMe.Events.EventType do
   end
 
   @doc false
-  def txhash_changeset(event_type, attrs) do
+  def onchain_changeset(event_type, attrs) do
     event_type
-    |> cast(attrs, [:tx_hash])
-    |> validate_required([:tx_hash])
+    |> cast(attrs, [:tx_hash, :contract_event_id])
+    |> validate_required([:tx_hash, :contract_event_id])
   end
 end

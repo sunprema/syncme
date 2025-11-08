@@ -21,10 +21,18 @@
       <:col :let={{_id, event_type}} label="Description">{event_type.description}</:col>
       <:col :let={{_id, event_type}} label="Slug">{event_type.slug}</:col>
       <:col :let={{_id, event_type}} label="Duration">{event_type.duration_in_minutes}</:col>
-      
+
       <:col :let={{_id, event_type}} label="Tx hash">
-      
-      <.link href= {"https://sepolia.basescan.org/tx/#{event_type.tx_hash}"} target="_blank" :if={event_type.tx_hash != nil}> { "#{String.slice(event_type.tx_hash, 0..4)}...#{String.slice(event_type.tx_hash, -4..-1)}"} </.link>
+        <.link
+          :if={event_type.tx_hash != nil}
+          href={"https://sepolia.basescan.org/tx/#{event_type.tx_hash}"}
+          target="_blank"
+        >
+          {"#{String.slice(event_type.tx_hash, 0..4)}...#{String.slice(event_type.tx_hash, -4..-1)}"}
+        </.link>
+      </:col>
+      <:col :let={{_id, event_type}} label="onchain event id">
+        {event_type.contract_event_id}
       </:col>
     </.table>
   </div>

@@ -6,6 +6,8 @@ defmodule SyncMeWeb.BookingEvent do
   alias SyncMe.Payments
   alias SyncMe.GoogleCalendar
 
+   alias SyncMe.Blockchain.Contracts.SyncMeEscrow
+
   require Timex
 
   @impl true
@@ -60,15 +62,63 @@ defmodule SyncMeWeb.BookingEvent do
   end
 
   @impl true
-  def handle_event("save_booking", %{"txhash" => txhash}, socket) do
-    # verify txhash to make sure payment is successful and store the booking details in db
+  def handle_event("pay_and_confirm_booking", _unhandled_params, socket) do
+    event_type = socket.assigns.event_type
+    meeting_start_time = socket.assigns.meeting_start_time
+    meeting_end_time = socket.assigns.meeting_end_time
+    IO.inspect("#{inspect(event_type)} , #{meeting_start_time}")
+    scope = socket.assigns.current_scope
 
-    {:noreply,
-     socket
-     |> put_flash(
-       :info,
-       "Transaction hash #{inspect(txhash)} is verified. Meeting will be booked here."
-     )}
+    case event_type.is_active && not is_nil(event_type.tx_hash) do
+      true ->
+        bookings_attrs = %{
+          "partner_id" => event_type.partner_id,
+          "start_time" => meeting_start_time,
+          "end_time" => meeting_end_time,
+          "status" => "pending",
+          "price_at_booking" => event_type.price,
+          "duration_at_booking" => event_type.duration_in_minutes,
+          "event_type_id" => event_type.id
+        }
+
+        case Bookings.create_booking(scope, bookings_attrs) do
+          {:ok, %Bookings.Booking{} = booking} ->
+            book_event_contract =
+              SyncMeEscrow.book_event(
+                Decimal.to_integer(event_type.contract_event_id),
+                DateTime.to_unix(booking.start_time)
+              )
+
+            hex_code = Ethers.Utils.hex_encode(book_event_contract.data, include_prefix: false)
+
+            bookEvent_call_data = %{
+              "user_wallet_address" => socket.assigns.current_scope.user.wallet_address,
+              "booking_id" => booking.id,
+              "to" => SyncMeEscrow.contract_address(),
+              "data" => hex_code,
+              "price_at_booking" => Decimal.to_integer(booking.price_at_booking)
+            }
+            {:noreply,
+             socket
+             |> push_event("booking_created", bookEvent_call_data)
+             |> put_flash(:info, "Meeting is created #{booking.id}")}
+
+          {:error, reason} ->
+            IO.inspect(" BOOKING FAILED #{inspect(reason)}")
+
+            {:noreply,
+             socket
+             |> put_flash(:info, "Meeting insertion failed")}
+        end
+
+      false ->
+        {:noreply,
+         socket
+         |> put_flash(
+           :info,
+           "This meeting cannot be booked."
+         )}
+    end
   end
 
   @impl true
@@ -131,15 +181,17 @@ defmodule SyncMeWeb.BookingEvent do
   @impl true
   def handle_event(
         "slot_selected",
-        %{"meeting_start_time" => meeting_start_time},
+        %{"meeting_start_time" => meeting_start_time_encoded},
         socket
       ) do
-    {:ok, meeting_start_time, _} = DateTime.from_iso8601(URI.decode(meeting_start_time))
+    {:ok, meeting_start_time, _} = DateTime.from_iso8601(URI.decode(meeting_start_time_encoded))
 
     {:noreply,
      socket
      |> assign_meeting_times(meeting_start_time, socket.assigns.event_type)
-     |> push_patch(to: ~p"/book_event/details/#{socket.assigns.event_type.id}")}
+     |> push_patch(
+       to: ~p"/book_event/details/#{socket.assigns.event_type.id}/#{meeting_start_time_encoded}"
+     )}
   end
 
   @impl true

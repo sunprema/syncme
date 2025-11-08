@@ -9,6 +9,9 @@
       <div class="flex flex-col space-y-4">
         <h2 class="text-2xl">{@partner.syncme_link}</h2>
         <h3 class="text-sm text-gray-800">{@partner.bio}</h3>
+        <h3 class="text-sm text-gray-800 font-extralight">
+          Partner Timezone: {@partner.timezone}
+        </h3>
       </div>
     </div>
 
@@ -23,7 +26,9 @@
               </span>
             </h2>
             <p class="text-sm text-gray-600/80 ">{event_type.description}</p>
-
+            <h2 class="text-xs font-extralight italic">{event_type.contract_event_id}</h2>
+            <h2 class="text-xs font-extralight italic">TxID: {event_type.tx_hash}</h2>
+            <h2 class="text-xs font-extralight italic">{event_type.updated_at}</h2>
             <div class="flex justify-between items-baseline card-actions py-0">
               <span class="badge text-xs px-1 rounded">
                 <.icon name="hero-credit-card" />{event_type.price}$

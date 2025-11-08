@@ -20,40 +20,64 @@ export const BasePaymentHook = (sdkProvider) => ({
     
     mounted(){
 
+        this.handleEvent("booking_created", async( bookEvent_call_data) => {
+            const {user_wallet_address, booking_id, to, data, price_at_booking} = bookEvent_call_data
+            console.log(user_wallet_address, booking_id, to, data)
+
+            approve_spending_call =  {
+                    to: base_sepolia_usdc_address,
+                    value: '0x0',
+                    data: encodeFunctionData({
+                        abi: ERC20ABI,
+                        functionName: 'approve',
+                        args: [to, price_at_booking]
+                    })
+            }
+
+            bookingEvent_call = {
+                to: to,
+                data: data // Encode using your ABI                    
+            }
+
+            const calls =[
+                approve_spending_call,
+                //create_eventtype_call
+                bookingEvent_call                    
+            ]
+
+            const result = await sdkProvider.request({
+                    method: 'wallet_sendCalls',
+                    params: [{
+                        version: '1.0',
+                        chainId: numberToHex(base.constants.CHAIN_IDS.baseSepolia),
+                        atomicRequired: true,
+                        from: user_wallet_address,
+                        calls: calls,
+                        capabilities: {
+
+                            paymasterService: {
+                                url: paymasterServiceUrl
+                            },
+                            dataCallback:{
+                                requests:[
+                                    { 
+                                        "type": "email" , 
+                                        "optional" : false 
+                                    },
+                                    { 
+                                        "type": "name" , 
+                                        "optional" : false 
+                                    }
+                                ]
+                            },  
+                        }
+                }]
+            });
+            window.bookEventResult = result
+        })
+
         const payAndBookEvent = async () => {
             try {
-                if (!window.createBaseAccountSDK) {
-                  this.pushEvent("base-sign-in-error", { error: "Base SDK not loaded" });
-                  return;
-                }
-                const nonce = crypto.randomUUID().replace(/-/g, "");
-        
-                const { accounts, chainId, isConnected } = await provider.request({
-                  method: "wallet_connect",
-                  params: [
-                    {
-                        version: "1",
-                        capabilities: {
-                            signInWithEthereum: {
-                                nonce,
-                                chainId: "0x14a34",// "0x2105", // Base Mainnet (8453)
-                            },
-                        },
-                    }
-                  ],
-                });
-
-                const { address } = accounts[0];
-                const { message, signature } = accounts[0].capabilities.signInWithEthereum;
-                
-                const booking_call_data = encodeFunctionData({
-                    abi: SyncMeABI,
-                    functionName: 'createEventType',
-                    args: ["Master Solidity", "Master Solidity", "In this meeting, lets discuss about mastering Solidity", 60, 500_000]
-                });
-
-                console.log(booking_call_data);
-                
                 
                 //request spend permission
                 approve_spending_call =  {
@@ -128,9 +152,15 @@ export const BasePaymentHook = (sdkProvider) => ({
         }
 
         this.el.addEventListener("click" ,() =>{
-            console.log("Will process payment here");
-            const dataAttributes = this.el.dataset
-            console.log(`The eventId ${dataAttributes.eventId} - address ${dataAttributes.userWalletAddress}`);
+            console.log("Will pay and confirm booking here");
+            //send the save_booking event first to save basic booking info
+            //get the calldata for booking
+            //request spending 
+            //eth_call with calldata
+            
+            const { eventId, userWalletAddress, contractEventId} = this.el.dataset
+            console.log(eventId, userWalletAddress, contractEventId)
+            this.pushEvent("pay_and_confirm_booking")
             //payAndBookEvent();
         })
     }

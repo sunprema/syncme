@@ -74,15 +74,8 @@ defmodule SyncMe.Bookings do
 
   """
   def create_booking(%Scope{user: guest_user}, attrs) when not is_nil(guest_user) do
-    with {:ok, event_type} <- validate_event_type(attrs),
-         {:ok, start_time} <- validate_start_time(attrs),
-         :ok <- check_availability(event_type, start_time) do
-      # If all validations pass, proceed with the database transaction.
-      do_create_booking(guest_user, event_type, start_time)
-    else
-      # This `else` block catches any error tuple from the `with` chain.
-      {:error, reason} -> {:error, reason}
-    end
+    attrs = Map.put(attrs, "guest_user_id", guest_user.id)
+    Repo.insert(Booking.changeset(%Booking{}, attrs))
   end
 
   def create_booking(%Scope{user: nil}, _attrs) do
@@ -193,21 +186,6 @@ defmodule SyncMe.Bookings do
         {:ok, booking}
       end
     end)
-  end
-
-  # Validation Step 1: Check the EventType
-  defp validate_event_type(%{"event_type_id" => id}) do
-    case Repo.get(EventType, id) do
-      nil ->
-        {:error, :event_type_not_found}
-
-      event_type ->
-        if event_type.is_active do
-          {:ok, event_type}
-        else
-          {:error, :event_type_not_active}
-        end
-    end
   end
 
   defp validate_event_type(_attrs), do: {:error, :event_type_not_found}

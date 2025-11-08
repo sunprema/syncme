@@ -164,18 +164,34 @@ defmodule SyncMeWeb.PartnerLive.EventTypesComponent do
       ) do
     IO.puts("The txHash #{tx_hash} , event_type_id #{event_type_id}")
     # Double check If the transaction is mined and store it in db
-    {:ok, %{"status" => status}} = SyncMe.Blockchain.get_transaction_status_testnet(tx_hash)
+    {:ok, %{"status" => status, "logs" => logs}} =
+      SyncMe.Blockchain.get_transaction_status_testnet(tx_hash)
 
     case status do
       "0x1" ->
         IO.inspect("The transaction is mined", label: "TXHASH_EVENT")
+        # get the contract_event_id from the logs
+        contract_event_id =
+          Enum.find_value(logs, fn log ->
+            case Ethers.Event.find_and_decode(
+                   log,
+                   SyncMe.Blockchain.Contracts.SyncMeEscrow.EventFilters
+                 ) do
+              {:ok, %Ethers.Event{} = event} ->
+                # The 1st position has the event id returned
+                Enum.at(event.topics, 1)
+
+              {:error, :not_found} ->
+                nil
+            end
+          end)
 
         case Events.get_event_type(socket.assigns.current_scope, event_type_id) do
           nil ->
             IO.inspect("No event found!")
 
           event ->
-            Events.update_tx_hash(event, tx_hash)
+            Events.update_onchain_info(event, tx_hash, contract_event_id)
         end
 
       _ ->

@@ -91,11 +91,11 @@ defmodule SyncMe.Events do
     event_type
   end
 
-  def update_tx_hash(%EventType{} = event_type, tx_hash) do
-    attrs = %{"tx_hash" => tx_hash}
+  def update_onchain_info(%EventType{} = event_type, tx_hash, contract_event_id) do
+    attrs = %{"tx_hash" => tx_hash, "contract_event_id" => contract_event_id}
 
     event_type
-    |> EventType.txhash_changeset(attrs)
+    |> EventType.onchain_changeset(attrs)
     |> Repo.update()
   end
 end

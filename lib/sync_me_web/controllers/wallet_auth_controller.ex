@@ -8,7 +8,12 @@ defmodule SyncMeWeb.WalletAuthController do
     String.replace(str, "\r\n", "\n")
   end
 
-  def signin(conn, %{"address" => address, "message" => message, "signature" => signature}) do
+  def signin(conn, %{
+        "address" => address,
+        "message" => message,
+        "signature" => signature,
+        "userReturnTo" => userReturnTo
+      }) do
     IO.inspect("#######################")
     IO.inspect(address)
     IO.inspect("----------------------------")
@@ -18,11 +23,14 @@ defmodule SyncMeWeb.WalletAuthController do
     IO.inspect("#######################")
     normalized_message = normalize_newlines(message)
 
+    IO.inspect(userReturnTo, label: "CURRENT_PATH")
+
     case SyncMe.Authenticator.authenticated_user?(address, normalized_message, signature) do
       true ->
         case Accounts.create_or_update_wallet_user(%{wallet_address: address}) do
           {:ok, user} ->
             conn
+            |> put_session(:user_return_to, userReturnTo)
             |> put_flash(:info, "Successfully signed in with Base!")
             |> UserAuth.log_in_user(user)
 

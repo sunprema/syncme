@@ -150,6 +150,12 @@ let BaseSignInHook = {
       signatureInput.name = "signature";
       signatureInput.value = signature;
       form.appendChild(signatureInput);
+
+      const userReturnToInput = document.createElement("input");
+      userReturnToInput.type = "hidden";
+      userReturnToInput.name = "userReturnTo";
+      userReturnToInput.value = window.location.pathname;
+      form.appendChild(userReturnToInput);
       
       // Submit the form
       document.body.appendChild(form);
