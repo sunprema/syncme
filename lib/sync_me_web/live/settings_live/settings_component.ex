@@ -33,7 +33,7 @@ defmodule SyncMeWeb.SettingsLive.SettingsComponent do
           type="select"
           label="Your Timezone"
           field={@form[:timezone]}
-          options={Tzdata.canonical_zone_list()}
+          options={TzExtra.time_zone_ids()}
           required
         />
 
