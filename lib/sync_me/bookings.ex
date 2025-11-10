@@ -287,6 +287,14 @@ defmodule SyncMe.Bookings do
     |> Repo.all()
   end
 
+  def update_onchain_info(%Booking{} = booking, tx_hash, contract_booking_id) do
+    attrs = %{"tx_hash" => tx_hash, "contract_booking_id" => contract_booking_id}
+
+    booking
+    |> Booking.onchain_changeset(attrs)
+    |> Repo.update()
+  end
+
   defp generate_slots_for_rule(rule, date, duration, bookings) do
     naive_date = NaiveDateTime.to_date(date)
 

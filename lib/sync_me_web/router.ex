@@ -78,7 +78,8 @@ defmodule SyncMeWeb.Router do
 
   scope "/api", SyncMeWeb do
     pipe_through [:api]
-    post "/api/paymaster", PaymasterController, :proxy
+    post "/paymaster", PaymasterController, :proxy
+    post "/profile/validate", BookingEventController, :validate_profile
   end
 
   scope "/", SyncMeWeb do
@@ -98,6 +99,8 @@ defmodule SyncMeWeb.Router do
       live "/book_event/auth/details/:event_type_id/:encodedTimeSelected",
            BookingEvent,
            :pay_confirm
+
+
 
       live "/booking/success", BookingCompletionLive, :success
       live "/booking/view/:booking_id", BookingView, :show

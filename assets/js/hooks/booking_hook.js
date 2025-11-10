@@ -30,7 +30,7 @@ export const BasePaymentHook = (sdkProvider) => ({
                     data: encodeFunctionData({
                         abi: ERC20ABI,
                         functionName: 'approve',
-                        args: [to, price_at_booking]
+                        args: [to, price_at_booking]                        
                     })
             }
 
@@ -45,7 +45,7 @@ export const BasePaymentHook = (sdkProvider) => ({
                 bookingEvent_call                    
             ]
 
-            const result = await sdkProvider.request({
+            const sendCallsResponse = await sdkProvider.request({
                     method: 'wallet_sendCalls',
                     params: [{
                         version: '1.0',
@@ -68,14 +68,48 @@ export const BasePaymentHook = (sdkProvider) => ({
                                         "type": "name" , 
                                         "optional" : false 
                                     }
-                                ]
+                                ],                                
                             },  
                         }
                 }]
             });
-            window.bookEventResult = result
-        })
+            window.bookEventResult = sendCallsResponse
 
+            const checkStatus = async () => {
+                const status = await sdkProvider.request({
+                    method: 'wallet_getCallsStatus',
+                    params: [sendCallsResponse.callsId]
+                });
+                window.bookingEventStatus = status
+                if (status.status === 200 || status.status === "CONFIRMED") {
+                    console.log('Batch completed successfully!');
+                    console.log('Transaction receipts:', status.receipts);
+                    const txHash = status.receipts[0]?.transactionHash;
+                    const logs = status.receipts[0]?.logs;
+                    alert(txHash);
+                    console.log( txHash );
+                    console.log(logs);
+                    window.booking_event_logs = logs;
+
+                    
+                        
+                    this.pushEvent( "booking_txhash_event", {tx_hash: txHash , booking_id }, (reply, ref) =>  {
+                        alert(JSON.stringify(reply));
+                        window.respy = reply
+                    } );
+                     
+
+                } else if (status.status === 100 || status.status === "PENDING") {
+                    console.log('Batch still pending...');
+                    setTimeout(checkStatus, 2000); // Check again in 2 seconds
+                } else {
+                    console.error('Batch failed with status:', status.status);
+                }
+            };
+            checkStatus();
+            
+        })
+        /*
         const payAndBookEvent = async () => {
             try {
                 
@@ -150,6 +184,7 @@ export const BasePaymentHook = (sdkProvider) => ({
                     this.pushEvent("base-sign-in-error", { error: error?.message || String(error) });
             }
         }
+        */
 
         this.el.addEventListener("click" ,() =>{
             console.log("Will pay and confirm booking here");
