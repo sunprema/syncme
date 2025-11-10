@@ -305,6 +305,8 @@ defmodule SyncMe.Bookings do
     booking
     |> Booking.onchain_changeset(attrs)
     |> Repo.update()
+
+    SendBookingEmails.new(%{booking_id: booking.id}, max_attempts: 2) |> Oban.insert()
   end
 
   defp generate_slots_for_rule(rule, date, duration, bookings) do

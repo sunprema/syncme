@@ -7,7 +7,8 @@ defmodule SyncMe.Calendar.ICS do
   def generate(%Booking{} = booking) do
     event_type = booking.event_type
     partner = booking.partner
-    guest = booking.guest_user
+    guest_email = booking.guest_email
+    guest_name = booking.guest_name
 
     uid = Ecto.UUID.generate()
     now = DateTime.utc_now() |> DateTime.to_string() |> String.replace(~r/[-:]|\.\d+/, "")
@@ -20,7 +21,7 @@ defmodule SyncMe.Calendar.ICS do
     UID:#{uid}@syncme.local
     DTSTAMP:#{now}
     ORGANIZER;CN=#{partner.user.first_name}:MAILTO:#{partner.user.email}
-    ATTENDEE;CN=#{guest.first_name};ROLE=REQ-PARTICIPANT:MAILTO:#{guest.email}
+    ATTENDEE;CN=#{guest_name};ROLE=REQ-PARTICIPANT:MAILTO:#{guest_email}
     DTSTART:#{format_time(booking.start_time)}
     DTEND:#{format_time(booking.end_time)}
     SUMMARY:#{event_type.name}

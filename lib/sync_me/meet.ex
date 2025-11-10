@@ -14,23 +14,18 @@ defmodule SyncMe.Google.Meet do
 
   Returns the `hangoutLink` from the created event.
   """
-  def create_event(%Booking{
-        event_type: event_type,
-        guest_user: guest_user,
-        partner: partner,
-        start_time: start_time,
-        end_time: end_time
-      }) do
-    with {:ok, token} <- SyncMe.GoogleCalendar.get_valid_access_token(partner) do
+  def create_event(%Booking{} = booking ) do
+
+    with {:ok, token} <- SyncMe.GoogleCalendar.get_valid_access_token(booking.partner) do
       event = %{
-        "summary" => event_type.name,
+        "summary" => booking.event_type.name,
         "guestsCanInviteOthers" => false,
-        "description" => event_type.description,
-        "start" => %{"dateTime" => DateTime.to_iso8601(start_time)},
-        "end" => %{"dateTime" => DateTime.to_iso8601(end_time)},
+        "description" => booking.event_type.description,
+        "start" => %{"dateTime" => DateTime.to_iso8601(booking.start_time)},
+        "end" => %{"dateTime" => DateTime.to_iso8601(booking.end_time)},
         "attendees" => [
-          %{"email" => guest_user.email},
-          %{"email" => partner.user.email, "organizer" => true, "self" => true}
+          %{"email" => booking.guest_email},
+          %{"email" => booking.partner.user.email, "organizer" => true, "self" => true}
         ],
         "conferenceData" => %{
           "createRequest" => %{
