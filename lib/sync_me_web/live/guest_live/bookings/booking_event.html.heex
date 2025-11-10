@@ -9,7 +9,7 @@
     <div class="flex flex-col gap-2">
       <h2 class="text-2xl">{@partner.syncme_link}</h2>
       <p class="text-sm text-gray-800">{@partner.bio}</p>
-      <h3 class="text-sm text-gray-800 font-extralight"> Partner Timezone: {@partner.timezone}</h3>
+      <h3 class="text-sm text-gray-800 font-extralight">Partner Timezone: {@partner.timezone}</h3>
     </div>
   </div>
 
@@ -137,27 +137,30 @@
             Back
           </.link>
 
-
           <button
             :if={@live_action == :details && @current_scope && @current_scope.user.wallet_address}
             id="pay_confirm_btn"
             class="btn btn-neutral"
             data-event-id={@event_type.id}
             data-contract-event-id={@event_type.contract_event_id}
-            data-user-wallet-address={ (@current_scope && @current_scope.user.wallet_address) || "USER_NOT_LOGGED"}
+            data-user-wallet-address={
+              (@current_scope && @current_scope.user.wallet_address) || "USER_NOT_LOGGED"
+            }
             phx-hook="BasePaymentHook"
           >
-              Pay & Confirm            
+            Pay & Confirm
           </button>
 
           <button
-              :if={@live_action == :details && !( @current_scope && @current_scope.user.wallet_address)}
-              class="btn btn-primary font-normal"
-              id="base-login"
-              phx-hook="BaseSignInHook"
-            >
-              Login & Book
-            </button>
+            :if={
+              @live_action == :details && !(@current_scope && @current_scope.user.wallet_address)
+            }
+            class="btn btn-primary font-normal"
+            id="base-login"
+            phx-hook="BaseSignInHook"
+          >
+            Login & Book
+          </button>
         </div>
       </div>
     <% end %>

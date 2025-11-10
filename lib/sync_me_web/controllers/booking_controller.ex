@@ -38,10 +38,8 @@ defmodule SyncMeWeb.BookingEventController do
     |> redirect(to: ~p"/book_event/auth/details/#{event_type_id}/#{encodedTimeSelected}")
   end
 
-
-  def validate_profile(conn, request ) do
-    IO.inspect( "Received #{inspect(request)}", label: "Validating Profile")
+  def validate_profile(conn, request) do
+    IO.inspect("Received #{inspect(request)}", label: "Validating Profile")
     json(conn, request)
   end
-
 end

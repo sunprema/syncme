@@ -63,8 +63,8 @@ defmodule SyncMe.Bookings.Booking do
   @doc false
   def onchain_changeset(booking, attrs) do
     booking
-    |> cast(attrs, [:tx_hash, :contract_booking_id])
-    |> validate_required([:tx_hash, :contract_booking_id])
+    |> cast(attrs, [:tx_hash, :contract_booking_id, :guest_email, :guest_name, :status])
+    |> validate_required([:tx_hash, :contract_booking_id, :guest_email, :guest_name, :status])
   end
 
   defp validate_time_order(changeset) do

@@ -100,8 +100,6 @@ defmodule SyncMeWeb.Router do
            BookingEvent,
            :pay_confirm
 
-
-
       live "/booking/success", BookingCompletionLive, :success
       live "/booking/view/:booking_id", BookingView, :show
     end

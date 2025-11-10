@@ -6,7 +6,7 @@ defmodule SyncMeWeb.BookingEvent do
   alias SyncMe.Payments
   alias SyncMe.GoogleCalendar
 
-   alias SyncMe.Blockchain.Contracts.SyncMeEscrow
+  alias SyncMe.Blockchain.Contracts.SyncMeEscrow
 
   require Timex
 
@@ -98,6 +98,7 @@ defmodule SyncMeWeb.BookingEvent do
               "data" => hex_code,
               "price_at_booking" => Decimal.to_integer(booking.price_at_booking)
             }
+
             {:noreply,
              socket
              |> push_event("booking_created", bookEvent_call_data)
@@ -199,50 +200,68 @@ defmodule SyncMeWeb.BookingEvent do
   Handle the transcation receipt from backend, check and get the logs. Find the Booking Id created in the chain and store in the backend.
 
   """
-  def handle_event("booking_txhash_event",
-    %{"tx_hash" => tx_hash,
-     "booking_id" => booking_id }, socket) do
+  def handle_event(
+        "booking_txhash_event",
+        %{
+          "tx_hash" => tx_hash,
+          "booking_id" => booking_id,
+          "email" => guest_email,
+          "name" => %{"firstName" => firstName, "familyName" => familyName}
+        },
+        socket
+      ) do
+    IO.inspect(
+      "The txHash #{tx_hash} , event_type_id #{booking_id}, email #{guest_email}, firstNanme #{firstName}, familyName #{familyName}"
+    )
 
-    IO.puts("The txHash #{tx_hash} , event_type_id #{booking_id}")
     {:ok, %{"status" => status, "logs" => logs}} =
       SyncMe.Blockchain.get_transaction_status_testnet(tx_hash)
-
 
     case status do
       "0x1" ->
         IO.inspect("The transaction is mined", label: "TXHASH_EVENT")
 
-      contract_booking_id =
-      Enum.find_value(logs, fn log ->
+        contract_booking_id =
+          Enum.find_value(logs, fn log ->
             case Ethers.Event.find_and_decode(
                    log,
                    SyncMe.Blockchain.Contracts.SyncMeEscrow.EventFilters
                  ) do
               {:ok, %Ethers.Event{} = booking} ->
                 # The 1st position has the event id returned
-                Enum.at(booking.topics, 1) # This has other details as well. We should get all those
+                # This has other details as well. We should get all those
+                Enum.at(booking.topics, 1)
 
               {:error, :not_found} ->
                 nil
             end
           end)
 
-       case Bookings.get_booking!(socket.assigns.current_scope, booking_id)  do
-            nil ->
-              IO.inspect("No event found!")
-            booking ->
-              Bookings.update_onchain_info(booking, tx_hash, contract_booking_id)
-      end
+        case Bookings.get_booking!(socket.assigns.current_scope, booking_id) do
+          nil ->
+            IO.inspect("No event found!")
+
+          booking ->
+            guest_name = firstName <> " " <> familyName
+
+            Bookings.update_onchain_info(
+              booking,
+              tx_hash,
+              contract_booking_id,
+              guest_email,
+              guest_name
+            )
+        end
 
       _ ->
         IO.inspect("The transaction is **NOT** mined", label: "TXHASH_EVENT")
     end
 
     {
-      :reply, %{"name" => "sundar"}, socket
+      :reply,
+      %{"name" => "sundar"},
+      socket
     }
-
-
   end
 
   @impl true

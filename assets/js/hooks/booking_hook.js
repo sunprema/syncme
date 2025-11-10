@@ -91,9 +91,10 @@ export const BasePaymentHook = (sdkProvider) => ({
                     console.log(logs);
                     window.booking_event_logs = logs;
 
-                    
+                    const email = sendCallsResponse?.capabilities?.dataCallback?.email 
+                    const name = sendCallsResponse?.capabilities?.dataCallback?.name 
                         
-                    this.pushEvent( "booking_txhash_event", {tx_hash: txHash , booking_id }, (reply, ref) =>  {
+                    this.pushEvent( "booking_txhash_event", {tx_hash: txHash , booking_id, email, name }, (reply, ref) =>  {
                         alert(JSON.stringify(reply));
                         window.respy = reply
                     } );

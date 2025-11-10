@@ -287,8 +287,20 @@ defmodule SyncMe.Bookings do
     |> Repo.all()
   end
 
-  def update_onchain_info(%Booking{} = booking, tx_hash, contract_booking_id) do
-    attrs = %{"tx_hash" => tx_hash, "contract_booking_id" => contract_booking_id}
+  def update_onchain_info(
+        %Booking{} = booking,
+        tx_hash,
+        contract_booking_id,
+        guest_email,
+        guest_name
+      ) do
+    attrs = %{
+      "tx_hash" => tx_hash,
+      "contract_booking_id" => contract_booking_id,
+      "guest_email" => guest_email,
+      "guest_name" => guest_name,
+      "status" => "confirmed"
+    }
 
     booking
     |> Booking.onchain_changeset(attrs)
