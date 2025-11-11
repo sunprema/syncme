@@ -52,7 +52,7 @@ defmodule SyncMe.Accounts.User do
       changeset
       |> unsafe_validate_unique(:email, SyncMe.Repo)
       |> unique_constraint(:email)
-      |> validate_email_changed()
+      #|> validate_email_changed()
     else
       changeset
     end

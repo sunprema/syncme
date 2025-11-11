@@ -101,7 +101,6 @@ let BaseSignInHook = {
         const { message, signature } = accounts[0].capabilities.signInWithEthereum;
         window.base_account = accounts
         const isValidSignature = await publicClient.verifyMessage({address, message, signature})
-        alert(`The signature is valid ? - ${isValidSignature}`);
         //this.pushEvent("base-signed-in", { "csrf_token" :csrfToken, address, message, signature });
         submitWalletAuth({ address, message, signature })
       } catch (error) {

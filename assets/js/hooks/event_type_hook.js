@@ -36,12 +36,11 @@ export const EventTypeHook = (sdkProvider) => ({
                     console.log('Transaction receipts:', status.receipts);
                     const txHash = status.receipts[0]?.transactionHash;
                     const logs = status.receipts[0]?.logs;
-                    alert(txHash);
+                    
                     console.log( txHash );
                     console.log(logs);
                     window.event_logs = logs;
                     this.pushEventTo( this.el, "txhash_event", {txHash , event_type_id}, (reply, ref) =>  {
-                        alert(JSON.stringify(reply));
                         window.respy = reply
                     } );
 

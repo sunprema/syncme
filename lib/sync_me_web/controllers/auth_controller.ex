@@ -52,16 +52,18 @@ defmodule SyncMeWeb.AuthController do
                     |> put_flash(:info, "Successfully connected your Google Calendar.")
                     |> redirect(to: "/")
 
-                  {:error, _changeset} ->
+                  {:error, changeset} ->
+                    IO.inspect("#{inspect(changeset)}", label: "GOOGLE TOKENS UPDATE FAILED")
                     conn
-                    |> put_flash(:error, "Could not integrate with your Google Calendar")
+                    |> put_flash(:error, "Could not integrate with your Google Calendar - update tokens failed")
                     |> redirect(to: "/")
                 end
             end
 
-          {:error, _changeset} ->
+          {:error, changeset} ->
+            IO.inspect("#{inspect(changeset)}", label: "GOOGLE USER DATA UPDATE FAILED")
             conn
-            |> put_flash(:error, "Could not integrate with your Google Calendar")
+            |> put_flash(:error, "Could not integrate with your Google Calendar - user data update failed")
             |> redirect(to: "/")
         end
     end

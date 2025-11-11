@@ -86,7 +86,6 @@ export const BasePaymentHook = (sdkProvider) => ({
                     console.log('Transaction receipts:', status.receipts);
                     const txHash = status.receipts[0]?.transactionHash;
                     const logs = status.receipts[0]?.logs;
-                    alert(txHash);
                     console.log( txHash );
                     console.log(logs);
                     window.booking_event_logs = logs;
@@ -95,7 +94,6 @@ export const BasePaymentHook = (sdkProvider) => ({
                     const name = sendCallsResponse?.capabilities?.dataCallback?.name 
                         
                     this.pushEvent( "booking_txhash_event", {tx_hash: txHash , booking_id, email, name }, (reply, ref) =>  {
-                        alert(JSON.stringify(reply));
                         window.respy = reply
                     } );
                      
