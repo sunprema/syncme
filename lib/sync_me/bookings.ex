@@ -302,11 +302,16 @@ defmodule SyncMe.Bookings do
       "status" => "confirmed"
     }
 
-    booking
-    |> Booking.onchain_changeset(attrs)
-    |> Repo.update()
+    case booking |> Booking.onchain_changeset(attrs) |> Repo.update() do
+      {:ok, updated_booking} ->
+        SyncMe.Workers.SendBookingEmails.new(%{booking_id: updated_booking.id}, max_attempts: 2)
+        |> Oban.insert()
 
-    SendBookingEmails.new(%{booking_id: booking.id}, max_attempts: 2) |> Oban.insert()
+        {:ok, "success"}
+
+      {:error, _x} ->
+        {:error, "Failed"}
+    end
   end
 
   defp generate_slots_for_rule(rule, date, duration, bookings) do

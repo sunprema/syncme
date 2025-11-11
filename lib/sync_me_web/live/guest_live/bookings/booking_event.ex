@@ -217,45 +217,54 @@ defmodule SyncMeWeb.BookingEvent do
     {:ok, %{"status" => status, "logs" => logs}} =
       SyncMe.Blockchain.get_transaction_status_testnet(tx_hash)
 
-    case status do
-      "0x1" ->
-        IO.inspect("The transaction is mined", label: "TXHASH_EVENT")
+    socket =
+      case status do
+        "0x1" ->
+          IO.inspect("The transaction is mined", label: "TXHASH_EVENT")
 
-        contract_booking_id =
-          Enum.find_value(logs, fn log ->
-            case Ethers.Event.find_and_decode(
-                   log,
-                   SyncMe.Blockchain.Contracts.SyncMeEscrow.EventFilters
-                 ) do
-              {:ok, %Ethers.Event{} = booking} ->
-                # The 1st position has the event id returned
-                # This has other details as well. We should get all those
-                Enum.at(booking.topics, 1)
+          contract_booking_id =
+            Enum.find_value(logs, fn log ->
+              case Ethers.Event.find_and_decode(
+                     log,
+                     SyncMe.Blockchain.Contracts.SyncMeEscrow.EventFilters
+                   ) do
+                {:ok, %Ethers.Event{} = booking} ->
+                  # The 1st position has the event id returned
+                  # This has other details as well. We should get all those
+                  Enum.at(booking.topics, 1)
 
-              {:error, :not_found} ->
-                nil
-            end
-          end)
+                {:error, :not_found} ->
+                  nil
+              end
+            end)
 
-        case Bookings.get_booking!(socket.assigns.current_scope, booking_id) do
-          nil ->
-            IO.inspect("No event found!")
+          case Bookings.get_booking!(socket.assigns.current_scope, booking_id) do
+            nil ->
+              IO.inspect("No event found!")
+              socket |> put_flash(:error, "Booking not found")
 
-          booking ->
-            guest_name = firstName <> " " <> familyName
+            booking ->
+              guest_name = firstName <> " " <> familyName
 
-            Bookings.update_onchain_info(
-              booking,
-              tx_hash,
-              contract_booking_id,
-              guest_email,
-              guest_name
-            )
-        end
+              case Bookings.update_onchain_info(
+                     booking,
+                     tx_hash,
+                     contract_booking_id,
+                     guest_email,
+                     guest_name
+                   ) do
+                {:ok, "success"} ->
+                  socket |> put_flash(:info, "Booking completed successfully")
 
-      _ ->
-        IO.inspect("The transaction is **NOT** mined", label: "TXHASH_EVENT")
-    end
+                {:error, _} ->
+                  socket |> put_flash(:error, "Booking update chain info failed.")
+              end
+          end
+
+        _x ->
+          IO.inspect("The transaction is **NOT** mined", label: "TXHASH_EVENT")
+          socket |> put_flash(:error, "The transaction is **NOT** mined")
+      end
 
     {
       :reply,

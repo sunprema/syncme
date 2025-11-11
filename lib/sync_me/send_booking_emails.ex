@@ -20,7 +20,11 @@ defmodule SyncMe.Workers.SendBookingEmails do
             label: "Generated google meet link successfully"
           )
 
-          changeset = Booking.changeset(booking, %{video_conference_link: meeting_link})
+          changeset =
+            Booking.video_conference_link_changeset(booking, %{
+              "video_conference_link" => meeting_link
+            })
+
           {:ok, updated_booking} = Repo.update(changeset)
           # Preload associations again on the updated struct
           Repo.preload(updated_booking, [:event_type, :guest_user, partner: :user])
@@ -33,11 +37,12 @@ defmodule SyncMe.Workers.SendBookingEmails do
       end
 
     ics_content = ICS.generate(booking)
-    guest = booking.guest_user
+    guest_email = booking.guest_email
+    guest_name = booking.guest_name
     partner = booking.partner
 
     # Email to Guest
-    BookingMailer.booking_confirmation_email(booking, guest.email, guest.first_name, ics_content)
+    BookingMailer.booking_confirmation_email(booking, guest_email, guest_name, ics_content)
     |> BookingMailer.deliver()
 
     # Email to Partner

@@ -67,6 +67,13 @@ defmodule SyncMe.Bookings.Booking do
     |> validate_required([:tx_hash, :contract_booking_id, :guest_email, :guest_name, :status])
   end
 
+  @doc false
+  def video_conference_link_changeset(booking, attrs) do
+    booking
+    |> cast(attrs, [:video_conference_link])
+    |> validate_required([:video_conference_link])
+  end
+
   defp validate_time_order(changeset) do
     start_time = get_field(changeset, :start_time)
     end_time = get_field(changeset, :end_time)
