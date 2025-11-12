@@ -32,4 +32,12 @@ defmodule SyncMeWeb.BookingView do
          |> assign(booking: booking)}
     end
   end
+
+  @impl true
+  def handle_event("complete_booking", %{"booking_id" => booking_id }, socket) do
+
+    booking = Bookings.get_booking!(socket.assigns.current_scope, booking_id)
+    {:reply, %{"name" => "sundar", "contract_id" => booking.contract_booking_id}, socket}
+  end
+
 end

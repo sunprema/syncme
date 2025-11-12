@@ -12,7 +12,7 @@
   <.table
     id="event_types"
     rows={@streams.bookings}
-    row_click={fn {_id, booking} -> JS.navigate(~p"/partner/booking/view/#{booking.id}") end}
+    row_click={fn {_id, booking} -> JS.patch(~p"/partner/booking/view/#{booking.id}") end}
   >
     <:col :let={{_id, booking}} label="Event">
       <span class="font-extralight">{booking.event_type.name}</span>
