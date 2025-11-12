@@ -254,7 +254,9 @@ defmodule SyncMeWeb.BookingEvent do
                      guest_name
                    ) do
                 {:ok, "success"} ->
-                  socket |> put_flash(:info, "Booking completed successfully")
+                  socket
+                  |> put_flash(:info, "Booking completed successfully")
+                  |> redirect(to: ~p"/user/home")
 
                 {:error, _} ->
                   socket |> put_flash(:error, "Booking update chain info failed.")

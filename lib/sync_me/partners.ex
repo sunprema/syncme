@@ -26,6 +26,8 @@ defmodule SyncMe.Partners do
            %Partner{}
            |> Partner.changeset(Map.put(attrs, "timezone", attrs["timezone"]), scope)
            |> Repo.insert() do
+      partner = Repo.preload(partner, [:user])
+      Repo.update!(SyncMe.Accounts.User.upgrade_partner_changeset(partner.user, true))
       {:ok, partner}
     end
   end

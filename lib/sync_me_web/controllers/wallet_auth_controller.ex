@@ -29,8 +29,14 @@ defmodule SyncMeWeb.WalletAuthController do
       true ->
         case Accounts.create_or_update_wallet_user(%{wallet_address: address}) do
           {:ok, user} ->
+            conn =
+              if userReturnTo != "/" do
+                put_session(conn, :user_return_to, userReturnTo)
+              else
+                conn
+              end
+
             conn
-            |> put_session(:user_return_to, userReturnTo)
             |> put_flash(:info, "Successfully signed in with Base!")
             |> UserAuth.log_in_user(user)
 

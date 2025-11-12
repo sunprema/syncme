@@ -264,11 +264,12 @@ defmodule SyncMeWeb.UserAuth do
 
   @doc "Returns the path to redirect to after log in."
   # the user was already logged in, redirect to settings
-  def signed_in_path(%Plug.Conn{assigns: %{current_scope: %Scope{user: %Accounts.User{}}}}) do
-    ~p"/user/home"
+  def signed_in_path(conn) do
+    case conn.assigns.current_scope && conn.assigns.current_scope.user.is_partner do
+      true -> ~p"/partner/home"
+      _ -> ~p"/partner/home"
+    end
   end
-
-  def signed_in_path(_), do: ~p"/user/home"
 
   @doc """
   Plug for routes that require the user to be authenticated.

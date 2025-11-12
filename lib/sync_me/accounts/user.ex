@@ -13,6 +13,7 @@ defmodule SyncMe.Accounts.User do
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
     field :is_oauth_user, :boolean
+    field :is_partner, :boolean
     field :wallet_address, :string
     field :wallet_type, :string, default: "base"
     has_one :partner, SyncMe.Partners.Partner
@@ -39,6 +40,10 @@ defmodule SyncMe.Accounts.User do
     |> validate_email(opts)
   end
 
+  def upgrade_partner_changeset(user, partner?) do
+    change(user, is_partner: partner?)
+  end
+
   defp validate_email(changeset, opts) do
     changeset =
       changeset
@@ -52,7 +57,8 @@ defmodule SyncMe.Accounts.User do
       changeset
       |> unsafe_validate_unique(:email, SyncMe.Repo)
       |> unique_constraint(:email)
-      #|> validate_email_changed()
+
+      # |> validate_email_changed()
     else
       changeset
     end

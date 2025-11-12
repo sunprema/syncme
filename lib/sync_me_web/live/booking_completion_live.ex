@@ -48,6 +48,7 @@ defmodule SyncMeWeb.BookingCompletionLive do
            socket
            |> assign(:booking, booking)
            |> put_flash(:info, "Your meeting is confirmed!")}
+          |> redirect(to: ~p"/user/home")
 
         {:error, reason} ->
           # This can happen if the slot was taken while user was paying
