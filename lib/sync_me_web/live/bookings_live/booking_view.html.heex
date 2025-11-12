@@ -1,1 +1,7 @@
+
 <h1>{@booking.event_type.name}</h1>
+<h1>{@booking.tx_hash}</h1>
+<h1>{@booking.status}</h1>
+
+<button class="btn btn-primary" 
+data-booking-id={@booking.contract_booking_id} id="complete_booking" phx-hook="BookingHook"> Complete Meeting </button>

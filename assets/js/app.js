@@ -27,8 +27,9 @@ import "cally";
 
 import { createPublicClient, http } from 'viem'
 import { base } from 'viem/chains'
-import { BasePaymentHook } from "./hooks/booking_hook";
+import { BasePaymentHook } from "./hooks/base_payment_hook";
 import { EventTypeHook } from "./hooks/event_type_hook";
+import {BookingHook} from "./hooks/booking_hook";
 
 const publicClient = createPublicClient({ 
   chain: base,   
@@ -66,8 +67,9 @@ const provider = window.createBaseAccountSDK({
 
 let Hooks = {};
 Hooks.CalendarHook = CalendarHook ; 
-Hooks.BasePaymentHook = BasePaymentHook(provider)
-Hooks.EventTypeHook = EventTypeHook(provider)
+Hooks.BasePaymentHook = BasePaymentHook(provider);
+Hooks.EventTypeHook = EventTypeHook(provider);
+Hooks.BookingHook = BookingHook(provider);
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
 // Base Account sign-in hook
