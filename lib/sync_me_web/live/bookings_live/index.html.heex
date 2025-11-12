@@ -14,11 +14,25 @@
     rows={@streams.bookings}
     row_click={fn {_id, booking} -> JS.navigate(~p"/partner/booking/view/#{booking.id}") end}
   >
-    <:col :let={{_id, booking}} label="Event">{booking.event_type.name}</:col>
-    <:col :let={{_id, booking}} label="Guest">{booking.guest_user.email}</:col>
-    <:col :let={{_id, booking}} label="Status">{booking.status}</:col>
-    <:col :let={{_id, booking}} label="Duration">{booking.duration_at_booking}</:col>
-    <:col :let={{_id, booking}} label="Link">{booking.video_conference_link}</:col>
-    <:col :let={{_id, booking}} label="Price">{booking.price_at_booking}</:col>
+    <:col :let={{_id, booking}} label="Event" ><span class="font-extralight">{booking.event_type.name}</span></:col>
+    <:col :let={{_id, booking}} label="Guest"><span class="font-extralight">{booking.guest_user.email}</span></:col>
+    <:col :let={{_id, booking}} label="Status"><span class="font-extralight" >{booking.status}</span></:col>
+    <:col :let={{_id, booking}} label="Duration"><span class="font-extralight">{booking.duration_at_booking}</span></:col>
+    <:col :let={{_id, booking}} label="Link"><span class="font-extralight">{booking.video_conference_link}</span></:col>
+    <:col :let={{_id, booking}} label="Price"><span class="font-extralight">{booking.price_at_booking}</span></:col>
+    <:col :let={{_id, booking}} label="Tx hash" >
+        <.link
+          :if={booking.tx_hash != nil}
+          href={"https://sepolia.basescan.org/tx/#{booking.tx_hash}"}
+          target="_blank"
+          class="font-extralight"
+        >
+          {"#{String.slice(booking.tx_hash, 0..4)}...#{String.slice(booking.tx_hash, -4..-1)}"}
+        </.link>
+      </:col>
+      <:col :let={{_id, booking}} label="onchain booking id">
+        <span class="font-extralight">{booking.contract_booking_id}</span>
+    </:col>
+
   </.table>
 </Layouts.partner_layout>
