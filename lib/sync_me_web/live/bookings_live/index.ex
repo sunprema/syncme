@@ -20,8 +20,6 @@ defmodule SyncMeWeb.BookingsLive.Index do
     |> stream(:bookings, bookings)
   end
 
-
-
   defp apply_action(socket, _, params) do
     apply_action(socket, :upcoming, params)
   end

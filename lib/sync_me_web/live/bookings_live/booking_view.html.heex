@@ -1,7 +1,25 @@
+<Layouts.partner_layout flash={@flash} current_scope={@current_scope} tab="bookings">
+  <.header>
+    Complete Booking
+    <:subtitle>Enter the OTP code and submit to complete the booking</:subtitle>
+    <:actions>
+      <.link patch={~p"/partner/bookings"}>
+        <button class="btn btn-neutral">All Bookings</button>
+      </.link>
+    </:actions>
+  </.header>
 
 <h1>{@booking.event_type.name}</h1>
 <h1>{@booking.tx_hash}</h1>
 <h1>{@booking.status}</h1>
 
-<button class="btn btn-primary" 
-data-booking-id={@booking.id} id="complete_booking" phx-hook="BookingHook"> Complete Meeting </button>
+<button
+  class="btn btn-primary"
+  data-booking-id={@booking.id}
+  id="complete_booking"
+  phx-hook="BookingHook"
+>
+   Complete Meeting 
+</button>
+
+</Layouts.partner_layout>
