@@ -42,6 +42,7 @@ export const EventTypeHook = (sdkProvider) => ({
                     window.event_logs = logs;
                     this.pushEventTo( this.el, "txhash_event", {txHash , event_type_id}, (reply, ref) =>  {
                         window.respy = reply
+                        this.js().patch("/partner/event_types");
                     } );
 
                 } else if (status.status === 100 || status.status === "PENDING") {

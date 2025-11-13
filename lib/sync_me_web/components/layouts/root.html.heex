@@ -39,12 +39,14 @@
       <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4  justify-end">
         <%= if @current_scope do %>
           <li>
+            <a href="https://account.base.app/" target="_blank">
             <span>
               {@current_scope.user.email} /
               <span class="tooltip tooltip-bottom text-xs" data-tip="base chain address">
                 {"#{String.slice(@current_scope.user.wallet_address, 0..4)}...#{String.slice(@current_scope.user.wallet_address, -4..-1)}"}
               </span>
             </span>
+            </a>
           </li>
           <li>
             <.link href={~p"/users/settings"}>Settings</.link>
