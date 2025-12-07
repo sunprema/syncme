@@ -39,3 +39,4 @@ env.sh
 .elixir_ls
 # Rust binary artifacts
 /target/
+.DS_Store
